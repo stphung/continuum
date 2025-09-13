@@ -85,7 +85,15 @@ See `CLAUDE.md` for detailed development guidance.
 
 ## License
 
-MIT License - Feel free to use, modify, and distribute.
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+
+This means you are free to:
+- Run the program for any purpose
+- Study and modify the source code
+- Redistribute copies
+- Distribute modified versions
+
+Under the condition that any distributed versions (modified or not) are also licensed under GPL v3.0.
 
 ## Acknowledgments
 
