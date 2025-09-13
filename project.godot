@@ -12,13 +12,15 @@ config_version=5
 
 config/name="Raiden Clone"
 config/description="A vertical shooter inspired by Raiden"
-run/main_scene="res://Game.tscn"
+run/main_scene="res://scenes/main/Game.tscn"
 config/features=PackedStringArray("4.4")
 config/icon="res://icon.svg"
 
 [autoload]
 
-SoundManager="*res://SynthSoundManager.gd"
+SoundManager="*res://scripts/autoloads/SynthSoundManager.gd"
+EffectManager="*res://scripts/autoloads/VisualEffects.gd"
+EnemyManager="*res://scripts/autoloads/EnemyManager.gd"
 
 [display]
 

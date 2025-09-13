@@ -66,7 +66,7 @@ func _on_shoot_timer_timeout():
 	shoot()
 
 func shoot():
-	var bullet_scene = preload("res://EnemyBullet.tscn") if ResourceLoader.exists("res://EnemyBullet.tscn") else null
+	var bullet_scene = preload("res://scenes/projectiles/EnemyBullet.tscn") if ResourceLoader.exists("res://scenes/projectiles/EnemyBullet.tscn") else null
 	if bullet_scene:
 		var bullet = bullet_scene.instantiate()
 		bullet.position = position + Vector2(0, 20)

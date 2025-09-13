@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dq77ogde6f1co"]
 
-[ext_resource type="Script" path="res://LaserBullet.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/projectiles/LaserBullet.gd" id="1"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1"]
 radius = 4.0

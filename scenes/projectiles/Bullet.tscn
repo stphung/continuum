@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bullet123456"]
 
-[ext_resource type="Script" path="res://Bullet.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/projectiles/Bullet.gd" id="1"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1"]
 radius = 3.0
