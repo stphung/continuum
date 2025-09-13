@@ -85,7 +85,7 @@ See `CLAUDE.md` for detailed development guidance.
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE.md) file for details.
 
 This means you are free to:
 - Run the program for any purpose
