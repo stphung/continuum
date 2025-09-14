@@ -162,10 +162,6 @@ jobs:
           mv templates/* ~/.local/share/godot/export_templates/4.4.1.stable/
           rm -f Godot_v4.4.1-stable_export_templates.tpz
 
-      - name: Create Android Debug Keystore
-        run: |
-          keytool -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 365 -keyalg RSA -keysize 2048
-
       - name: Import project assets
         run: godot --path . --headless --import --quit-after 1 || true
 
