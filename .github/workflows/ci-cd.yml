@@ -127,111 +127,16 @@ jobs:
   export-android:
     name: Android Export
     runs-on: ubuntu-22.04
-    container:
-      image: barichello/godot-ci:4.4.1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           lfs: true
 
-      - name: Setup
-        run: |
-          mkdir -v -p ~/.local/share/godot/export_templates/
-          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
-
-      - name: Install Android Build Template
-        run: |
-          echo "=== Installing Android Build Template ==="
-          export ANDROID_SDK_ROOT=/usr/lib/android-sdk
-          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-
-          TEMPLATE_DIR="${HOME}/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
-          mkdir -p android/build
-
-          if [ -f "$TEMPLATE_DIR/android_source.zip" ]; then
-            echo "Extracting android_source.zip..."
-            cd android/build
-            unzip -q "$TEMPLATE_DIR/android_source.zip"
-            echo "Android build template installed successfully"
-            cd ../..
-          else
-            echo "ERROR: android_source.zip not found"
-          fi
-
-      - name: Setup Android SDK
-        run: |
-          export ANDROID_SDK_ROOT=/usr/lib/android-sdk
-          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-
-          # Create missing keystore directory
-          mkdir -p /usr/lib/android-sdk/.android
-
-          # Generate debug keystore if it doesn't exist
-          if [ ! -f "/usr/lib/android-sdk/.android/debug.keystore" ]; then
-            echo "Creating debug keystore..."
-            keytool -genkeypair \
-              -alias androiddebugkey \
-              -keypass android \
-              -keystore /usr/lib/android-sdk/.android/debug.keystore \
-              -storepass android \
-              -dname "CN=Android Debug,O=Android,C=US" \
-              -keyalg RSA \
-              -keysize 2048 \
-              -validity 10000
-          fi
-
-          # Configure Godot editor settings
-          mkdir -p ~/.config/godot
-          cat > ~/.config/godot/editor_settings-4.4.tres << EOF
-          [gd_resource type="EditorSettings" format=3]
-
-          [resource]
-          export/android/android_sdk_path = "/usr/lib/android-sdk"
-          export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"
-          export/android/debug_keystore = "/usr/lib/android-sdk/.android/debug.keystore"
-          export/android/debug_keystore_user = "androiddebugkey"
-          export/android/debug_keystore_pass = "android"
-          EOF
-
-      - name: Import project assets
-        run: |
-          godot --path . --headless --import --quit-after 1 || true
-
-      - name: Android Build
-        run: |
-          mkdir -v -p build/android
-          export ANDROID_SDK_ROOT=/usr/lib/android-sdk
-          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-
-          echo "=== Build environment verification ==="
-          echo "Android template directory contents:"
-          ls -la android/build/ 2>/dev/null || echo "No template directory"
-
-          echo "=== Android SDK verification ==="
-          echo "ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT"
-          echo "JAVA_HOME: $JAVA_HOME"
-          ls -la "$ANDROID_SDK_ROOT/build-tools/" 2>/dev/null || echo "No build-tools"
-          ls -la "$ANDROID_SDK_ROOT/platforms/" 2>/dev/null || echo "No platforms"
-
-          echo "=== Keystore verification ==="
-          ls -la "/usr/lib/android-sdk/.android/" 2>/dev/null || echo "No keystore directory"
-
-          echo "=== Full export presets configuration ==="
-          cat export_presets.cfg | grep -A 20 -B 2 "Android"
-
-          echo "=== Running Android export with Gradle ==="
-          echo "Available export presets:"
-          godot --headless --export-list 2>/dev/null || echo "Using direct export approach"
-
-          echo "Attempting Android export..."
-          godot --headless --verbose --export-debug "Android" build/android/$EXPORT_NAME.apk
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+      - name: Godot Android Export
+        uses: dulvui/godot-android-export@v4
         with:
-          name: android
-          path: build/android
+          godot-version: 4.4.1
 
   create-release:
     name: Create Release
