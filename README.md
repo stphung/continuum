@@ -4,6 +4,8 @@ An open-source vertical scrolling shmup built with Godot 4.4, featuring dual wea
 
 ![Game Screenshot](https://img.shields.io/badge/Godot-4.4-blue.svg) ![Language](https://img.shields.io/badge/Language-GDScript-orange.svg) ![License](https://img.shields.io/badge/License-GPL%20v3.0-blue.svg) ![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen.svg)
 
+[![CI/CD Pipeline](https://github.com/stphung/continuum/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/stphung/continuum/actions/workflows/ci-cd.yml) [![GitHub Pages](https://img.shields.io/badge/Play%20Online-GitHub%20Pages-success)](https://stphung.github.io/continuum/)
+
 ## 🎮 **Game Features**
 
 ### **Dual Weapon System**
@@ -178,6 +180,30 @@ Continuum combines classic arcade shmup action with modern technical innovation:
 - **Testing**: Comprehensive test coverage with automated quality assurance
 - **Performance**: Optimized for 60 FPS with efficient memory management
 - **Platforms**: Cross-platform compatibility through Godot Engine
+
+## 🔄 **Automated Builds & Deployment**
+
+Continuum features a comprehensive CI/CD pipeline that automatically builds and deploys across multiple platforms:
+
+### **Available Platforms**
+- **🌐 Web Version**: [Play instantly in your browser](https://stphung.github.io/continuum/) (GitHub Pages)
+- **🐧 Linux**: Native executable for Linux distributions
+- **🪟 Windows**: Executable for Windows 10/11
+- **🍎 macOS**: Universal binary for Intel and Apple Silicon Macs
+- **📱 Android**: APK for Android devices (ARM64)
+
+### **Continuous Integration**
+- **Automated Testing**: Every commit triggers comprehensive test suite
+- **Multi-Platform Builds**: Parallel builds for all supported platforms
+- **Quality Gates**: Code must pass all tests and validation checks
+- **Release Automation**: Git tags automatically create GitHub releases with all builds
+
+### **Download Options**
+1. **Latest Release**: Visit [Releases](https://github.com/stphung/continuum/releases) for stable builds
+2. **Play Online**: [stphung.github.io/continuum](https://stphung.github.io/continuum/) for instant browser gameplay
+3. **Development Builds**: Available as artifacts from successful CI runs
+
+See [CI/CD Documentation](.github/CICD.md) for complete pipeline details.
 
 ## 🤝 **Contributing**
 
