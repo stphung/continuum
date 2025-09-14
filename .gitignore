@@ -54,5 +54,5 @@ addons/gdUnit4/
 !addons/gd-plug/
 
 # Android AAR libraries (downloaded in CI)
-android/libs/debug/godot-lib.template_debug.aar
-android/libs/release/godot-lib.template_release.aar
+android/build/libs/debug/godot-lib.template_debug.aar
+android/build/libs/release/godot-lib.template_release.aar
