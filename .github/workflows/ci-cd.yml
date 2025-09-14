@@ -142,24 +142,33 @@ jobs:
 
       - name: Setup Android SDK
         run: |
-          # Set up Android SDK paths for Godot
-          export ANDROID_SDK_ROOT=/usr/lib/android-sdk
-          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+          # Debug available Android tools
+          echo "=== Checking Android SDK paths ==="
+          ls -la /usr/lib/ | grep android || echo "No android in /usr/lib/"
+          find /usr -name "android*" -type d 2>/dev/null | head -10
+          find /opt -name "android*" -type d 2>/dev/null | head -10
 
-          # Create godot settings directory
-          mkdir -p ~/.config/godot
+          echo "=== Checking Java paths ==="
+          ls -la /usr/lib/jvm/ || echo "No JVM found"
+          which java || echo "No java found"
+          java -version 2>&1 || echo "Java version failed"
 
-          # Configure Godot editor settings with Android SDK paths
-          cat > ~/.config/godot/editor_settings-4.4.tres << EOF
-          [gd_resource type="EditorSettings" format=3]
+          echo "=== Available SDKs ==="
+          find / -name "build-tools" -type d 2>/dev/null | head -10
+          find / -name "platforms" -type d 2>/dev/null | head -10
 
-          [resource]
-          export/android/android_sdk_path = "/usr/lib/android-sdk"
-          export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"
-          export/android/debug_keystore = "/usr/lib/android-sdk/.android/debug.keystore"
-          export/android/debug_keystore_user = "androiddebugkey"
-          export/android/debug_keystore_pass = "android"
-          EOF
+          # Try to find actual Android SDK location
+          ANDROID_HOME=$(find /opt /usr -name "android-sdk*" -type d 2>/dev/null | head -1)
+          if [ -z "$ANDROID_HOME" ]; then
+            ANDROID_HOME=$(find /opt /usr -name "*android*" -type d | grep -E "(sdk|Android)" | head -1)
+          fi
+
+          echo "Found Android SDK at: $ANDROID_HOME"
+
+          if [ -n "$ANDROID_HOME" ]; then
+            ls -la "$ANDROID_HOME" || echo "Cannot list Android SDK contents"
+            ls -la "$ANDROID_HOME/build-tools/" 2>/dev/null || echo "No build-tools directory"
+          fi
 
       - name: Import project assets
         run: |
