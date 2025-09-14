@@ -213,12 +213,23 @@ jobs:
       - name: Android Build
         run: |
           mkdir -v -p build/android
-          # Try to get detailed export preset information
-          echo "=== Export Preset Debugging ==="
-          godot --headless --export-pack "Android" build/android/debug.pck || echo "Export pack failed"
+
+          # Temporarily move test files to prevent parsing errors during Android export
+          echo "=== Temporarily moving test files ==="
+          if [ -d "test" ]; then
+            mv test test_backup
+            echo "Test files moved to test_backup"
+          fi
+
           echo "=== Attempting APK Export ==="
           # Export with debug configuration with maximum verbosity
           godot --headless --verbose --export-debug "Android" build/android/$EXPORT_NAME.apk
+
+          # Restore test files after export
+          if [ -d "test_backup" ]; then
+            mv test_backup test
+            echo "Test files restored"
+          fi
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
