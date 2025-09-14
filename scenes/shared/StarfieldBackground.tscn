@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://starfield_bg_123456"]
+
+[ext_resource type="Script" path="res://scripts/shared/StarfieldBackground.gd" id="1"]
+
+[node name="StarfieldBackground" type="Node2D"]
+script = ExtResource("1")
+star_count = 50
+star_speed = 100.0
+min_star_size = 1.0
+max_star_size = 3.0
+min_alpha = 0.3
+max_alpha = 0.8
+screen_width = 800.0
+screen_height = 900.0
+star_color = Color(1, 1, 1, 1)
+animated = true

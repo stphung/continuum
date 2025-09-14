@@ -1,0 +1,111 @@
+{
+	"enabled": false,
+	"input_timeout": 30.0,
+	"attract_cycle_time": 15.0,
+	"demo_session_length": 120.0,
+	"high_score_display_time": 20.0,
+	"difficulty_preset": "intermediate",
+	"auto_transition": true,
+	"deployment_type": "arcade",
+	"attract_screens": [
+		{
+			"type": "logo",
+			"duration": 12.0,
+			"start_demo": false
+		},
+		{
+			"type": "gameplay",
+			"duration": 15.0,
+			"start_demo": false
+		},
+		{
+			"type": "features",
+			"duration": 12.0,
+			"start_demo": false
+		},
+		{
+			"type": "high_scores",
+			"duration": 10.0,
+			"start_demo": false
+		},
+		{
+			"type": "instructions",
+			"duration": 8.0,
+			"start_demo": true
+		}
+	],
+	"ai_configuration": {
+		"reaction_time": 0.15,
+		"prediction_depth": 1.5,
+		"evasion_distance": 80.0,
+		"aggression_factor": 0.7,
+		"bomb_threshold": 0.8,
+		"powerup_priority": 0.9,
+		"weapon_switch_intelligence": 0.85,
+		"movement_smoothness": 0.3,
+		"error_rate": 0.05,
+		"spatial_awareness": 150.0
+	},
+	"audio_settings": {
+		"attract_mode_volume": 0.7,
+		"demo_audio_enabled": true,
+		"ui_sound_effects": true,
+		"background_music_enabled": false
+	},
+	"visual_settings": {
+		"particle_density": 0.5,
+		"animation_speed": 1.0,
+		"screen_saver_timeout": 300.0,
+		"overlay_opacity": 0.9,
+		"transition_duration": 1.0
+	},
+	"deployment_presets": {
+		"arcade": {
+			"input_timeout": 20.0,
+			"demo_session_length": 90.0,
+			"difficulty_preset": "intermediate",
+			"auto_transition": true,
+			"attract_cycle_time": 12.0
+		},
+		"exhibition": {
+			"input_timeout": 45.0,
+			"demo_session_length": 180.0,
+			"difficulty_preset": "expert",
+			"auto_transition": true,
+			"attract_cycle_time": 20.0
+		},
+		"retail": {
+			"input_timeout": 15.0,
+			"demo_session_length": 60.0,
+			"difficulty_preset": "beginner",
+			"auto_transition": true,
+			"attract_cycle_time": 10.0
+		},
+		"demonstration": {
+			"input_timeout": 60.0,
+			"demo_session_length": 300.0,
+			"difficulty_preset": "expert",
+			"auto_transition": false,
+			"attract_cycle_time": 25.0
+		}
+	},
+	"high_score_settings": {
+		"max_scores": 20,
+		"min_valid_score": 100,
+		"score_validation_enabled": true,
+		"auto_save_interval": 30.0,
+		"backup_enabled": true
+	},
+	"security_settings": {
+		"prevent_alt_tab": false,
+		"lock_settings": false,
+		"admin_password_hash": "",
+		"reset_confirmation_required": true
+	},
+	"debug_settings": {
+		"show_ai_debug_info": false,
+		"log_performance_metrics": true,
+		"enable_manual_controls": false,
+		"force_demo_mode": false
+	}
+}

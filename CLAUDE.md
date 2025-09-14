@@ -78,6 +78,185 @@ When multiple independent tasks are required, execute subagents in parallel:
 4. **Testing Phase**: Use `test-automator` agent to ensure functionality preservation
 5. **Performance Phase**: Use `performance-engineer` agent to validate improvements
 
+### **Team Orchestration Framework**
+
+Claude Code should orchestrate subagents like a senior development team lead managing a diverse team of specialists. This requires strategic coordination, resource management, and quality oversight.
+
+#### **Multi-Agent Team Coordination**
+
+**Team Formation Strategy**
+```
+For Complex Features (e.g., New Weapon System):
+├── Lead Agent: `architect-review` (Technical Leadership)
+├── Core Team: `unity-developer` + `performance-engineer` (Implementation)
+├── Quality Assurance: `code-reviewer` + `test-automator` (Validation)
+├── Specialists: `ai-engineer` (Advanced Logic) + `security-auditor` (Safety)
+└── Integration: `architect-review` (Final System Review)
+```
+
+**Resource Allocation Matrix**
+- **High-Priority Parallel Tasks**: Core implementation can run simultaneously with test creation
+- **Sequential Dependencies**: Architecture review must precede implementation, performance optimization follows
+- **Quality Gates**: No feature advances without passing both code review AND comprehensive testing
+- **Bottleneck Management**: Never have more than 4 agents running simultaneously to avoid resource conflicts
+
+#### **Task Dependency Management**
+
+**Critical Path Identification**
+```gdscript
+# Example: Adding Boss Battle System
+Task Dependencies:
+1. architect-review → Validates boss system integration points
+2. [ai-engineer + unity-developer] → Parallel implementation (boss AI + game integration)
+3. [code-reviewer + test-automator] → Parallel quality assurance
+4. performance-engineer → Optimization after core implementation
+5. architect-review → Final integration validation
+```
+
+**Dependency Resolution Protocol**
+- **Blocking Tasks**: Architecture decisions must complete before implementation begins
+- **Parallel Opportunities**: Code review and test generation can run simultaneously
+- **Handoff Requirements**: Each agent must provide clear deliverables for downstream agents
+- **Quality Checkpoints**: Multi-agent validation required at each major milestone
+
+#### **Communication & Knowledge Transfer Protocol**
+
+**Agent-to-Agent Information Flow**
+```
+architect-review findings → Inform all downstream implementation agents
+code-reviewer issues → Feed back to original implementation agent
+test-automator failures → Trigger debugger agent + original implementer
+performance-engineer bottlenecks → Inform architect-review for system redesign
+```
+
+**Knowledge Synthesis Requirements**
+- **Implementation Agents**: Must document design decisions for code-reviewer
+- **Quality Agents**: Must provide actionable feedback, not just criticism
+- **Specialist Agents**: Must explain recommendations in context of overall architecture
+- **Review Agents**: Must validate that previous agent feedback was properly addressed
+
+#### **Multi-Stage Quality Gates**
+
+**Stage 1: Design Validation**
+- `architect-review` agent validates feature fits system architecture
+- Must approve before any implementation begins
+- Provides technical constraints and integration points
+
+**Stage 2: Implementation Quality**
+- `code-reviewer` + domain specialist (e.g., `ai-engineer`) work in parallel
+- Code quality validated simultaneously with domain expertise
+- Both must approve before advancing to testing
+
+**Stage 3: Comprehensive Testing**
+- `test-automator` creates comprehensive test suite
+- `performance-engineer` validates performance impact
+- Both quality and performance tests must pass
+
+**Stage 4: System Integration**
+- `architect-review` validates system-wide impact
+- `security-auditor` reviews for security implications (when applicable)
+- Final approval required for production integration
+
+#### **Conflict Resolution & Decision Making**
+
+**Agent Disagreement Protocol**
+When agents provide conflicting recommendations:
+
+1. **Technical Conflicts**:
+   - `architect-review` agent serves as final arbiter for architectural decisions
+   - `performance-engineer` has veto power on performance-critical decisions
+   - `security-auditor` has veto power on security-related implementations
+
+2. **Quality Conflicts**:
+   - `code-reviewer` and `test-automator` disagreements resolved by `architect-review`
+   - Implementation agents must satisfy both code quality AND test coverage requirements
+   - No compromise on quality standards - both agents must approve
+
+3. **Performance vs. Feature Conflicts**:
+   - `performance-engineer` provides performance budget
+   - Feature implementation must stay within performance constraints
+   - If impossible, `architect-review` must redesign approach
+
+#### **Team Performance Monitoring**
+
+**Agent Effectiveness Metrics**
+- **architect-review**: Measures system cohesion and integration success
+- **code-reviewer**: Tracks code quality improvements and issue identification
+- **test-automator**: Monitors test coverage and bug detection rates
+- **performance-engineer**: Validates performance targets are met
+- **Domain specialists**: Ensure feature requirements are fully implemented
+
+**Continuous Improvement Protocol**
+- After each major feature, conduct retrospective analysis of agent coordination
+- Identify bottlenecks in agent workflow and optimize sequences
+- Adjust parallel vs. sequential execution based on effectiveness
+- Refine quality gates based on issue detection success rates
+
+#### **Escalation & Specialist Deployment**
+
+**When to Deploy Additional Specialists**
+```
+Standard Team Insufficient → Bring in Specialists:
+├── Complex AI/ML Features → Add `ml-engineer` or `data-scientist`
+├── Performance Critical Code → Escalate to `performance-engineer` + `database-optimizer`
+├── Security Sensitive Features → Mandatory `security-auditor` involvement
+├── Legacy Integration → Deploy `legacy-modernizer` + `architect-review`
+└── Production Issues → Immediate `incident-responder` + `debugger` deployment
+```
+
+**Specialist Integration Protocol**
+- Specialists join existing team rather than replacing agents
+- Must coordinate with lead `architect-review` agent
+- Provide domain expertise while respecting overall system architecture
+- Document specialist knowledge for future reference
+
+#### **Advanced Team Patterns**
+
+**Cross-Functional Feature Teams**
+For major features (bosses, weapon systems, difficulty modes):
+```
+Team Composition:
+├── Tech Lead: architect-review (Overall coordination)
+├── Implementation: Domain specialist + performance-engineer
+├── Quality: code-reviewer + test-automator (Parallel validation)
+├── Integration: architect-review (System consistency)
+└── Deployment: security-auditor (Final safety check)
+```
+
+**Rapid Response Teams**
+For critical bugs or urgent fixes:
+```
+Emergency Response:
+├── Incident Commander: debugger (Problem identification)
+├── Solution Team: Appropriate domain specialist
+├── Quality Validation: code-reviewer + test-automator (Accelerated)
+├── Deployment: performance-engineer (Impact validation)
+```
+
+**Innovation Teams**
+For experimental features or research:
+```
+R&D Team:
+├── Research Lead: ai-engineer or data-scientist
+├── Feasibility: architect-review + performance-engineer
+├── Prototype: Domain specialist + code-reviewer
+├── Validation: test-automator + performance-engineer
+```
+
+### **Team Leadership Principles**
+
+**As Team Orchestrator, Claude Code Should:**
+1. **Plan Before Execute**: Always start with `architect-review` for feature planning
+2. **Maximize Parallelism**: Run independent tasks simultaneously when possible
+3. **Enforce Quality Gates**: No exceptions to multi-agent validation requirements
+4. **Manage Dependencies**: Sequence agents based on logical dependencies, not convenience
+5. **Synthesize Findings**: Combine agent insights into coherent implementation strategy
+6. **Monitor Team Health**: Adjust workflows based on agent effectiveness
+7. **Escalate Appropriately**: Bring in specialists when standard team hits limitations
+8. **Document Decisions**: Capture team decisions and rationale for future reference
+
+This orchestration approach transforms Claude Code from a single agent into a sophisticated team coordinator, ensuring comprehensive, high-quality development that leverages specialized expertise while maintaining architectural coherence.
+
 ## Development Commands
 
 ### Running the Game

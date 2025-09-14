@@ -8,49 +8,32 @@ var score = 0
 var lives = 3
 var bombs = 3
 var game_over = false
-var star_speed = 100
-var stars = []
 var current_player = null
 
 func _ready():
 	randomize()
-	create_starfield()
+	setup_starfield_background()
 	spawn_player()
 	update_ui()
 	_setup_enemy_system()
 
-func create_starfield():
-	# Clear existing stars first to avoid duplicates
-	for star in stars:
-		if is_instance_valid(star):
-			star.get_parent().remove_child(star)
-			star.queue_free()
-	stars.clear()
+func setup_starfield_background():
+	"""Initialize the reusable StarfieldBackground component"""
+	var starfield_scene = preload("res://scenes/shared/StarfieldBackground.tscn")
+	if starfield_scene:
+		var starfield = starfield_scene.instantiate()
+		# Insert starfield between background and other elements
+		add_child(starfield)
+		move_child(starfield, 1)  # Position after Background (index 0)
 
-	# Clear any existing stars in the Stars node
-	for child in $Stars.get_children():
-		$Stars.remove_child(child)
-		child.queue_free()
-
-	for i in range(50):
-		var star = ColorRect.new()
-		var size = randf_range(1, 3)
-		star.size = Vector2(size, size)
-		star.position = Vector2(randf_range(0, 800), randf_range(0, 900))
-		star.color = Color(1, 1, 1, randf_range(0.3, 0.8))
-		$Stars.add_child(star)
-		stars.append(star)
+		# Configure for game scene
+		starfield.set_screen_dimensions(800, 900)
+		starfield.star_count = 50
+		starfield.star_speed = 100
 
 func _process(delta):
-	if not game_over:
-		update_starfield(delta)
-
-func update_starfield(delta):
-	for star in stars:
-		star.position.y += star_speed * star.color.a * delta
-		if star.position.y > 900:
-			star.position.y = -10
-			star.position.x = randf_range(0, 800)
+	# Starfield animation is now handled by the StarfieldBackground component
+	pass
 
 func spawn_player():
 	var player_scene = preload("res://scenes/player/Player.tscn") if ResourceLoader.exists("res://scenes/player/Player.tscn") else null
@@ -189,12 +172,63 @@ func game_over_sequence():
 	$UI/GameOverPanel.visible = true
 	$UI/GameOverPanel/FinalScoreLabel.text = "Final Score: " + str(score)
 
+	# Report score to kiosk system if active
+	if has_node("/root/KioskManager") and KioskManager.is_kiosk_active():
+		var metadata = {
+			"survival_time": Time.get_ticks_msec() / 1000.0,
+			"enemies_defeated": EnemyManager.get_enemies_destroyed_count() if EnemyManager.has_method("get_enemies_destroyed_count") else 0,
+			"weapon_level": current_player.weapon_level if current_player and is_instance_valid(current_player) else 1,
+			"weapon_type": current_player.weapon_type if current_player and is_instance_valid(current_player) else "vulcan"
+		}
+		KioskManager.high_score_manager.add_score("PLAYER", score, metadata)
+
 	if current_player and is_instance_valid(current_player):
 		current_player.queue_free()
 		current_player = null
 
 func _on_restart_button_pressed():
 	get_tree().reload_current_scene()
+
+# Kiosk Mode Support Methods
+func pause_game():
+	"""Pause game for kiosk mode transitions"""
+	set_process(false)
+	$EnemySpawnTimer.paused = true
+	$WaveTimer.paused = true
+
+func resume_game():
+	"""Resume game from kiosk mode"""
+	set_process(true)
+	$EnemySpawnTimer.paused = false
+	$WaveTimer.paused = false
+
+func get_current_score() -> int:
+	"""Get current game score (for kiosk system)"""
+	return score
+
+func get_player_weapon_info() -> Dictionary:
+	"""Get player weapon information for AI system"""
+	if current_player and is_instance_valid(current_player):
+		return {
+			"weapon_type": current_player.weapon_type,
+			"weapon_level": current_player.weapon_level,
+			"can_shoot": current_player.can_shoot
+		}
+	return {}
+
+func is_game_active() -> bool:
+	"""Check if game is actively being played"""
+	return not game_over and current_player != null and is_instance_valid(current_player)
+
+func add_bomb():
+	"""Add a bomb to player inventory (for powerup system)"""
+	bombs += 1
+	update_ui()
+
+func add_life():
+	"""Add a life to player (for powerup system)"""
+	lives += 1
+	update_ui()
 
 func update_ui():
 	$UI/HUD/ScoreLabel.text = "Score: " + str(score)

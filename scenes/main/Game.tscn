@@ -10,8 +10,6 @@ offset_right = 800.0
 offset_bottom = 900.0
 color = Color(0.05, 0.05, 0.15, 1)
 
-[node name="Stars" type="Node2D" parent="."]
-
 [node name="Enemies" type="Node2D" parent="."]
 
 [node name="Bullets" type="Node2D" parent="."]

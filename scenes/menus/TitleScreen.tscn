@@ -1,0 +1,131 @@
+[gd_scene load_steps=3 format=3 uid="uid://title_screen_123456"]
+
+[ext_resource type="PackedScene" uid="uid://starfield_bg_123456" path="res://scenes/shared/StarfieldBackground.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/menus/TitleScreen.gd" id="2"]
+
+[node name="TitleScreen" type="Node2D"]
+script = ExtResource("2")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 800.0
+offset_bottom = 900.0
+color = Color(0.05, 0.05, 0.15, 1)
+
+[node name="StarfieldBackground" parent="." instance=ExtResource("1")]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MainContainer" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="TitleContainer" type="VBoxContainer" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -300.0
+offset_right = 200.0
+offset_bottom = -100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameTitle" type="Label" parent="UI/MainContainer/TitleContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "CONTINUUM"
+horizontal_alignment = 1
+
+[node name="GameSubtitle" type="Label" parent="UI/MainContainer/TitleContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Professional Shmup Engine"
+horizontal_alignment = 1
+modulate = Color(0.8, 0.8, 0.8, 1)
+
+[node name="Spacer1" type="Control" parent="UI/MainContainer/TitleContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 50)
+
+[node name="MenuContainer" type="VBoxContainer" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -120.0
+offset_top = -50.0
+offset_right = 120.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StartButton" type="Button" parent="UI/MainContainer/MenuContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(240, 50)
+theme_override_font_sizes/font_size = 24
+text = "START GAME"
+
+[node name="OptionsButton" type="Button" parent="UI/MainContainer/MenuContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(240, 50)
+theme_override_font_sizes/font_size = 24
+text = "OPTIONS"
+
+[node name="CreditsButton" type="Button" parent="UI/MainContainer/MenuContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(240, 50)
+theme_override_font_sizes/font_size = 24
+text = "CREDITS"
+
+[node name="QuitButton" type="Button" parent="UI/MainContainer/MenuContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(240, 50)
+theme_override_font_sizes/font_size = 24
+text = "QUIT"
+
+[node name="VersionLabel" type="Label" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -30.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 16
+text = "Version 1.0.0"
+horizontal_alignment = 2
+modulate = Color(0.6, 0.6, 0.6, 1)
+
+[node name="Instructions" type="RichTextLabel" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -120.0
+offset_right = 480.0
+offset_bottom = -20.0
+grow_vertical = 0
+theme_override_font_sizes/normal_font_size = 14
+bbcode_enabled = true
+text = "[b]Controls:[/b]
+WASD/Arrow Keys - Move
+Space/Z - Shoot
+X - Bomb
+Escape - Pause"
+modulate = Color(0.7, 0.7, 0.7, 1)
+
+[connection signal="pressed" from="UI/MainContainer/MenuContainer/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="UI/MainContainer/MenuContainer/OptionsButton" to="." method="_on_options_button_pressed"]
+[connection signal="pressed" from="UI/MainContainer/MenuContainer/CreditsButton" to="." method="_on_credits_button_pressed"]
+[connection signal="pressed" from="UI/MainContainer/MenuContainer/QuitButton" to="." method="_on_quit_button_pressed"]

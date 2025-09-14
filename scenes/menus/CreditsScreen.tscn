@@ -1,0 +1,202 @@
+[gd_scene load_steps=3 format=3 uid="uid://credits_screen_123456"]
+
+[ext_resource type="PackedScene" uid="uid://starfield_bg_123456" path="res://scenes/shared/StarfieldBackground.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/menus/CreditsScreen.gd" id="2"]
+
+[node name="CreditsScreen" type="Node2D"]
+script = ExtResource("2")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 800.0
+offset_bottom = 900.0
+color = Color(0.05, 0.05, 0.15, 1)
+
+[node name="StarfieldBackground" parent="." instance=ExtResource("1")]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="MainContainer" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -400.0
+offset_right = 350.0
+offset_bottom = 350.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CreditsContent" type="VBoxContainer" parent="UI/MainContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GameTitle" type="Label" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "CONTINUUM"
+horizontal_alignment = 1
+
+[node name="GameSubtitle" type="Label" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Professional Shmup Engine"
+horizontal_alignment = 1
+modulate = Color(0.8, 0.8, 0.8, 1)
+
+[node name="Spacer1" type="Control" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+
+[node name="DevelopmentHeader" type="Label" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Development"
+horizontal_alignment = 1
+modulate = Color(1, 0.7, 0.3, 1)
+
+[node name="Spacer2" type="Control" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
+
+[node name="DeveloperCredits" type="RichTextLabel" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 200)
+theme_override_font_sizes/normal_font_size = 18
+bbcode_enabled = true
+text = "[center][b]Game Design & Programming[/b]
+[i]Professional Game Development Team[/i]
+
+[b]Audio System[/b]
+Zero-dependency procedural audio synthesis
+All sounds generated programmatically
+
+[b]Graphics & Visual Effects[/b]
+Custom particle systems and visual effects
+Optimized for 60 FPS performance
+
+[b]Architecture[/b]
+Modern Godot 4.4 implementation
+Clean code practices and comprehensive testing[/center]"
+
+[node name="Spacer3" type="Control" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 30)
+
+[node name="TechnologyHeader" type="Label" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Technology"
+horizontal_alignment = 1
+modulate = Color(0.3, 0.7, 1, 1)
+
+[node name="Spacer4" type="Control" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
+
+[node name="TechnologyCredits" type="RichTextLabel" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 300)
+theme_override_font_sizes/normal_font_size = 18
+bbcode_enabled = true
+text = "[center][b]Built with Godot Engine 4.4[/b]
+[i]Open-source game development platform[/i]
+
+[b]Key Features:[/b]
+• Professional-grade scene management
+• Advanced audio synthesis engine
+• Modular component architecture
+• Comprehensive testing framework
+• Cross-platform deployment ready
+
+[b]Development Tools:[/b]
+• gdUnit4 - Professional testing framework
+• gd-plug - Dependency management
+• Pre-commit hooks for quality assurance
+• Automated CI/CD pipeline integration
+
+[b]Performance Optimizations:[/b]
+• 60 FPS target maintained
+• Memory-efficient resource management
+• Object pooling for particles and projectiles
+• Platform-specific optimization strategies[/center]"
+
+[node name="Spacer5" type="Control" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 30)
+
+[node name="InnovationHeader" type="Label" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Innovation Highlights"
+horizontal_alignment = 1
+modulate = Color(0.7, 1, 0.3, 1)
+
+[node name="Spacer6" type="Control" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
+
+[node name="InnovationCredits" type="RichTextLabel" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 250)
+theme_override_font_sizes/normal_font_size = 18
+bbcode_enabled = true
+text = "[center][b]Zero-Dependency Audio System[/b]
+All game audio generated programmatically
+No external audio files required
+
+[b]Professional Architecture[/b]
+SOLID principles implementation
+Testable component design
+Signal-based loose coupling
+
+[b]Advanced Visual Effects[/b]
+Multi-layered particle systems
+Performance-optimized rendering
+Configurable effect parameters
+
+[b]Comprehensive Quality Assurance[/b]
+80%+ automated test coverage
+Pre-commit quality gates
+Professional documentation standards[/center]"
+
+[node name="Spacer7" type="Control" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+
+[node name="ThankYou" type="Label" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Thank you for playing!"
+horizontal_alignment = 1
+modulate = Color(1, 1, 0.5, 1)
+
+[node name="Spacer8" type="Control" parent="UI/MainContainer/ScrollContainer/CreditsContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 60)
+
+[node name="BackButton" type="Button" parent="UI/MainContainer"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -60.0
+offset_top = -60.0
+offset_right = 60.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 20
+text = "BACK"
+
+[connection signal="pressed" from="UI/MainContainer/BackButton" to="." method="_on_back_button_pressed"]

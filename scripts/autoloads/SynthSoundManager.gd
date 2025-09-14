@@ -4,8 +4,9 @@ var audio_players = {}
 var sample_rate = 44100.0
 
 func _ready():
-	# Create audio players for different sound types
-	var sound_types = ["shoot", "laser", "enemy_hit", "enemy_destroy", "player_hit", "powerup", "bomb", "wave_start"]
+	# Create audio players for different sound types (including menu sounds)
+	var sound_types = ["shoot", "laser", "enemy_hit", "enemy_destroy", "player_hit", "powerup", "bomb", "wave_start",
+					  "menu_navigate", "menu_hover", "menu_select", "menu_back", "menu_music"]
 	for sound_type in sound_types:
 		var player = AudioStreamPlayer.new()
 		player.name = sound_type
@@ -45,6 +46,16 @@ func generate_sound(sound_type: String) -> AudioStreamWAV:
 			return create_big_explosion(0.5)
 		"wave_start":
 			return create_fanfare(0.5)
+		"menu_navigate":
+			return create_menu_navigate_sound()
+		"menu_hover":
+			return create_menu_hover_sound()
+		"menu_select":
+			return create_menu_select_sound()
+		"menu_back":
+			return create_menu_back_sound()
+		"menu_music":
+			return create_menu_music_loop()
 		_:
 			return create_beep(0.1, 440)
 
@@ -352,3 +363,236 @@ func stop_sound(sound_name: String):
 func stop_all_sounds():
 	for player in audio_players.values():
 		player.stop()
+
+# Menu Audio Generation Functions - Professional Title Screen System
+
+func preload_menu_sounds():
+	"""Pre-generate essential menu sounds for immediate availability"""
+	# This helps avoid audio delays during menu navigation
+	var menu_sounds = ["menu_navigate", "menu_hover", "menu_select", "menu_back"]
+	for sound in menu_sounds:
+		var stream = generate_sound(sound)
+		if audio_players.has(sound):
+			audio_players[sound].stream = stream
+
+func create_menu_navigate_sound() -> AudioStreamWAV:
+	"""Generate subtle navigation sound for menu movement"""
+	var stream = AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = int(sample_rate)
+	stream.stereo = false
+
+	var duration = 0.08
+	var num_samples = int(duration * sample_rate)
+	var audio_data = PackedByteArray()
+
+	for i in range(num_samples):
+		var t = float(i) / sample_rate
+		var progress = float(i) / num_samples
+
+		# Two-tone blip: C5 to E5
+		var freq1 = 523.25  # C5
+		var freq2 = 659.25  # E5
+		var freq = lerp(freq1, freq2, progress)
+
+		# Clean sine wave with soft attack/release
+		var sample = sin(2.0 * PI * freq * t) * 0.3
+
+		# Envelope with quick attack and smooth release
+		var envelope = 1.0
+		if progress < 0.1:
+			envelope = progress * 10
+		elif progress > 0.6:
+			envelope = 1.0 - (progress - 0.6) * 2.5
+
+		sample *= envelope
+
+		var int_sample = int(clamp(sample * 32767, -32768, 32767))
+		audio_data.append(int_sample & 0xFF)
+		audio_data.append((int_sample >> 8) & 0xFF)
+
+	stream.data = audio_data
+	return stream
+
+func create_menu_hover_sound() -> AudioStreamWAV:
+	"""Generate soft hover feedback sound"""
+	var stream = AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = int(sample_rate)
+	stream.stereo = false
+
+	var duration = 0.05
+	var num_samples = int(duration * sample_rate)
+	var audio_data = PackedByteArray()
+
+	for i in range(num_samples):
+		var t = float(i) / sample_rate
+		var progress = float(i) / num_samples
+
+		# Single pure tone - G5
+		var freq = 783.99  # G5
+
+		# Very soft sine wave
+		var sample = sin(2.0 * PI * freq * t) * 0.15
+
+		# Bell-like envelope
+		var envelope = 1.0 - progress
+		if progress < 0.05:
+			envelope = progress * 20
+
+		sample *= envelope
+
+		var int_sample = int(clamp(sample * 32767, -32768, 32767))
+		audio_data.append(int_sample & 0xFF)
+		audio_data.append((int_sample >> 8) & 0xFF)
+
+	stream.data = audio_data
+	return stream
+
+func create_menu_select_sound() -> AudioStreamWAV:
+	"""Generate confirmation sound for menu selection"""
+	var stream = AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = int(sample_rate)
+	stream.stereo = false
+
+	var duration = 0.15
+	var num_samples = int(duration * sample_rate)
+	var audio_data = PackedByteArray()
+
+	for i in range(num_samples):
+		var t = float(i) / sample_rate
+		var progress = float(i) / num_samples
+
+		# Rising chord: G4 -> C5 -> E5
+		var base_freq = 392.00  # G4
+		var chord_progress = progress * 2.0
+		var freq = base_freq
+
+		if chord_progress < 1.0:
+			freq = lerp(392.00, 523.25, chord_progress)  # G4 to C5
+		else:
+			freq = lerp(523.25, 659.25, chord_progress - 1.0)  # C5 to E5
+
+		# Rich harmonic content for satisfying sound
+		var sample = sin(2.0 * PI * freq * t) * 0.4
+		sample += sin(2.0 * PI * freq * 2 * t) * 0.15  # Octave
+		sample += sin(2.0 * PI * freq * 1.5 * t) * 0.1  # Fifth
+
+		# Professional envelope with sustain
+		var envelope = 1.0
+		if progress < 0.02:
+			envelope = progress * 50  # Quick attack
+		elif progress > 0.7:
+			envelope = 1.0 - (progress - 0.7) * 3.33  # Gradual release
+
+		sample *= envelope
+
+		var int_sample = int(clamp(sample * 32767, -32768, 32767))
+		audio_data.append(int_sample & 0xFF)
+		audio_data.append((int_sample >> 8) & 0xFF)
+
+	stream.data = audio_data
+	return stream
+
+func create_menu_back_sound() -> AudioStreamWAV:
+	"""Generate back/cancel sound for menu navigation"""
+	var stream = AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = int(sample_rate)
+	stream.stereo = false
+
+	var duration = 0.12
+	var num_samples = int(duration * sample_rate)
+	var audio_data = PackedByteArray()
+
+	for i in range(num_samples):
+		var t = float(i) / sample_rate
+		var progress = float(i) / num_samples
+
+		# Descending tone: E5 to C5
+		var freq = lerp(659.25, 523.25, progress)  # E5 to C5
+
+		# Softer tone with slight modulation
+		var sample = sin(2.0 * PI * freq * t) * 0.25
+		sample += sin(2.0 * PI * freq * 0.995 * t) * 0.15  # Slight detune for warmth
+
+		# Smooth envelope
+		var envelope = 1.0 - progress
+		if progress < 0.05:
+			envelope = progress * 20
+
+		sample *= envelope
+
+		var int_sample = int(clamp(sample * 32767, -32768, 32767))
+		audio_data.append(int_sample & 0xFF)
+		audio_data.append((int_sample >> 8) & 0xFF)
+
+	stream.data = audio_data
+	return stream
+
+func create_menu_music_loop() -> AudioStreamWAV:
+	"""Generate ambient menu background music loop"""
+	var stream = AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = int(sample_rate)
+	stream.stereo = false
+
+	var duration = 8.0  # 8-second loop
+	var num_samples = int(duration * sample_rate)
+	var audio_data = PackedByteArray()
+
+	# Chord progression: Am - F - C - G (in simplified form)
+	var chord_notes = [
+		[220.00, 261.63, 329.63],  # A minor (A3, C4, E4)
+		[174.61, 220.00, 261.63],  # F major (F3, A3, C4)
+		[130.81, 164.81, 196.00],  # C major (C3, E3, G3)
+		[123.47, 155.56, 196.00]   # G major (B2, D3, G3)
+	]
+
+	for i in range(num_samples):
+		var t = float(i) / sample_rate
+		var progress = float(i) / num_samples
+
+		# Determine which chord (2 seconds each)
+		var chord_index = int(progress * 4) % 4
+		var chord = chord_notes[chord_index]
+		var chord_progress = fmod(progress * 4, 1.0)
+
+		# Generate chord tones with slow attack/release
+		var sample = 0.0
+		for note_freq in chord:
+			var note_sample = sin(2.0 * PI * note_freq * t) * 0.08
+			# Add slight detuning and phase for richness
+			note_sample += sin(2.0 * PI * note_freq * 1.002 * t) * 0.05
+			sample += note_sample
+
+		# Add pad-like texture with higher harmonics
+		var bass_freq = chord[0]
+		sample += sin(2.0 * PI * bass_freq * 0.5 * t) * 0.04  # Sub-bass
+
+		# Smooth chord transitions
+		var chord_envelope = 1.0
+		if chord_progress < 0.1:
+			chord_envelope = chord_progress * 10  # Fade in
+		elif chord_progress > 0.9:
+			chord_envelope = 1.0 - (chord_progress - 0.9) * 10  # Fade out
+
+		# Overall gentle envelope for seamless looping
+		var loop_envelope = 0.8  # Keep it subtle
+		if progress < 0.01:
+			loop_envelope = progress * 80
+		elif progress > 0.99:
+			loop_envelope = 1.0 - (progress - 0.99) * 80
+
+		sample *= chord_envelope * loop_envelope
+
+		var int_sample = int(clamp(sample * 32767, -32768, 32767))
+		audio_data.append(int_sample & 0xFF)
+		audio_data.append((int_sample >> 8) & 0xFF)
+
+	stream.data = audio_data
+	stream.loop_mode = AudioStreamWAV.LOOP_FORWARD  # Enable looping
+	stream.loop_begin = 0
+	stream.loop_end = num_samples
+	return stream
