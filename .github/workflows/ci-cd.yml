@@ -154,7 +154,7 @@ jobs:
           # Create Godot editor settings directory
           mkdir -p ~/.config/godot
 
-          # Configure Godot editor settings for Android (no keystore needed for unsigned builds)
+          # Configure Godot editor settings for Android
           cat > ~/.config/godot/editor_settings-4.4.tres << 'EOF'
           [gd_resource type="EditorSettings" load_steps=1 format=3]
           [resource]
@@ -165,6 +165,16 @@ jobs:
           export/android/shutdown_adb_on_exit = true
           export/android/android_build_tools_ver = "33.0.2"
           EOF
+
+      - name: Setup Release Keystore (if available)
+        run: |
+          if [ -n "${{ secrets.SECRET_RELEASE_KEYSTORE_BASE64 }}" ]; then
+            echo "Setting up release keystore..."
+            echo ${{ secrets.SECRET_RELEASE_KEYSTORE_BASE64 }} | base64 --decode > /tmp/release.keystore
+            ls -la /tmp/release.keystore
+          else
+            echo "No release keystore configured, using debug build"
+          fi
 
       - name: Temporarily Hide Test Files
         run: |
@@ -205,20 +215,40 @@ jobs:
         run: |
           mkdir -v -p build/android
 
+          # Configure keystore settings if available (following official Godot CI pattern)
+          if [ -n "${{ secrets.SECRET_RELEASE_KEYSTORE_BASE64 }}" ]; then
+            echo "=== Configuring Release Build with Keystore ==="
+            # Update export preset with keystore settings
+            sed 's@keystore/release=".*"@keystore/release="/tmp/release.keystore"@g' -i export_presets.cfg
+            sed 's@keystore/release_user=".*"@keystore/release_user="${{ secrets.SECRET_RELEASE_KEYSTORE_USER }}"@g' -i export_presets.cfg
+            sed 's@keystore/release_password=".*"@keystore/release_password="${{ secrets.SECRET_RELEASE_KEYSTORE_PASSWORD }}"@g' -i export_presets.cfg
+            sed 's@package/signed=false@package/signed=true@g' -i export_presets.cfg
+
+            EXPORT_TYPE="release"
+            EXPORT_PRESET="Android"
+            OUTPUT_FILE="build/android/$EXPORT_NAME.apk"
+          else
+            echo "=== Using Debug Build (no keystore) ==="
+            EXPORT_TYPE="debug"
+            EXPORT_PRESET="Android Debug"
+            OUTPUT_FILE="build/android/$EXPORT_NAME-debug.apk"
+          fi
+
           echo "=== Debug Android Export Configuration ==="
-          # List all export presets
-          echo "Available export presets:"
-          godot --headless --quit-after 1 --export-list || echo "Failed to list export presets"
+          echo "Export type: $EXPORT_TYPE"
+          echo "Export preset: $EXPORT_PRESET"
+          echo "Output file: $OUTPUT_FILE"
 
           echo "Export preset configuration:"
           cat export_presets.cfg | grep -A 50 "preset.3"
 
-          # Check export configuration before attempting export
-          godot --headless --script-verbose --export-debug "Android Debug" --quit-after 1 || echo "Export check failed"
-
           echo "=== Attempting APK Export ==="
-          # Export with debug configuration with maximum verbosity (following official Godot CI pattern)
-          godot --headless --verbose --export-debug "Android Debug" build/android/$EXPORT_NAME-debug.apk
+          # Export with appropriate configuration
+          if [ "$EXPORT_TYPE" = "release" ]; then
+            godot --headless --verbose --export-release "$EXPORT_PRESET" "$OUTPUT_FILE"
+          else
+            godot --headless --verbose --export-debug "$EXPORT_PRESET" "$OUTPUT_FILE"
+          fi
 
       - name: Restore Test Files
         if: always()
