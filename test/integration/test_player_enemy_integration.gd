@@ -39,6 +39,9 @@ func test_player_bullet_enemy_collision():
 	# Simulate collision
 	bullet._on_area_entered(enemy)
 
+	# Wait for deferred queue_free to take effect
+	await get_tree().process_frame
+
 	assert_that(enemy.health).is_equal(initial_enemy_health - 1)
 	assert_that(bullet.is_queued_for_deletion()).is_true()
 
@@ -83,6 +86,9 @@ func test_laser_bullet_exhaustion():
 	# Hit enemy twice
 	laser._on_area_entered(test_enemy)
 	laser._on_area_entered(test_enemy)
+
+	# Wait for deferred queue_free to take effect
+	await get_tree().process_frame
 
 	# Laser should be destroyed after reaching pierce count
 	assert_that(laser.is_queued_for_deletion()).is_true()
