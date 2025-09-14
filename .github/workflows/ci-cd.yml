@@ -157,12 +157,50 @@ jobs:
         run: |
           godot --path . --headless --import --quit-after 1 || true
 
+      - name: Configure Android Build Environment
+        run: |
+          # Create debug keystore for CI builds
+          keytool -genkey -v -keystore /tmp/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Debug,O=Debug,C=US"
+
+          # Set up Godot editor settings for Android
+          mkdir -p ~/.config/godot
+          cat > ~/.config/godot/editor_settings-4.4.tres << 'EOF'
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+
+          export/android/android_sdk_path = "/usr/lib/android-sdk"
+          export/android/debug_keystore = "/tmp/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          export/android/force_system_user = false
+          export/android/timestamping_authority_url = ""
+          export/android/shutdown_adb_on_exit = true
+          export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"
+          EOF
+
+      - name: Verify Android Environment
+        run: |
+          echo "=== Java SDK Information ==="
+          echo "JAVA_HOME: $JAVA_HOME"
+          which java
+          java -version
+
+          echo "=== Android SDK Information ==="
+          echo "ANDROID_HOME: $ANDROID_HOME"
+          ls -la $ANDROID_HOME/ || echo "ANDROID_HOME directory not found"
+          ls -la $ANDROID_HOME/build-tools/ || echo "build-tools directory not found"
+
+          echo "=== Available Build Tools Versions ==="
+          find $ANDROID_HOME -name "build-tools" -type d -exec ls -la {} \; || echo "No build-tools found"
+
+          echo "=== Keystore Information ==="
+          ls -la /tmp/debug.keystore
+
       - name: Android Build
         run: |
           mkdir -v -p build/android
-          # Set debug keystore path for the container
-          export ANDROID_DEBUG_KEYSTORE="/github/workspace/debug.keystore"
-          # Try export with additional debug info
+          # Export with debug configuration
           godot --headless --verbose --export-debug "Android" build/android/$EXPORT_NAME.apk
 
       - name: Upload Artifact
