@@ -162,6 +162,9 @@ jobs:
       - name: Android Build
         run: |
           mkdir -v -p build/android
+          # Set debug keystore path for the container
+          export ANDROID_DEBUG_KEYSTORE="/github/workspace/debug.keystore"
+          # Try export with additional debug info
           godot --headless --verbose --export-debug "Android" build/android/$EXPORT_NAME.apk
 
       - name: Upload Artifact
