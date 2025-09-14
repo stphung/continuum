@@ -166,6 +166,10 @@ jobs:
           # Extract android_source.zip from export templates
           echo "=== Installing Android Build Template ==="
 
+          # Set Android SDK environment variables
+          export ANDROID_SDK_ROOT=/usr/lib/android-sdk
+          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+
           # Find the export templates directory (moved to home directory in Setup step)
           TEMPLATE_DIR="${HOME}/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
           echo "Template directory: $TEMPLATE_DIR"
