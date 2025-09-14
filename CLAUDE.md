@@ -1,22 +1,22 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides comprehensive guidance to Claude Code (claude.ai/code) when working with the Continuum shmup engine codebase.
 
 ## Project Overview
 
-This is a Godot 4.4 vertical shooter game inspired by Raiden. It's a 2D arcade-style shoot-em-up with programmatically generated sound effects, organized following Godot industry best practices.
+Continuum is a professional-grade vertical scrolling shmup built in Godot 4.4, demonstrating modern game development architecture and innovative technical solutions. The project emphasizes clean code practices, comprehensive testing, and zero-dependency audio generation.
 
 ## Development Commands
 
 ### Running the Game
 ```bash
-# Run the game directly
+# Launch game directly
 /Applications/Godot.app/Contents/MacOS/Godot --path .
 
-# Run in editor mode
+# Open in Godot Editor for development
 /Applications/Godot.app/Contents/MacOS/Godot --path . --editor
 
-# Run with specific renderer
+# Launch with specific rendering backend
 /Applications/Godot.app/Contents/MacOS/Godot --path . --rendering-driver metal
 ```
 
@@ -25,218 +25,274 @@ This is a Godot 4.4 vertical shooter game inspired by Raiden. It's a 2D arcade-s
 # Install all project dependencies
 ./plug.gd install
 
-# Update dependencies to latest versions
+# Update dependencies to latest compatible versions
 ./plug.gd update
 
-# Clean install (remove and reinstall all)
+# Clean installation (remove and reinstall all dependencies)
 ./plug.gd clean && ./plug.gd install
+
+# Add new dependency
+# Edit plug.gd and add: plug("AuthorName/AddonName", {"tag": "v1.0.0"})
 ```
 
-### Testing with gdUnit4
+### Professional Testing Framework (gdUnit4)
 ```bash
-# Run complete test suite
+# Execute complete test suite with detailed reports
 ./run_tests.sh
 
-# Run tests with detailed output
+# Run tests with specific configuration
 /Applications/Godot.app/Contents/MacOS/Godot --path . --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add test --continue --ignoreHeadlessMode
 
-# Generate test reports only
-./run_tests.sh  # Reports in reports/ folder
+# Run specific test suites
+/Applications/Godot.app/Contents/MacOS/Godot --path . --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add test/unit/test_audio_synthesis.gd
+
+# Generate comprehensive HTML reports
+# Reports automatically generated in reports/ directory after test execution
 ```
 
 ### Pre-commit Quality Gates
 ```bash
-# Install pre-commit hooks (for contributors)
+# Install pre-commit hooks for automated quality assurance
 pip install pre-commit
 pre-commit install
 
-# Run pre-commit checks manually
+# Execute quality checks manually
 pre-commit run --all-files
 
-# Skip hooks for emergency commits
+# Skip hooks for emergency commits (use sparingly)
 git commit --no-verify -m "Emergency fix"
+
+# Update hook versions
+pre-commit autoupdate
 ```
 
-### Project Validation
+### Project Validation & Debugging
 ```bash
-# Check for script errors without running
+# Validate project integrity without running
 /Applications/Godot.app/Contents/MacOS/Godot --path . --headless --quit-after 1
 
 # Export for distribution (requires export templates)
-/Applications/Godot.app/Contents/MacOS/Godot --path . --export-release "macOS" game.app
+/Applications/Godot.app/Contents/MacOS/Godot --path . --export-release "macOS" continuum.app
+
+# Profile performance (development builds)
+/Applications/Godot.app/Contents/MacOS/Godot --path . --debug-stringnames --verbose
 ```
 
-## Project Structure (Professional Organization)
+## Professional Architecture
 
+### Core Systems (Autoloaded Singletons)
+
+**SynthSoundManager.gd** - Advanced Audio Synthesis Engine
+- Programmatically generates all game audio without external files
+- Supports multiple waveform types: sine, square, sawtooth, brown noise
+- Dynamic frequency sweeps and pitch bending for realistic effects
+- Optimized 16-bit PCM generation with configurable sample rates
+- Memory-efficient streaming with automatic cleanup
+
+**VisualEffects.gd** - Particle System Manager
+- Configurable explosion effects for different contexts (enemy, bomb, player)
+- Multi-layered particle systems with core and outer effects
+- Performance-optimized with automatic lifecycle management
+- Extensible system for adding new visual effect types
+
+**EnemyManager.gd** - Wave Progression System
+- Mathematical difficulty scaling with configurable parameters
+- Multiple spawn formation patterns (line, V-shape, random burst)
+- Enemy health/speed/points progression algorithms
+- Wave state management with reset capabilities
+
+### Game Component Architecture
+
+**Player System (scripts/player/Player.gd)**
+- Dual weapon system: Vulcan (spread) and Laser (piercing)
+- 5-level weapon progression with escalating effects
+- Invulnerability system with visual feedback
+- Signal-based communication with game systems
+- Boundary constraint enforcement with smooth movement
+
+**Enemy System (scripts/enemies/Enemy.gd)**
+- Configurable movement patterns: straight, zigzag, dive-bomb
+- Health scaling based on wave progression
+- Damage feedback and destruction effects
+- Point value calculation with wave multipliers
+
+**Projectile System (scripts/projectiles/)**
+- Bullet.gd: Standard projectiles with basic damage
+- LaserBullet.gd: Piercing projectiles with multi-target damage
+- EnemyBullet.gd: Opponent projectiles with player detection
+- Efficient collision detection using Godot groups
+
+### Scene Structure and Organization
 ```
-/
-├── scenes/
-│   ├── main/                    # Main game scenes
-│   │   ├── Game.tscn           # Primary game scene
-│   │   └── Main.tscn           # Entry point scene
-│   ├── player/
-│   │   └── Player.tscn         # Player ship and controls
-│   ├── enemies/
-│   │   └── Enemy.tscn          # Enemy ships with AI
-│   ├── projectiles/
-│   │   ├── Bullet.tscn         # Vulcan weapon bullets
-│   │   ├── LaserBullet.tscn    # Laser weapon beams
-│   │   └── EnemyBullet.tscn    # Enemy projectiles
-│   └── pickups/
-│       └── PowerUp.tscn        # Collectible power-ups
-├── scripts/
-│   ├── autoloads/              # Singleton systems
-│   │   ├── VisualEffects.gd    # Centralized particle effects
-│   │   ├── EnemyManager.gd     # Enemy spawning & waves
-│   │   └── SynthSoundManager.gd # Audio synthesis
-│   ├── main/
-│   │   └── Game.gd             # Main game controller
-│   ├── player/
-│   │   └── Player.gd           # Player mechanics
-│   ├── enemies/
-│   │   └── Enemy.gd            # Enemy AI and behavior
-│   ├── projectiles/
-│   │   ├── Bullet.gd, LaserBullet.gd, EnemyBullet.gd
-│   └── pickups/
-│       └── PowerUp.gd          # Power-up logic with floating animations
-├── test/                       # Professional testing framework
-│   ├── unit/                   # Component-level tests
-│   │   └── test_example.gd     # Example test suite (working)
-│   ├── integration/            # System interaction tests
-│   ├── scene/                  # End-to-end gameplay tests
-│   ├── helpers/                # Test utilities and mocks
-│   └── broken/                 # Template tests (need gdUnit4 API fixes)
-├── addons/
-│   ├── gd-plug/                # Package manager (committed)
-│   └── gdUnit4/                # Testing framework (managed by gd-plug)
-├── plug.gd                     # Package configuration (version controlled)
-├── run_tests.sh                # Test runner script
-├── .pre-commit-config.yaml     # Pre-commit quality gates
-└── assets/                     # Ready for future assets
-    ├── sprites/, sounds/, fonts/
+scenes/
+├── main/
+│   ├── Game.tscn          # Primary game scene with all systems
+│   └── Main.tscn          # Entry point scene
+├── player/
+│   └── Player.tscn        # Player ship with collision and visuals
+├── enemies/
+│   └── Enemy.tscn         # Configurable enemy template
+├── projectiles/
+│   ├── Bullet.tscn        # Standard player projectile
+│   ├── LaserBullet.tscn   # Piercing laser projectile
+│   └── EnemyBullet.tscn   # Enemy projectile
+└── pickups/
+    └── PowerUp.tscn       # Animated power-up with physics
 ```
 
-## Refactored Architecture
+### Professional Testing Architecture
 
-### Core Systems
+**Test Structure**
+```
+test/
+├── unit/                  # Component-level testing
+│   ├── test_audio_synthesis.gd      # Audio generation verification
+│   ├── test_weapon_systems.gd       # Weapon mechanics validation
+│   ├── test_enemy_spawning.gd       # Enemy management testing
+│   ├── test_powerup_collection.gd   # Power-up system testing
+│   └── test_player_movement.gd      # Player control validation
+├── integration/           # System interaction testing
+├── scene/                 # End-to-end gameplay testing
+└── helpers/              # Testing utilities and mock objects
+```
 
-**Game.gd (Main Game Controller) - `scripts/main/Game.gd`**
-- Manages game state (score, lives, bombs) - **Reduced from 391 to 198 lines**
-- Orchestrates system communication via signals
-- Controls UI updates and game over sequences
-- Creates and updates scrolling starfield background
-- Delegates enemy management to EnemyManager autoload
+**Testing Best Practices**
+- Use `auto_free()` for automatic memory management in tests
+- Implement `before_test()` and `after_test()` for setup/cleanup
+- Utilize `await` for asynchronous operations and signal testing
+- Create mock objects for isolated component testing
+- Verify both positive and negative test cases
 
-**VisualEffects System - `scripts/autoloads/VisualEffects.gd`**
-- **NEW**: Centralized particle effects management
-- Template-based explosion creation (enemy, player, bomb types)
-- Standardized particle cleanup and lifecycle management
-- Eliminates code duplication across explosion effects
-- Usage: `EffectManager.create_explosion("enemy_destroy", position, parent_node)`
+## Development Patterns
 
-**EnemyManager System - `scripts/autoloads/EnemyManager.gd`**
-- **NEW**: Dedicated enemy spawning and wave management
-- Handles three formation patterns: line, V-formation, random burst
-- Progressive difficulty scaling (health, speed, points)
-- Automatic game state reset on restart
-- Wave progression with proper announcements
+### Adding New Game Features
 
-**Player System - `scripts/player/Player.gd`**
-- Enhanced movement, shooting, power-up collection, invulnerability
-- Two weapon types: Vulcan (spread shot) and Laser (piercing beam)
-- Weapon levels (1-5) affect fire rate and damage output
-- **Improved**: Uses VisualEffects system for death explosions
-- Signals: `player_hit`, `shoot(position, direction, weapon_type)`, `use_bomb`
+**New Enemy Types**
+1. Create new enemy scene inheriting from Enemy.tscn
+2. Extend Enemy.gd with custom movement patterns in `_process(delta)`
+3. Configure spawn parameters in EnemyManager.gd
+4. Add destruction effects in VisualEffects.gd
+5. Generate appropriate audio in SynthSoundManager.gd
 
-**Enemy System - `scripts/enemies/Enemy.gd`**
-- Configurable health, speed, points, and movement patterns
-- Three movement patterns: straight, zigzag, dive
-- Enemies scale in difficulty based on wave number
-- Dynamic bullet scene loading for projectiles
+**New Weapon Systems**
+1. Create projectile scene inheriting from Area2D
+2. Implement collision detection and damage logic
+3. Add weapon switching logic in Player.gd
+4. Configure fire rates and upgrade paths
+5. Generate weapon-specific audio effects
 
-**Enhanced PowerUp System - `scripts/pickups/PowerUp.gd`**
-- **NEW**: Beautiful floating animations with drifting, pulsing, and rotation
-- Organic movement patterns using sine waves and random drift
-- Four power-up types with weighted probability distribution
-- Enhanced visual feedback with scale animations
+**New Power-Up Types**
+1. Add power-up type to PowerUp.gd enum
+2. Implement collection effects in Player.gd
+3. Add floating animation parameters
+4. Configure visual and audio feedback
 
-**Projectile System - `scripts/projectiles/`**
-- Bullet.gd: Standard vulcan projectiles (1 damage, no pierce)
-- LaserBullet.gd: Laser projectiles (3+ damage, pierces 2+ enemies, scales with level)
-- EnemyBullet.gd: Simple projectiles fired by enemies
-- All inherit from Area2D and use collision groups for hit detection
+### Code Quality Standards
 
-**Audio System - `scripts/autoloads/SynthSoundManager.gd`**
-- Programmatically generates all sound effects using waveform synthesis
-- No external audio files required
-- Creates distinct sounds for: shooting, hits, explosions, power-ups, alarms
-- Uses AudioStreamWAV with 16-bit PCM data
+**Architecture Principles**
+- Follow SOLID principles with clear separation of concerns
+- Use composition over inheritance for complex systems
+- Implement dependency injection through autoloaded singletons
+- Maintain signal-based communication for loose coupling
+- Prefer explicit resource management over implicit garbage collection
 
-**Testing Framework - `test/` + gdUnit4**
-- **gdUnit4 v5.0.3**: Modern testing framework with GDScript and C# support
-- **Professional Test Structure**: unit/, integration/, scene/, helpers/
-- **Automated Quality Gates**: Pre-commit hooks run tests before every commit
-- **Comprehensive Reports**: HTML and XML reports with JUnit compatibility
-- **CI/CD Ready**: Headless test execution for GitHub Actions integration
+**Performance Optimization**
+- Implement object pooling for frequently instantiated objects (bullets, particles)
+- Use `is_instance_valid()` before accessing potentially freed nodes
+- Minimize signal connections and disconnections during gameplay
+- Optimize particle systems with appropriate emission limits
+- Profile memory usage and implement cleanup strategies
 
-**Package Management - gd-plug + `plug.gd`**
-- **Modern Dependency Management**: Industry-standard package manager for Godot
-- **Version Locked Dependencies**: Pinned versions ensure reproducible builds
-- **Clean Version Control**: Only config tracked, dependencies auto-installed
-- **Developer Friendly**: Simple `./plug.gd install` sets up complete environment
+**Testing Requirements**
+- Maintain 80%+ test coverage for core game systems
+- Write tests before implementing new features (TDD)
+- Use meaningful test descriptions and organize by functionality
+- Implement both unit and integration tests for complex systems
+- Validate edge cases and error conditions
 
-### Enhanced Scene Structure
-- **Main Scene**: `scenes/main/Game.tscn` - Primary game scene
-- **Organized Components**: Player/Enemy/Bullet scenes in categorized folders
-- **Node Hierarchy**: Game > [Background, Stars, Enemies, Bullets, PowerUps, Effects, Player, UI]
-- **Clean References**: All paths use organized structure (res://scenes/category/Scene.tscn)
+### Sound System Development
 
-### Signal Flow (Refactored)
-1. **Player shoots** → Game receives signal → Spawns bullets in Bullets node
-2. **Enemy destroyed** → EnemyManager emits signal → Game updates score, VisualEffects creates explosion
-3. **Player hit** → Game decreases lives → VisualEffects creates death explosion → Respawn or game over
-4. **Power-up collected** → Player upgrades → Game updates UI
-5. **Wave progression** → EnemyManager advances wave → Spawns formation → Shows wave announcement
+**Waveform Generation Patterns**
+```gdscript
+# Sine Wave: Clean, tonal sounds (UI, power-ups)
+func create_sine_tone(frequency: float, duration: float) -> AudioStreamWAV
 
-## Key Development Patterns
+# Square Wave: Harsh, electronic sounds (alarms, warnings)
+func create_square_tone(frequency: float, duration: float) -> AudioStreamWAV
 
-### Adding New Features (Updated Paths)
-- **New enemy types**: Extend `scripts/enemies/Enemy.gd`, add movement pattern in `_process()`
-- **New weapons**: Create bullet scene in `scenes/projectiles/`, script in `scripts/projectiles/`, add to Player's `fire_weapon()`
-- **New power-ups**: Add type to `scripts/pickups/PowerUp.gd`, handle in Player's `collect_powerup()`
-- **New visual effects**: Add effect type to `scripts/autoloads/VisualEffects.gd`
+# Sawtooth Wave: Aggressive sounds (lasers, engines)
+func create_sawtooth_tone(frequency: float, duration: float) -> AudioStreamWAV
 
-### System Integration
-- **Visual Effects**: `EffectManager.create_explosion(type, position, parent)`
-- **Enemy Spawning**: Handled automatically by EnemyManager autoload
-- **Sound Effects**: `SoundManager.play_sound(sound_name, volume, pitch)`
-- **Power-ups**: Automatically float with organic animations
+# Noise Generation: Explosions and impacts
+func create_brown_noise(duration: float, cutoff_freq: float) -> AudioStreamWAV
 
-### Common Modifications
-- **Difficulty tuning**: Adjust wave properties in `scripts/autoloads/EnemyManager.gd`
-- **Visual effects**: Modify templates in `scripts/autoloads/VisualEffects.gd`
-- **Weapon balance**: Modify damage, pierce_count, fire rates in `scripts/projectiles/` weapon scripts
-- **Sound adjustments**: Edit waveform parameters in `scripts/autoloads/SynthSoundManager.gd`
+# Frequency Sweeps: Dynamic pitch effects
+func create_frequency_sweep(start_freq: float, end_freq: float, duration: float) -> AudioStreamWAV
+```
 
-### Architecture Best Practices Applied
-- **Single Responsibility Principle**: Each system has one clear purpose
-- **DRY (Don't Repeat Yourself)**: No code duplication in effects or spawning
-- **Separation of Concerns**: Clean boundaries between game logic, effects, and audio
-- **Godot Conventions**: Professional folder structure following industry standards
-- **Maintainability**: Easy to locate and modify any system component
+**Audio Integration Guidelines**
+- All audio must be generated programmatically (no external files)
+- Use consistent sample rates (44100 Hz) and bit depth (16-bit)
+- Implement envelope shaping (ADSR) for realistic sound evolution
+- Add randomization to prevent repetitive audio patterns
+- Optimize memory usage with efficient PCM data generation
 
-### Godot-Specific Considerations
-- **Dynamic Loading**: Autoloads use `load()` instead of `preload()` for scene references
-- **State Management**: EnemyManager automatically resets game state on restart
-- **Signal Connections**: Made after instantiation with proper cleanup
-- **Resource Management**: Use `is_instance_valid()` before accessing nodes that might be freed
-- **Group System**: ("enemies", "player_bullets", etc.) for efficient collision detection
-- **Professional Structure**: Organized scenes and scripts following Godot best practices
+### Visual Effects Development
 
-## Code Quality Metrics Achieved
-- **49% reduction** in main Game.gd complexity (391→198 lines)
-- **32% reduction** in Player.gd size with enhanced functionality
-- **Zero code duplication** in visual effects system
-- **Professional organization** following Godot industry standards
-- **Enhanced maintainability** through clean architecture
-- **100% functionality preservation** during refactoring
+**Particle System Configuration**
+```gdscript
+# Standard explosion parameters
+{
+    "amount": 45,           # Number of particles
+    "lifetime": 1.0,        # Duration in seconds
+    "velocity_min": 80,     # Minimum initial velocity
+    "velocity_max": 350,    # Maximum initial velocity
+    "scale_min": 0.8,       # Minimum particle scale
+    "scale_max": 2.5,       # Maximum particle scale
+    "color": Color.ORANGE   # Base particle color
+}
+```
+
+**Performance Considerations**
+- Limit simultaneous particle systems to maintain 60 FPS
+- Implement automatic cleanup for expired effects
+- Use object pooling for particle instances when possible
+- Configure LOD (Level of Detail) based on distance/importance
+
+## Key Development Guidelines
+
+### Resource Management
+- Use `preload()` with `ResourceLoader.exists()` for safe resource loading
+- Implement proper signal connection/disconnection lifecycle
+- Clean up temporary nodes with `queue_free()` and await completion
+- Monitor memory usage during development and testing
+
+### Code Organization
+- Follow Godot naming conventions (snake_case for files, PascalCase for classes)
+- Organize scripts by functional domain (player/, enemies/, projectiles/)
+- Use meaningful variable and function names that describe intent
+- Document complex algorithms and mathematical formulas
+
+### Version Control Best Practices
+- Use semantic commit messages describing the change impact
+- Test all changes with the automated test suite before committing
+- Keep commits focused and atomic (one feature/fix per commit)
+- Use feature branches for significant changes or experiments
+
+### Deployment and Distribution
+- Validate all systems work correctly in release builds
+- Test exported versions on target platforms before distribution
+- Ensure all assets are properly included in export settings
+- Verify performance characteristics match development environment
+
+## Project Evolution Notes
+
+This codebase represents the evolution from a simple arcade-style game into a professional-grade game engine demonstration. Key architectural decisions prioritize:
+
+1. **Maintainability**: Clean separation of concerns with testable components
+2. **Innovation**: Zero-dependency audio generation and procedural effects
+3. **Performance**: Efficient memory management and 60 FPS target
+4. **Quality**: Comprehensive testing and automated quality assurance
+5. **Modularity**: Extensible systems that support easy feature addition
+
+When extending or modifying the codebase, maintain these principles to preserve the project's professional standards and technical excellence.

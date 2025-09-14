@@ -1,305 +1,189 @@
-# Raiden Clone - Professional Godot Shooter
+# Continuum
 
-A meticulously crafted vertical shooter game inspired by Raiden, built with Godot 4.4 following industry best practices.
+An open-source vertical scrolling shmup built with Godot 4.4, featuring dual weapon systems, wave-based progression, and procedurally generated audio.
 
-![Game Screenshot](https://img.shields.io/badge/Godot-4.4-blue.svg) ![Language](https://img.shields.io/badge/Language-GDScript-orange.svg) ![Architecture](https://img.shields.io/badge/Architecture-Refactored-green.svg) ![Code Quality](https://img.shields.io/badge/Code%20Quality-Professional-brightgreen.svg) ![Testing](https://img.shields.io/badge/Testing-gdUnit4-purple.svg) ![Package Manager](https://img.shields.io/badge/Dependencies-gd--plug-yellow.svg)
+![Game Screenshot](https://img.shields.io/badge/Godot-4.4-blue.svg) ![Language](https://img.shields.io/badge/Language-GDScript-orange.svg) ![License](https://img.shields.io/badge/License-GPL%20v3.0-blue.svg) ![Open Source](https://img.shields.io/badge/Open%20Source-Yes-brightgreen.svg)
 
-## 🎮 Enhanced Features
+## 🎮 **Game Features**
 
-### 🚀 **Classic Vertical Shooter Gameplay**
-- Raiden-inspired arcade action with modern polish
-- **Progressive difficulty** with intelligent wave-based enemy spawning
-- **Three formation patterns**: Line, V-formation, and random burst attacks
-- **Three lives system** with dramatic death explosions and invulnerability frames
+### **Dual Weapon System**
+Switch between two distinct weapon types, each with 5 upgrade levels:
+- **Vulcan Cannon**: Rapid-fire spread shots that increase from 1 to 5 projectiles
+- **Laser System**: Piercing beams that penetrate multiple enemies with scaling damage
 
-### ⚔️ **Advanced Dual Weapon System**
-- **Vulcan**: Rapid-fire spread shot that widens and intensifies with upgrades (5 levels)
-- **Laser**: Powerful piercing beam that damages multiple enemies with scaling power
-- **Dynamic fire rate scaling** based on weapon type and level
-- **Visual weapon feedback** with distinct sound effects
+### **Wave-Based Gameplay**
+Face increasingly challenging waves of enemies with:
+- **Dynamic Difficulty**: Enemy health, speed, and point values scale with each wave
+- **Formation Patterns**: Enemies spawn in line formations, V-shapes, and random bursts
+- **Movement Behaviors**: Straight-line attacks, zigzag patterns, and dive-bomb maneuvers
 
-### 💥 **Professional Visual Effects System**
-- **Centralized VisualEffects manager** for consistent particle systems
-- **Multi-layered explosion particles**: Core, burst, and outer ring effects
-- **Expanding shockwave rings** with cascading animations
-- **Dramatic screen flash sequences** and pulse effects
-- **Ship fragment physics** with realistic debris
+### **Power-Up System**
+Collect floating power-ups that provide:
+- **Weapon Upgrades**: Increase your weapon level for more firepower
+- **Weapon Switch**: Toggle between Vulcan and Laser systems
+- **Bombs**: Screen-clearing explosions for emergency situations
+- **Extra Lives**: Extend your survival in the increasingly difficult waves
 
-### 🌊 **Enhanced Power-up Animations**
-- **Beautiful floating motion** with organic drift and bobbing
-- **Pulsing scale animations** and smooth rotation effects
-- **Unique trajectories** using sine wave mathematics
-- **Visual polish** that draws the player's attention
+### **Unique Audio**
+Experience a completely procedural soundscape:
+- **Zero Audio Files**: All sound effects are generated in real-time using mathematical waveforms
+- **Dynamic Audio**: Sounds vary based on context with pitch and frequency modulation
+- **Rich Sound Design**: From laser blasts to explosion effects, everything is synthesized on-the-fly
 
-### 🎵 **Synthesized Audio Engine**
-- **Real-time mathematical sound generation** using waveform synthesis
-- **Zero external audio files** - everything generated programmatically
-- **Distinct audio signatures**: Weapon-specific shooting sounds, impact effects, explosions
-- **Dynamic pitch variation** for audio richness
+## 🚀 **Quick Start**
 
-### 🎯 **Intelligent Power-up System**
-- **Red "P"**: Weapon power upgrade (40% drop rate)
-- **Blue "L"**: Laser/Vulcan weapon switching (30% drop rate)
-- **Yellow "B"**: Screen-clearing bomb with massive explosion (20% drop rate)
-- **Green "1"**: Extra life (10% drop rate)
-- **Weighted probability distribution** for balanced gameplay
+### **System Requirements**
+- Godot Engine 4.4.1 or newer
+- Windows, macOS, or Linux
 
-## 🎮 Controls
-
-- **Movement**: WASD or Arrow Keys
-- **Shoot**: Space or Z (hold for continuous fire)
-- **Bomb**: X (clears screen with spectacular visual effects)
-
-## 🏗️ Professional Project Structure
-
-```
-/
-├── scenes/                          # Organized scene files
-│   ├── main/                       # Game entry points
-│   │   ├── Game.tscn               # Primary game scene
-│   │   └── Main.tscn               # Entry point scene
-│   ├── player/                     # Player-related scenes
-│   │   └── Player.tscn             # Player ship and controls
-│   ├── enemies/                    # Enemy and AI systems
-│   │   └── Enemy.tscn              # Enemy ships with AI patterns
-│   ├── projectiles/                # All projectile types
-│   │   ├── Bullet.tscn             # Vulcan weapon bullets
-│   │   ├── LaserBullet.tscn        # Laser weapon beams
-│   │   └── EnemyBullet.tscn        # Enemy projectiles
-│   └── pickups/                    # Collectible items
-│       └── PowerUp.tscn            # Enhanced floating power-ups
-├── scripts/                        # Organized script architecture
-│   ├── autoloads/                  # Singleton systems (Godot best practice)
-│   │   ├── VisualEffects.gd        # Centralized particle effects
-│   │   ├── EnemyManager.gd         # Enemy spawning & wave progression
-│   │   └── SynthSoundManager.gd    # Audio synthesis engine
-│   ├── main/                       # Core game logic
-│   │   └── Game.gd                 # Main controller (391→198 lines)
-│   ├── player/                     # Player mechanics
-│   │   └── Player.gd               # Movement, weapons, collision
-│   ├── enemies/                    # Enemy AI and behavior
-│   │   └── Enemy.gd                # Movement patterns and combat
-│   ├── projectiles/                # Weapon systems
-│   │   └── [Bullet.gd, LaserBullet.gd, EnemyBullet.gd]
-│   └── pickups/                    # Power-up logic
-│       └── PowerUp.gd              # Floating animations and effects
-└── assets/                         # Ready for expansion
-    ├── sprites/, sounds/, fonts/   # Future asset categories
-```
-
-## 🚀 Getting Started
-
-### Prerequisites
-- **Godot 4.4** or later
-- **Metal rendering support** (macOS) or equivalent GPU
-
-### Running the Game
-1. **Clone this repository**
-   ```bash
-   git clone [repository-url]
-   cd godot-hello-world
-   ```
-
-2. **Launch with Godot Editor**
-   - Open Godot Engine
-   - Click "Import" and select the project directory
-   - Choose `project.godot` to import
-   - Press **F5** or click "Run" to play
-
-3. **Command Line Launch (macOS)**
-   ```bash
-   # Run the game directly
-   /Applications/Godot.app/Contents/MacOS/Godot --path .
-
-   # Run in editor mode
-   /Applications/Godot.app/Contents/MacOS/Godot --path . --editor
-
-   # Run with specific renderer
-   /Applications/Godot.app/Contents/MacOS/Godot --path . --rendering-driver metal
-   ```
-
-## 📦 **Package Management & Dependencies**
-
-This project uses **gd-plug**, the modern package manager for Godot, ensuring professional dependency management and reproducible builds.
-
-### **Setup Dependencies**
+### **Installation & Play**
 ```bash
-# Install all project dependencies automatically
+# Clone the repository
+git clone <repository-url>
+cd continuum
+
+# Install dependencies (one-time setup)
 ./plug.gd install
+
+# Launch the game
+/Applications/Godot.app/Contents/MacOS/Godot --path .
 ```
 
-### **Current Dependencies**
-- **gdUnit4 v5.0.3** - Modern testing framework for Godot 4.4
-- **gd-plug** - Package manager for addon management
-
-### **Adding New Dependencies**
-Edit `plug.gd` to add new packages:
-```gdscript
-func _plugging():
-    plug("MikeSchulze/gdUnit4", {"tag": "v5.0.3"})
-    plug("AuthorName/NewAddon", {"tag": "v1.0.0"})  # Add here
+### **Controls**
+```
+Movement: Arrow Keys or WASD
+Shooting: Spacebar (automatic firing)
+Bomb:     Z key (limited use)
+Pause:    Escape key
 ```
 
-## 🧪 **Professional Testing Framework**
+## 🎯 **How to Play**
 
-Comprehensive test suite built with **gdUnit4** ensuring code quality and reliability.
+1. **Survive the Waves**: Destroy incoming enemies before they overwhelm you
+2. **Collect Power-Ups**: Grab floating items to upgrade your weapons and capabilities
+3. **Master Both Weapons**: Learn when to use spread fire vs. piercing lasers
+4. **Use Bombs Wisely**: Save screen-clearing bombs for critical moments
+5. **Achieve High Scores**: Earn points by destroying enemies, with higher waves worth more
 
-### **Running Tests**
+### **Weapon Strategy**
+- **Vulcan (Spread Fire)**: Excellent for crowd control and multiple weak enemies
+- **Laser (Piercing Beam)**: Perfect for tough enemies and tight formations
+- **Weapon Levels**: Higher levels increase damage, fire rate, and special effects
+
+### **Survival Tips**
+- Stay mobile - movement is key to avoiding enemy fire
+- Prioritize power-ups to stay competitive with wave difficulty
+- Learn enemy movement patterns to predict and avoid attacks
+- Use the invulnerability period after getting hit to reposition safely
+
+## 🏗️ **Technical Highlights**
+
+### **Open Source Architecture**
+- **Modular Design**: Clean separation between player systems, enemy management, and audio
+- **Signal-Based Communication**: Decoupled systems communicate through Godot's signal system
+- **Resource Efficiency**: Smart instantiation and cleanup for smooth 60 FPS gameplay
+
+### **Innovative Features**
+- **Procedural Audio Engine**: Complete sound synthesis without external audio files
+- **Particle Effects System**: Dynamic explosions and visual feedback
+- **Mathematical Difficulty Scaling**: Algorithmic wave progression for balanced challenge
+
+### **Development Quality**
+- **Modern Package Management**: Dependencies managed with gd-plug
+- **Comprehensive Testing**: Professional testing framework with gdUnit4
+- **Automated Quality Assurance**: Pre-commit hooks ensure code quality
+
+## 🔧 **Development & Modding**
+
+### **Development Setup**
 ```bash
-# Run complete test suite
+# Install development dependencies
+./plug.gd install
+
+# Run tests to verify setup
 ./run_tests.sh
 
-# Tests run automatically on commit (pre-commit hooks)
-git commit -m "Your changes"  # Tests execute automatically
+# Open in Godot Editor for modifications
+/Applications/Godot.app/Contents/MacOS/Godot --path . --editor
 ```
 
-### **Test Structure**
+### **Project Structure**
 ```
-test/
-├── unit/           # Component-level tests
-├── integration/    # System interaction tests
-├── scene/          # End-to-end gameplay tests
-└── helpers/        # Test utilities and mocks
-```
-
-### **Test Reports**
-- **HTML Reports**: Generated in `reports/` folder after each test run
-- **XML Reports**: JUnit-compatible for CI/CD integration
-- **Real-time Output**: Color-coded test results in terminal
-
-### **Pre-commit Quality Gates**
-- **Automated Testing**: All tests must pass before commits
-- **Code Quality**: Godot project validation and import checks
-- **File Formatting**: Trailing whitespace and end-of-file fixes
-- **Repository Health**: Large file detection and merge conflict prevention
-
-### **Continuous Integration Ready**
-```yaml
-# GitHub Actions Example
-- name: Setup Dependencies
-  run: ./plug.gd install
-
-- name: Run Tests
-  run: ./run_tests.sh
-
-- name: Upload Test Reports
-  uses: actions/upload-artifact@v3
-  with:
-    name: test-reports
-    path: reports/
+scenes/          # Game scenes (player, enemies, projectiles)
+scripts/         # Game logic organized by system
+  ├── autoloads/   # Global systems (audio, effects, enemy management)
+  ├── player/      # Player ship and weapon systems
+  ├── enemies/     # Enemy AI and behaviors
+  └── projectiles/ # Bullet and laser implementations
+test/            # Comprehensive test suite
+assets/          # Ready for sprites, sounds, fonts
 ```
 
-## 🏛️ Refactored Architecture
+### **Adding Content**
+The game is designed for easy modification:
+- **New Enemy Types**: Extend the base Enemy class with custom movement patterns
+- **New Weapons**: Create new projectile types and add them to the player system
+- **New Power-Ups**: Add power-up types and implement their effects
+- **New Audio**: Extend the synthesis engine with new waveform generators
 
-### **Clean Architecture Principles Applied**
-- ✅ **Single Responsibility Principle**: Each system has one clear purpose
-- ✅ **DRY (Don't Repeat Yourself)**: Zero code duplication across effects
-- ✅ **Separation of Concerns**: Clean boundaries between systems
-- ✅ **Professional Organization**: Industry-standard Godot folder structure
+### **Testing Your Changes**
+```bash
+# Run the complete test suite
+./run_tests.sh
 
-### **Core Systems (Refactored)**
+# Run specific test categories
+/Applications/Godot.app/Contents/MacOS/Godot --path . --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add test/unit
+```
 
-**🎮 Game Controller** (`scripts/main/Game.gd`)
-- **Streamlined from 391 to 198 lines** (49% reduction)
-- Orchestrates system communication via clean signal architecture
-- Manages game state (score, lives, bombs) and UI updates
-- Delegates specialized tasks to dedicated managers
+## 🎨 **Game Design Philosophy**
 
-**💥 VisualEffects System** (`scripts/autoloads/VisualEffects.gd`) **[NEW]**
-- **Centralized particle effects management**
-- **Template-based explosion creation** (enemy, player, bomb variants)
-- **Standardized cleanup and lifecycle management**
-- **Usage**: `EffectManager.create_explosion(type, position, parent)`
+Continuum combines classic arcade shmup action with modern technical innovation:
 
-**👾 EnemyManager System** (`scripts/autoloads/EnemyManager.gd`) **[NEW]**
-- **Dedicated enemy spawning and wave progression**
-- **Three formation patterns**: Line, V-formation, random burst
-- **Progressive difficulty scaling** (health, speed, points)
-- **Automatic game state reset** on restart
+- **Accessibility**: Easy to learn controls with deep strategic weapon management
+- **Progression**: Satisfying power-up system that keeps gameplay fresh
+- **Challenge**: Mathematically balanced difficulty that scales fairly
+- **Innovation**: Unique procedural audio creates a distinctive soundscape
+- **Performance**: Optimized for smooth 60 FPS gameplay across platforms
 
-**🚀 Enhanced Player System** (`scripts/player/Player.gd`)
-- **Streamlined from 312 to 212 lines** with enhanced functionality
-- **Improved weapon system** with better visual and audio feedback
-- **Enhanced collision detection** with precise hitboxes
-- **Integrated with VisualEffects system** for death animations
+## 📈 **Technical Stats**
 
-**🌟 Beautiful PowerUp System** (`scripts/pickups/PowerUp.gd`) **[ENHANCED]**
-- **Organic floating animations** using mathematical wave functions
-- **Smooth drifting patterns** with sine/cosine wave mathematics
-- **Pulsing scale effects** and rotation animations
-- **Unique movement per power-up** for visual appeal
+- **Language**: 100% GDScript
+- **Audio**: 100% procedurally generated (zero external sound files)
+- **Testing**: Comprehensive test coverage with automated quality assurance
+- **Performance**: Optimized for 60 FPS with efficient memory management
+- **Platforms**: Cross-platform compatibility through Godot Engine
 
-## 🔧 Development Excellence
+## 🤝 **Contributing**
 
-### **Code Quality Metrics Achieved**
-- **49% complexity reduction** in main Game controller
-- **32% size reduction** in Player system with enhanced features
-- **Zero code duplication** in visual effects and spawning systems
-- **100% functionality preservation** throughout refactoring
-- **Professional organization** following Godot industry conventions
+Continuum is open source and welcomes contributions:
 
-### **Technical Highlights**
-- **Mathematical Audio Synthesis**: Waveform generation using sine, saw, and square waves
-- **Efficient Particle Systems**: Template-based CPUParticles2D with automatic cleanup
-- **Intelligent Enemy AI**: Three movement patterns with difficulty scaling
-- **Precise Collision Detection**: Triangular hitboxes matching visual geometry
-- **Signal-Based Architecture**: Clean, decoupled system communication
-- **Dynamic Resource Loading**: Robust scene management for autoload systems
+1. **Fork the Repository**: Create your own copy to work on
+2. **Install Development Tools**: Run `./plug.gd install` for the full development environment
+3. **Make Your Changes**: Add features, fix bugs, or improve existing systems
+4. **Run Tests**: Ensure your changes don't break existing functionality with `./run_tests.sh`
+5. **Submit a Pull Request**: Share your improvements with the community
 
-### **Performance Optimizations**
-- **Automatic cleanup systems** for particles and temporary objects
-- **Efficient collision groups** for optimized physics queries
-- **Smart resource management** with validity checks
-- **Template-based object creation** for consistent performance
+### **Contribution Areas**
+- **Gameplay**: New enemy types, weapon systems, or power-up mechanics
+- **Audio**: Additional waveform generators or sound effect variations
+- **Visual Effects**: New particle systems or visual feedback
+- **Performance**: Optimization and efficiency improvements
+- **Testing**: Additional test coverage for new features
 
-## 🎯 Gameplay Features Deep Dive
+## 📄 **License**
 
-### **Wave System**
-- **Progressive Difficulty**: Enemies gain health, speed, and point values each wave
-- **Formation Patterns**: Strategic enemy deployment in lines, V-shapes, or random bursts
-- **Escalating Challenge**: Spawn rates increase and enemy variety expands
-- **Visual Feedback**: Clear wave announcements with dramatic effects
+Continuum is licensed under GPL v3.0, making it free and open source software. You're free to:
+- Play the game
+- Modify the source code
+- Distribute your modifications
+- Use it for learning game development
 
-### **Combat System**
-- **Weapon Switching**: Seamless transitions between Vulcan and Laser systems
-- **Power Progression**: Five upgrade levels with visual and mechanical improvements
-- **Screen-Clearing Bombs**: Massive explosions with cascading visual effects
-- **Invulnerability Frames**: Player safety with clear visual feedback
+See [LICENSE](LICENSE) for complete terms.
 
-## 📚 Documentation
+## 🎵 **Soundtrack Notes**
 
-- **`CLAUDE.md`**: Comprehensive development guide with architecture details
-- **Inline Code Comments**: Minimal, focused documentation following project conventions
-- **Git History**: Detailed commit messages documenting all improvements
-
-## 🏆 Architecture Awards
-
-This project demonstrates professional game development practices:
-- **Industry-Standard Structure**: Organized following Godot conventions
-- **Clean Code Principles**: SOLID principles applied throughout
-- **Maintainable Codebase**: Easy to extend and modify
-- **Performance Conscious**: Efficient resource usage and cleanup
-- **Visual Polish**: Professional particle effects and animations
-
-## 📄 License
-
-Licensed under **GNU General Public License v3.0** - see [LICENSE.md](LICENSE.md) for details.
-
-**You are free to:**
-- ✅ Run the program for any purpose
-- ✅ Study and modify the source code
-- ✅ Redistribute copies
-- ✅ Distribute modified versions
-
-**Under the condition** that any distributed versions are also licensed under GPL v3.0.
-
-## 🙏 Acknowledgments
-
-- **Inspired by**: Classic Raiden series by Seibu Kaihatsu
-- **Engine**: Godot Engine 4.4 community
-- **Architecture**: Professional game development best practices
-- **Code Quality**: Refactored for maintainability and extensibility
+One of Continuum's unique features is its completely procedural audio system. Every sound you hear - from laser blasts to explosions - is generated mathematically in real-time. This creates a unique audio experience that's both retro-inspired and technically innovative.
 
 ---
 
-*Built with ❤️ using professional game development practices and Godot Engine 4.4*
+**Experience the evolution of shmup gameplay - download, play, and modify Continuum today!**
