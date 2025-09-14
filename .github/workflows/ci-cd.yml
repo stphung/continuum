@@ -222,6 +222,10 @@ jobs:
         run: |
           mkdir -v -p build/android
 
+          echo "=== Debug Android Export Configuration ==="
+          # Check export configuration before attempting export
+          godot --headless --script-verbose --export-debug "Android" --quit-after 1 || echo "Export check failed"
+
           echo "=== Attempting APK Export ==="
           # Export with debug configuration with maximum verbosity
           godot --headless --verbose --export-debug "Android" build/android/$EXPORT_NAME.apk
