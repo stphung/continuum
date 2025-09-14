@@ -190,10 +190,24 @@ jobs:
           echo "=== Build environment verification ==="
           echo "Android template directory contents:"
           ls -la android/build/ 2>/dev/null || echo "No template directory"
-          echo "Export presets configuration:"
-          cat export_presets.cfg | grep -A 10 -B 2 "Android"
+
+          echo "=== Android SDK verification ==="
+          echo "ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT"
+          echo "JAVA_HOME: $JAVA_HOME"
+          ls -la "$ANDROID_SDK_ROOT/build-tools/" 2>/dev/null || echo "No build-tools"
+          ls -la "$ANDROID_SDK_ROOT/platforms/" 2>/dev/null || echo "No platforms"
+
+          echo "=== Keystore verification ==="
+          ls -la "/usr/lib/android-sdk/.android/" 2>/dev/null || echo "No keystore directory"
+
+          echo "=== Full export presets configuration ==="
+          cat export_presets.cfg | grep -A 20 -B 2 "Android"
 
           echo "=== Running Android export with Gradle ==="
+          echo "Available export presets:"
+          godot --headless --export-list || echo "Could not list export presets"
+
+          echo "Attempting Android export..."
           godot --headless --verbose --export-debug "Android" build/android/$EXPORT_NAME.apk
 
       - name: Upload Artifact
