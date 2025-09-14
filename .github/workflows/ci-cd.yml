@@ -164,7 +164,24 @@ jobs:
           export ANDROID_SDK_ROOT=/usr/lib/android-sdk
           export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
-          # Let container defaults handle SDK configuration
+          # Create missing keystore directory
+          mkdir -p /usr/lib/android-sdk/.android
+
+          # Generate debug keystore if it doesn't exist
+          if [ ! -f "/usr/lib/android-sdk/.android/debug.keystore" ]; then
+            echo "Creating debug keystore..."
+            keytool -genkeypair \
+              -alias androiddebugkey \
+              -keypass android \
+              -keystore /usr/lib/android-sdk/.android/debug.keystore \
+              -storepass android \
+              -dname "CN=Android Debug,O=Android,C=US" \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000
+          fi
+
+          # Configure Godot editor settings
           mkdir -p ~/.config/godot
           cat > ~/.config/godot/editor_settings-4.4.tres << EOF
           [gd_resource type="EditorSettings" format=3]
@@ -205,7 +222,7 @@ jobs:
 
           echo "=== Running Android export with Gradle ==="
           echo "Available export presets:"
-          godot --headless --export-list || echo "Could not list export presets"
+          godot --headless --export-list 2>/dev/null || echo "Using direct export approach"
 
           echo "Attempting Android export..."
           godot --headless --verbose --export-debug "Android" build/android/$EXPORT_NAME.apk
