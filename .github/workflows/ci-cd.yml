@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: Continuum CI/CD
 
 on:
   push:
@@ -12,9 +12,9 @@ env:
   EXPORT_NAME: continuum
 
 jobs:
-  test:
-    name: Run Tests
-    runs-on: ubuntu-latest
+  export-linux:
+    name: Linux Export
+    runs-on: ubuntu-22.04
     container:
       image: barichello/godot-ci:4.3
     steps:
@@ -28,263 +28,20 @@ jobs:
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
 
-
-      - name: Import project assets
+      - name: Linux Build
         run: |
-          godot --path . --headless --import --quit-after 1 || true
+          mkdir -v -p build/linux
+          godot --headless --verbose --export-release "Desktop" build/linux/$EXPORT_NAME.x86_64
 
-      - name: Validate project
-        run: |
-          godot --path . --headless --check-only --quit-after 1
-        continue-on-error: false
-
-
-  build-desktop:
-    name: Build Desktop
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
-    container:
-      image: barichello/godot-ci:4.3
-    strategy:
-      matrix:
-        platform: [linux, windows, macos]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - name: Setup
-        run: |
-          mkdir -v -p ~/.local/share/godot/export_templates/
-          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
-
-
-      - name: Import project assets
-        run: |
-          godot --path . --headless --import --quit-after 1 || true
-
-      - name: Build Desktop - Linux
-        if: matrix.platform == 'linux'
-        run: |
-          mkdir -v -p build
-          godot --path . --headless --verbose --export-release "Desktop" build/continuum-linux
-
-      - name: Build Desktop - Windows
-        if: matrix.platform == 'windows'
-        run: |
-          mkdir -v -p build
-          godot --path . --headless --verbose --export-release "Windows Desktop" build/continuum-windows.exe
-
-      - name: Build Desktop - macOS
-        if: matrix.platform == 'macos'
-        run: |
-          mkdir -v -p build
-          godot --path . --headless --verbose --export-release "macOS" build/continuum-macos.zip
-
-      - name: Upload Desktop Build - Linux
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
-        if: matrix.platform == 'linux'
         with:
-          name: continuum-linux
-          path: build/continuum-linux
-          retention-days: 14
+          name: linux
+          path: build/linux
 
-      - name: Upload Desktop Build - Windows
-        uses: actions/upload-artifact@v4
-        if: matrix.platform == 'windows'
-        with:
-          name: continuum-windows
-          path: build/continuum-windows.exe
-          retention-days: 14
-
-      - name: Upload Desktop Build - macOS
-        uses: actions/upload-artifact@v4
-        if: matrix.platform == 'macos'
-        with:
-          name: continuum-macos
-          path: build/continuum-macos.zip
-          retention-days: 14
-
-  build-android:
-    name: Build Android APK
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
-    container:
-      image: barichello/godot-ci:4.3
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          api-level: 33
-          build-tools-version: 33.0.2
-          cmdline-tools-version: 9477386
-
-      - name: Setup Godot
-        run: |
-          mkdir -v -p ~/.local/share/godot/export_templates/
-          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
-
-
-      - name: Import project assets
-        run: |
-          godot --path . --headless --import --quit-after 1 || true
-
-      - name: Setup Android keystore
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-        run: |
-          if [ ! -z "$ANDROID_KEYSTORE_BASE64" ]; then
-            echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android-keystore.jks
-            echo "Using production keystore"
-          else
-            # Create debug keystore for development builds
-            keytool -genkeypair -alias continuum -keypass android -keystore android-keystore.jks -storepass android -dname "CN=Continuum, OU=Game, O=Continuum, L=City, S=State, C=Country" -validity 10000 -keyalg RSA -keysize 2048
-            echo "Using debug keystore"
-          fi
-
-      - name: Configure Android export
-        env:
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-        run: |
-          # Configure Android export settings
-          mkdir -p ~/.config/godot
-          cat > ~/.config/godot/editor_settings-4.4.tres << EOF
-          [gd_resource type="EditorSettings" format=3]
-
-          [resource]
-          export/android/android_sdk_path = "$ANDROID_SDK_ROOT"
-          export/android/debug_keystore = "android-keystore.jks"
-          export/android/debug_keystore_user = "continuum"
-          export/android/debug_keystore_pass = "${ANDROID_KEYSTORE_PASSWORD:-android}"
-          EOF
-
-      - name: Build Android APK (Debug)
-        if: github.event_name == 'pull_request'
-        run: |
-          mkdir -v -p build
-          godot --path . --headless --verbose --export-debug "Android" build/continuum-debug.apk
-
-      - name: Build Android APK (Release)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          mkdir -v -p build
-          godot --path . --headless --verbose --export-release "Android" build/continuum-release.apk
-
-      - name: Upload Android APK (Debug)
-        uses: actions/upload-artifact@v4
-        if: github.event_name == 'pull_request'
-        with:
-          name: continuum-android-debug
-          path: build/continuum-debug.apk
-          retention-days: 14
-
-      - name: Upload Android APK (Release)
-        uses: actions/upload-artifact@v4
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        with:
-          name: continuum-android-release
-          path: build/continuum-release.apk
-          retention-days: 30
-
-  release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    needs: [test, build-desktop, build-android]
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts/
-
-      - name: Display artifacts structure
-        run: ls -R artifacts/
-
-      - name: Create release archives
-        run: |
-          cd artifacts/
-
-          # Create platform-specific archives
-          if [ -d "continuum-linux" ]; then
-            tar -czf ../continuum-linux-${{ github.ref_name }}.tar.gz -C continuum-linux .
-          fi
-
-          if [ -d "continuum-windows" ]; then
-            cd continuum-windows && zip -r ../../continuum-windows-${{ github.ref_name }}.zip . && cd ..
-          fi
-
-          if [ -d "continuum-macos" ]; then
-            cp continuum-macos/*.zip ../continuum-macos-${{ github.ref_name }}.zip
-          fi
-
-          if [ -d "continuum-android-release" ]; then
-            cp continuum-android-release/*.apk ../continuum-android-${{ github.ref_name }}.apk
-          fi
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          name: Continuum ${{ github.ref_name }}
-          body: |
-            ## Continuum ${{ github.ref_name }}
-
-            ### 🎮 Game Features
-            - Dual weapon system with 5 upgrade levels each
-            - Wave-based gameplay with dynamic difficulty scaling
-            - Procedurally generated audio (zero external sound files)
-            - Professional SCons build system with comprehensive testing
-
-            ### 📱 Downloads
-            - **Android APK**: Play on Android devices (ARM64)
-            - **Windows**: Desktop version for Windows 10/11
-            - **Linux**: Desktop version for Linux distributions
-            - **macOS**: Desktop version for macOS (Universal binary)
-
-            ### 🔧 Technical Notes
-            - Built with Godot 4.4.1
-            - Comprehensive test coverage with automated QA
-            - All builds verified through CI/CD pipeline
-
-            ### 🚀 Quick Start
-            1. Download the appropriate version for your platform
-            2. Install/extract and run
-            3. Use WASD/arrows to move, spacebar to shoot, Z for bombs
-
-            Enjoy the evolution of shmup gameplay!
-          draft: false
-          prerelease: false
-          files: |
-            continuum-linux-*.tar.gz
-            continuum-windows-*.zip
-            continuum-macos-*.zip
-            continuum-android-*.apk
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-  deploy-pages:
-    name: Deploy to GitHub Pages
-    runs-on: ubuntu-latest
-    needs: [test, build-desktop]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  export-windows:
+    name: Windows Export
+    runs-on: ubuntu-22.04
     container:
       image: barichello/godot-ci:4.3
     steps:
@@ -298,31 +55,47 @@ jobs:
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
 
-
-      - name: Import project assets
+      - name: Windows Build
         run: |
-          godot --path . --headless --import --quit-after 1 || true
+          mkdir -v -p build/windows
+          godot --headless --verbose --export-release "Windows Desktop" build/windows/$EXPORT_NAME.exe
 
-      - name: Build for Web
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: build/windows
+
+  export-web:
+    name: Web Export
+    runs-on: ubuntu-22.04
+    container:
+      image: barichello/godot-ci:4.3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Setup
+        run: |
+          mkdir -v -p ~/.local/share/godot/export_templates/
+          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+      - name: Web Build
         run: |
           mkdir -v -p build/web
-          godot --path . --headless --verbose --export-release "Web" build/web/index.html
+          godot --headless --verbose --export-release "Web" build/web/index.html
 
-      - name: Add COOP/COEP headers for SharedArrayBuffer
-        run: |
-          cat > build/web/.htaccess << 'EOF'
-          Header set Cross-Origin-Embedder-Policy "require-corp"
-          Header set Cross-Origin-Opener-Policy "same-origin"
-          EOF
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
         with:
-          path: build/web/
+          name: web
+          path: build/web
 
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/web
