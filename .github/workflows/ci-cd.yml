@@ -143,15 +143,12 @@ jobs:
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
 
-      - name: Install Android Build Template
+      - name: Verify Android Environment
         run: |
-          # Backup existing android directory
-          if [ -d "android" ]; then
-            mv android android.backup
-          fi
-          # Extract fresh android template to correct location
-          mkdir -p android/build
-          unzip -q ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_source.zip -d android/build
+          echo "=== Verifying pre-configured Android environment ==="
+          echo "Android templates should be pre-configured in barichello/godot-ci container"
+          ls -la ~/.local/share/godot/export_templates/ || echo "No user templates found"
+          ls -la /root/.local/share/godot/export_templates/ || echo "No root templates found"
 
       - name: Configure Godot Android Settings
         run: |
@@ -218,11 +215,11 @@ jobs:
           cat export_presets.cfg | grep -A 50 "preset.3"
 
           # Check export configuration before attempting export
-          godot --headless --script-verbose --export-debug "Android" --quit-after 1 || echo "Export check failed"
+          godot --headless --script-verbose --export-debug "Android Debug" --quit-after 1 || echo "Export check failed"
 
           echo "=== Attempting APK Export ==="
-          # Export with debug configuration with maximum verbosity
-          godot --headless --verbose --export-debug "Android" build/android/$EXPORT_NAME.apk
+          # Export with debug configuration with maximum verbosity (following official Godot CI pattern)
+          godot --headless --verbose --export-debug "Android Debug" build/android/$EXPORT_NAME-debug.apk
 
       - name: Restore Test Files
         if: always()
