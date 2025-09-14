@@ -180,6 +180,18 @@ jobs:
           export/android/android_build_tools_ver = "33.0.2"
           EOF
 
+          # Override the export preset configuration for CI
+          echo "=== Updating Export Presets for CI ==="
+          # Backup original and create CI-specific version
+          cp export_presets.cfg export_presets.cfg.backup
+
+          # Set build template path to the extracted location
+          sed -i 's|custom_template/debug=""|custom_template/debug="android/build"|g' export_presets.cfg
+          sed -i 's|custom_template/release=""|custom_template/release="android/build"|g' export_presets.cfg
+
+          echo "=== Verifying Export Presets ==="
+          cat export_presets.cfg | grep -A 5 -B 5 "custom_template"
+
       - name: Verify Android Environment
         run: |
           echo "=== Java SDK Information ==="
@@ -208,7 +220,11 @@ jobs:
       - name: Android Build
         run: |
           mkdir -v -p build/android
-          # Export with debug configuration
+          # Try to get detailed export preset information
+          echo "=== Export Preset Debugging ==="
+          godot --headless --export-pack "Android" build/android/debug.pck || echo "Export pack failed"
+          echo "=== Attempting APK Export ==="
+          # Export with debug configuration with maximum verbosity
           godot --headless --verbose --export-debug "Android" build/android/$EXPORT_NAME.apk
 
       - name: Upload Artifact
