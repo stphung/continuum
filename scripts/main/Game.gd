@@ -164,7 +164,7 @@ func respawn_player():
 	timer.wait_time = 1.0
 	timer.one_shot = true
 	timer.timeout.connect(spawn_player)
-	timer.timeout.connect(timer.call_deferred.bind("queue_free"))
+	timer.timeout.connect(func(): timer.queue_free())
 	add_child(timer)
 	timer.start()
 

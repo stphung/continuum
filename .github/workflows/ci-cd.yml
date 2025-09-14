@@ -8,7 +8,7 @@ on:
     branches: [ main ]
 
 env:
-  GODOT_VERSION: 4.3
+  GODOT_VERSION: 4.4.1
   EXPORT_NAME: continuum
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
     name: Linux Export
     runs-on: ubuntu-22.04
     container:
-      image: barichello/godot-ci:4.3
+      image: barichello/godot-ci:4.4.1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,6 +27,10 @@ jobs:
         run: |
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+      - name: Import project assets
+        run: |
+          godot --path . --headless --import --quit-after 1 || true
 
       - name: Linux Build
         run: |
@@ -43,7 +47,7 @@ jobs:
     name: Windows Export
     runs-on: ubuntu-22.04
     container:
-      image: barichello/godot-ci:4.3
+      image: barichello/godot-ci:4.4.1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -54,6 +58,10 @@ jobs:
         run: |
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+      - name: Import project assets
+        run: |
+          godot --path . --headless --import --quit-after 1 || true
 
       - name: Windows Build
         run: |
@@ -70,7 +78,7 @@ jobs:
     name: Web Export
     runs-on: ubuntu-22.04
     container:
-      image: barichello/godot-ci:4.3
+      image: barichello/godot-ci:4.4.1
     permissions:
       contents: write
     steps:
@@ -83,6 +91,10 @@ jobs:
         run: |
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+      - name: Import project assets
+        run: |
+          godot --path . --headless --import --quit-after 1 || true
 
       - name: Web Build
         run: |
