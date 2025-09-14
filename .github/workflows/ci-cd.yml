@@ -206,6 +206,14 @@ jobs:
           mkdir -v -p build/android
           export ANDROID_SDK_ROOT=/usr/lib/android-sdk
           export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+
+          echo "=== Pre-build verification ==="
+          echo "Android template directory contents:"
+          ls -la android/build/ || echo "No android/build directory"
+          echo "Export presets:"
+          cat export_presets.cfg | grep -A 10 -B 2 "Android"
+
+          echo "=== Running Android export ==="
           godot --headless --verbose --export-release "Android" build/android/$EXPORT_NAME.apk
 
       - name: Upload Artifact
