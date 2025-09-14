@@ -210,6 +210,13 @@ jobs:
           mkdir -v -p build/android
 
           echo "=== Debug Android Export Configuration ==="
+          # List all export presets
+          echo "Available export presets:"
+          godot --headless --quit-after 1 --export-list || echo "Failed to list export presets"
+
+          echo "Export preset configuration:"
+          cat export_presets.cfg | grep -A 50 "preset.3"
+
           # Check export configuration before attempting export
           godot --headless --script-verbose --export-debug "Android" --quit-after 1 || echo "Export check failed"
 
