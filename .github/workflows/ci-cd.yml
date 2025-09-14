@@ -214,11 +214,11 @@ jobs:
         run: |
           mkdir -v -p build/android
 
-          # Temporarily move test files to prevent parsing errors during Android export
+          # Temporarily move test files OUTSIDE project directory to prevent parsing errors
           echo "=== Temporarily moving test files ==="
           if [ -d "test" ]; then
-            mv test test_backup
-            echo "Test files moved to test_backup"
+            mv test /tmp/test_backup_$GITHUB_RUN_ID
+            echo "Test files moved outside project directory"
           fi
 
           echo "=== Attempting APK Export ==="
@@ -226,8 +226,8 @@ jobs:
           godot --headless --verbose --export-debug "Android" build/android/$EXPORT_NAME.apk
 
           # Restore test files after export
-          if [ -d "test_backup" ]; then
-            mv test_backup test
+          if [ -d "/tmp/test_backup_$GITHUB_RUN_ID" ]; then
+            mv /tmp/test_backup_$GITHUB_RUN_ID test
             echo "Test files restored"
           fi
 
