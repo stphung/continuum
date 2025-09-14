@@ -144,39 +144,18 @@ def setup_command_line_targets(env):
 # Build action implementations
 def build_dev_action(target, source, env):
     """Build development version"""
-    print("🔨 Building development version...")
-    godot_cmd = [
-        env['GODOT_EXECUTABLE'],
-        '--path', str(env['PROJECT_DIR']),
-        '--headless',
-        '--export-debug', 'Desktop',
-        str(env['BUILD_DIR'].abspath) + '/continuum-dev'
-    ]
-    return env.Execute(' '.join(godot_cmd))
+    output_path = str(env['BUILD_DIR'].abspath) + '/continuum-dev'
+    return env.GodotExport('Desktop', output_path, debug=True)
 
 def build_debug_action(target, source, env):
     """Build debug version with maximum debugging info"""
-    print("🐛 Building debug version...")
-    godot_cmd = [
-        env['GODOT_EXECUTABLE'],
-        '--path', str(env['PROJECT_DIR']),
-        '--headless',
-        '--export-debug', 'Desktop',
-        str(env['BUILD_DIR'].abspath) + '/continuum-debug'
-    ]
-    return env.Execute(' '.join(godot_cmd))
+    output_path = str(env['BUILD_DIR'].abspath) + '/continuum-debug'
+    return env.GodotExport('Desktop', output_path, debug=True)
 
 def build_release_action(target, source, env):
     """Build optimized release version"""
-    print("🚀 Building release version...")
-    godot_cmd = [
-        env['GODOT_EXECUTABLE'],
-        '--path', str(env['PROJECT_DIR']),
-        '--headless',
-        '--export-release', 'Desktop',
-        str(env['BUILD_DIR'].abspath) + '/continuum-release'
-    ]
-    return env.Execute(' '.join(godot_cmd))
+    output_path = str(env['BUILD_DIR'].abspath) + '/continuum-release'
+    return env.GodotExport('Desktop', output_path, debug=False)
 
 def package_release_action(target, source, env):
     """Package release build for distribution"""
@@ -188,21 +167,15 @@ def package_release_action(target, source, env):
 
 def process_assets_action(target, source, env):
     """Process and optimize game assets"""
-    print("🎨 Processing assets...")
-    # TODO: Implement asset processing pipeline
-    return 0
+    return env.ProcessAllAssets()
 
 def validate_assets_action(target, source, env):
     """Validate asset integrity"""
-    print("✅ Validating assets...")
-    # TODO: Implement asset validation
-    return 0
+    return env.ValidateAllAssets()
 
 def run_tests_action(target, source, env):
     """Execute the full test suite"""
-    print("🧪 Running test suite...")
-    test_cmd = ['./run_tests.sh']
-    return env.Execute(' '.join(test_cmd))
+    return env.GodotRunTests()
 
 def run_lint_action(target, source, env):
     """Run code quality checks"""
@@ -212,9 +185,7 @@ def run_lint_action(target, source, env):
 
 def run_validation_action(target, source, env):
     """Run comprehensive validation checks"""
-    print("🔎 Running comprehensive validation...")
-    # TODO: Implement full validation pipeline
-    return 0
+    return env.RunComprehensiveValidation()
 
 def clean_build_action(target, source, env):
     """Clean build artifacts"""

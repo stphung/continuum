@@ -286,12 +286,34 @@ This orchestration approach transforms Claude Code from a single agent into a so
 # Edit plug.gd and add: plug("AuthorName/AddonName", {"tag": "v1.0.0"})
 ```
 
-### Professional Testing Framework (gdUnit4)
+### Professional SCons Build System
 ```bash
 # Execute complete test suite with detailed reports
-./run_tests.sh
+scons test
 
-# Run tests with specific configuration
+# Run comprehensive project validation
+scons validate
+
+# Build development version with debugging
+scons build-dev
+
+# Build optimized release version
+scons build-release
+
+# Process and validate assets
+scons validate-assets
+scons process-assets
+
+# Clean build artifacts
+scons clean-build
+
+# Show all available build targets
+scons help
+```
+
+### Direct Godot Testing (Advanced)
+```bash
+# Run tests with specific configuration (bypasses SCons)
 /Applications/Godot.app/Contents/MacOS/Godot --path . --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add test --continue --ignoreHeadlessMode
 
 # Run specific test suites

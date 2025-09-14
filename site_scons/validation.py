@@ -54,7 +54,8 @@ def run_comprehensive_validation(env):
     total_passed = 0
     total_checks = len(validation_results)
 
-    for check, passed in validation_results.items():
+    for check, result in validation_results.items():
+        passed = (result == 0)  # 0 means success in SCons
         status = "✅ PASS" if passed else "❌ FAIL"
         print(f"  {check.replace('_', ' ').title():<20} {status}")
         if passed:
@@ -65,10 +66,10 @@ def run_comprehensive_validation(env):
 
     if total_passed == total_checks:
         print("🎉 All validation checks passed!")
-        return True
+        return 0
     else:
         print(f"❌ Validation failed: {total_checks - total_passed} issues found")
-        return False
+        return 1
 
 def validate_project_structure(env):
     """Validate project directory structure and organization"""
@@ -96,7 +97,7 @@ def validate_project_structure(env):
         ],
         'files': [
             'project.godot',
-            'run_tests.sh',
+            'SConstruct',
             'CLAUDE.md',
             'README.md',
             'LICENSE.md'
@@ -122,10 +123,10 @@ def validate_project_structure(env):
         print(f"    ❌ Project structure issues found:")
         for issue in issues:
             print(f"      - {issue}")
-        return False
+        return 1
 
     print(f"    ✅ Project structure validation passed")
-    return True
+    return 0
 
 def validate_code_quality(env):
     """Validate code quality and style"""
@@ -134,7 +135,7 @@ def validate_code_quality(env):
 
     if not os.path.exists(scripts_dir):
         issues.append("Scripts directory not found")
-        return False
+        return 1
 
     # Find all GDScript files
     gdscript_files = []
@@ -156,10 +157,10 @@ def validate_code_quality(env):
             print(f"      - {issue}")
         if len(issues) > 10:
             print(f"      ... and {len(issues) - 10} more issues")
-        return False
+        return 1
 
     print(f"    ✅ Code quality validation passed")
-    return True
+    return 0
 
 def check_script_quality(script_path):
     """Check individual script for quality issues"""
@@ -221,21 +222,19 @@ def validate_build_system(env):
     except Exception as e:
         issues.append(f"Cannot create build directories: {e}")
 
-    # Check test runner
-    test_script = os.path.join(str(env['PROJECT_DIR']), 'run_tests.sh')
-    if not os.path.exists(test_script):
-        issues.append("Test runner script missing: run_tests.sh")
-    elif not os.access(test_script, os.X_OK):
-        issues.append("Test runner script not executable")
+    # Check test system (SCons + gdUnit4)
+    gdunit_path = os.path.join(str(env['PROJECT_DIR']), 'addons', 'gdUnit4')
+    if not os.path.exists(gdunit_path):
+        issues.append("gdUnit4 testing framework not found in addons/gdUnit4")
 
     if issues:
         print(f"    ❌ Build system issues found:")
         for issue in issues:
             print(f"      - {issue}")
-        return False
+        return 1
 
     print(f"    ✅ Build system validation passed")
-    return True
+    return 0
 
 # Initialize validation system
 setup_validation_system(env)

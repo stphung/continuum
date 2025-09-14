@@ -42,7 +42,7 @@ def validate_all_assets(env):
 
     if total_issues == 0:
         print("✅ All assets validation passed")
-        return True
+        return 0
     else:
         print(f"❌ Asset validation failed with {total_issues} issues:")
         for category, issues in validation_results.items():
@@ -50,7 +50,7 @@ def validate_all_assets(env):
                 print(f"  {category.title()}:")
                 for issue in issues:
                     print(f"    - {issue}")
-        return False
+        return 1
 
 def validate_asset_directory(assets_path):
     """Validate assets directory structure and contents"""
@@ -182,7 +182,7 @@ def process_all_assets(env):
     # - Create optimized variants
 
     print("✅ Asset processing completed (placeholder)")
-    return True
+    return 0
 
 def check_asset_integrity(env):
     """Check asset integrity using checksums"""
@@ -213,10 +213,10 @@ def check_asset_integrity(env):
         with open(checksums_path, 'w') as f:
             json.dump(checksums, f, indent=2)
         print(f"✅ Asset integrity check completed - {len(checksums)} assets checked")
-        return True
+        return 0
     except Exception as e:
         print(f"❌ Failed to save asset checksums: {e}")
-        return False
+        return 1
 
 def optimize_assets(env):
     """Optimize assets for production builds"""
@@ -231,7 +231,7 @@ def optimize_assets(env):
     # - Create atlases
 
     print("✅ Asset optimization completed (placeholder)")
-    return True
+    return 0
 
 # Initialize asset processing
 setup_asset_processing(env)

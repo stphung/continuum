@@ -258,19 +258,19 @@ def godot_export(env, preset_name, output_path, debug=False):
 
         if result.returncode == 0:
             print(f"✅ Export successful: {output_path}")
-            return True
+            return 0
         else:
             print(f"❌ Export failed for {preset_name}")
             print(f"   stdout: {result.stdout}")
             print(f"   stderr: {result.stderr}")
-            return False
+            return 1
 
     except subprocess.TimeoutExpired:
         print(f"❌ Export timed out for {preset_name}")
-        return False
+        return 1
     except Exception as e:
         print(f"❌ Export error for {preset_name}: {e}")
-        return False
+        return 1
 
 def godot_import_assets(env):
     """Import and process project assets"""
@@ -291,18 +291,18 @@ def godot_import_assets(env):
 
         if result.returncode == 0:
             print("✅ Asset import successful")
-            return True
+            return 0
         else:
             print("❌ Asset import failed")
             print(f"   stderr: {result.stderr}")
-            return False
+            return 1
 
     except subprocess.TimeoutExpired:
         print("❌ Asset import timed out")
-        return False
+        return 1
     except Exception as e:
         print(f"❌ Asset import error: {e}")
-        return False
+        return 1
 
 def godot_validate_project(env):
     """Validate Godot project integrity"""
@@ -327,45 +327,60 @@ def godot_validate_project(env):
         print("❌ Project validation failed - missing files:")
         for missing in missing_files:
             print(f"   - {missing}")
-        return False
+        return 1
 
     print("✅ Project structure validation passed")
-    return True
+    return 0
 
 def godot_run_tests(env):
-    """Run Godot test suite using gdUnit4"""
+    """Run Godot test suite using gdUnit4 directly"""
+    godot_path = env['GODOT_EXECUTABLE']
     project_path = str(env['PROJECT_DIR'])
-
-    # Check if test runner script exists
-    test_script = os.path.join(project_path, 'run_tests.sh')
-    if not os.path.exists(test_script):
-        print("❌ Test runner script not found: run_tests.sh")
-        return False
 
     print("🧪 Running Godot test suite...")
 
+    # First, import project assets (needed for running tests)
+    print("📦 Importing project assets...")
     try:
-        result = subprocess.run(['./run_tests.sh'],
-                              cwd=project_path,
-                              capture_output=True,
-                              text=True,
-                              timeout=600)
+        result = subprocess.run([
+            godot_path,
+            '--path', project_path,
+            '--headless',
+            '--quit-after', '1'
+        ], capture_output=True, text=True, timeout=120)
+
+        if result.returncode != 0:
+            print(f"⚠️ Asset import warning: {result.stderr}")
+    except Exception as e:
+        print(f"⚠️ Asset import error: {e}")
+
+    # Run the tests using gdUnit4
+    try:
+        result = subprocess.run([
+            godot_path,
+            '--path', project_path,
+            '--headless',
+            '-s', 'addons/gdUnit4/bin/GdUnitCmdTool.gd',
+            '--add', 'test',
+            '--continue',
+            '--ignoreHeadlessMode'
+        ], capture_output=True, text=True, timeout=600)
 
         if result.returncode == 0:
             print("✅ All tests passed")
-            return True
+            return 0
         else:
             print("❌ Tests failed")
             print(f"   stdout: {result.stdout}")
             print(f"   stderr: {result.stderr}")
-            return False
+            return 1
 
     except subprocess.TimeoutExpired:
         print("❌ Test execution timed out")
-        return False
+        return 1
     except Exception as e:
         print(f"❌ Test execution error: {e}")
-        return False
+        return 1
 
 # Initialize Godot integration
 setup_godot_integration(env)
