@@ -106,10 +106,11 @@ func fire_laser():
 	shoot.emit($MuzzlePosition.global_position, Vector2.UP, "laser")
 
 func _on_area_entered(area):
-	if invulnerable:
-		return
-		
 	if area.is_in_group("enemies") or area.is_in_group("enemy_bullets"):
+		# Check invulnerability and immediately set it to prevent multiple hits in same frame
+		if invulnerable:
+			return
+		invulnerable = true  # Immediately set invulnerable to prevent multiple damage
 		take_damage()
 	elif area.is_in_group("powerups"):
 		collect_powerup(area)

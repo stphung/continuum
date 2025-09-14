@@ -10,6 +10,7 @@ signal enemy_destroyed(points, position)
 var direction = Vector2.DOWN
 var time_alive = 0.0
 var initial_x
+var dive_locked = false  # For dive pattern - lock direction after initial targeting
 
 func _ready():
 	add_to_group("enemies")
@@ -26,9 +27,12 @@ func _process(delta):
 			position.y += speed * delta
 			position.x = initial_x + sin(time_alive * 3) * 100
 		"dive":
-			var player = get_tree().get_first_node_in_group("player")
-			if player and position.y > 200:
-				direction = (player.position - position).normalized()
+			# Standard shmup dive pattern: target player position at spawn time only, then continue straight
+			if not dive_locked:
+				var player = get_tree().get_first_node_in_group("player")
+				if player:
+					direction = (player.position - position).normalized()
+					dive_locked = true  # Lock direction after first targeting - no more tracking
 			position += direction * speed * delta
 		_:
 			position += direction * speed * delta

@@ -129,6 +129,7 @@ func test_no_power_up_drops_at_level_1():
 	# Should drop 0 power-ups (level 1 - 1 = 0)
 	assert_that(power_ups_dropped).is_equal(0)
 
+
 class MockEnemy extends Area2D:
 	func _init():
 		add_to_group("enemies")
