@@ -177,6 +177,7 @@ jobs:
           export/android/timestamping_authority_url = ""
           export/android/shutdown_adb_on_exit = true
           export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"
+          export/android/android_build_tools_ver = "33.0.2"
           EOF
 
       - name: Verify Android Environment
@@ -185,6 +186,10 @@ jobs:
           echo "JAVA_HOME: $JAVA_HOME"
           which java
           java -version
+          echo "Available Java installations:"
+          find /usr/lib/jvm -type d -name "java-*" 2>/dev/null || echo "No JVM directory found"
+          echo "Checking for OpenJDK 17:"
+          ls -la /usr/lib/jvm/java-17-openjdk-amd64 2>/dev/null || echo "Java 17 path not found"
 
           echo "=== Android SDK Information ==="
           echo "ANDROID_HOME: $ANDROID_HOME"
@@ -196,6 +201,9 @@ jobs:
 
           echo "=== Keystore Information ==="
           ls -la /tmp/debug.keystore
+
+          echo "=== Godot Editor Settings ==="
+          cat ~/.config/godot/editor_settings-4.4.tres
 
       - name: Android Build
         run: |
