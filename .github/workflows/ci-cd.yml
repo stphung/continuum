@@ -166,8 +166,8 @@ jobs:
           # Extract android_source.zip from export templates
           echo "=== Installing Android Build Template ==="
 
-          # Find the export templates directory
-          TEMPLATE_DIR="/root/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          # Find the export templates directory (moved to home directory in Setup step)
+          TEMPLATE_DIR="${HOME}/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
           echo "Template directory: $TEMPLATE_DIR"
           ls -la "$TEMPLATE_DIR"
 
