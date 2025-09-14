@@ -123,3 +123,73 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
         if: github.ref == 'refs/heads/main'
+
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-22.04
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [export-linux, export-windows, export-web]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Linux Build
+        uses: actions/download-artifact@v4
+        with:
+          name: linux
+          path: ./artifacts/linux
+
+      - name: Download Windows Build
+        uses: actions/download-artifact@v4
+        with:
+          name: windows
+          path: ./artifacts/windows
+
+      - name: Download Web Build
+        uses: actions/download-artifact@v4
+        with:
+          name: web
+          path: ./artifacts/web
+
+      - name: Create Release Archives
+        run: |
+          cd artifacts
+          zip -r ../continuum-linux-${GITHUB_REF#refs/tags/}.zip linux/
+          zip -r ../continuum-windows-${GITHUB_REF#refs/tags/}.zip windows/
+          zip -r ../continuum-web-${GITHUB_REF#refs/tags/}.zip web/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            continuum-linux-*.zip
+            continuum-windows-*.zip
+            continuum-web-*.zip
+          body: |
+            ## 🎮 Continuum Release ${GITHUB_REF#refs/tags/}
+
+            **Professional vertical scrolling shmup built in Godot 4.4**
+
+            ### 🚀 Play Options
+            - **🌐 Web**: [Play Online](https://stphung.github.io/continuum/) (Instant browser play)
+            - **🐧 Linux**: Download `continuum-linux-*.zip`
+            - **🪟 Windows**: Download `continuum-windows-*.zip`
+            - **🌐 Web Offline**: Download `continuum-web-*.zip` for local hosting
+
+            ### ✨ Features
+            - **Dual Weapon System**: Vulcan spread + Laser piercing with 5-level progression
+            - **Zero-Dependency Audio**: All sounds generated programmatically
+            - **Dynamic Difficulty**: Mathematical wave progression scaling
+            - **Professional Architecture**: Clean code with comprehensive testing
+
+            ### 🎯 Controls
+            - **Movement**: Arrow Keys or WASD
+            - **Shoot**: Spacebar (automatic)
+            - **Bomb**: Z key
+            - **Pause**: Escape
+
+            Built with modern game development practices and innovative technical solutions.
+          draft: false
+          prerelease: false

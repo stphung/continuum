@@ -369,6 +369,48 @@ pre-commit autoupdate
 /Applications/Godot.app/Contents/MacOS/Godot --path . --debug-stringnames --verbose
 ```
 
+### CI/CD Monitoring & Management
+```bash
+# Monitor GitHub Actions workflow status
+gh run list --limit 10
+
+# Check specific workflow run details
+gh run view <run-id>
+
+# View logs for failed runs
+gh run view <run-id> --log-failed
+
+# Check job-specific logs
+gh run view --job=<job-id> --log
+
+# Monitor real-time workflow progress
+gh run watch <run-id>
+
+# Download CI/CD artifacts locally
+gh run download <run-id>
+
+# Trigger workflow manually (if configured)
+gh workflow run ci-cd.yml
+
+# Check repository Pages status
+gh api repos/OWNER/REPO/pages
+
+# View latest releases and assets
+gh release list
+gh release view <tag>
+gh release download <tag>
+```
+
+**CI/CD Troubleshooting Workflow:**
+1. **Always monitor builds** after pushing CI/CD changes
+2. **Use `gh run watch`** for real-time progress tracking
+3. **Check logs immediately** if builds fail (`gh run view --log-failed`)
+4. **Verify artifacts** are generated correctly (`gh run download`)
+5. **Test deployment endpoints** (GitHub Pages, releases)
+6. **Document fixes** in commit messages for future reference
+7. **Monitor release creation** when tags are pushed
+8. **Validate asset uploads** in GitHub releases
+
 ### Using Claude Code Subagents
 ```bash
 # After implementing new audio synthesis features
