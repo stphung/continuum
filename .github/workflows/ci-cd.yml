@@ -143,12 +143,11 @@ jobs:
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
 
-      - name: Verify Android Environment
+      - name: Install Android Build Template
         run: |
-          echo "=== Verifying pre-configured Android environment ==="
-          echo "Android templates should be pre-configured in barichello/godot-ci container"
-          ls -la ~/.local/share/godot/export_templates/ || echo "No user templates found"
-          ls -la /root/.local/share/godot/export_templates/ || echo "No root templates found"
+          # Install Android build template in project (required for Godot Android export)
+          mkdir -v -p android/build
+          unzip -q ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_source.zip -d android/build
 
       - name: Configure Godot Android Settings
         run: |
