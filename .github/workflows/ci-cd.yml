@@ -137,13 +137,7 @@ jobs:
         uses: dulvui/godot-android-export@v1
         with:
           godot-version: '4.4.1'
-          godot-export-name: 'Android'
-          godot-package-name: 'com.continuum.game'
-          godot-project-name: 'Continuum'
-          android-min-sdk: '21'
-          android-target-sdk: '34'
-          android-build-tools: '34.0.0'
-          android-sdk-platform: 'android-34'
+          package-name: 'com.continuum.game'
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
