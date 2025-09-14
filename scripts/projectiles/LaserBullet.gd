@@ -59,7 +59,7 @@ func create_impact_effect():
 	var timer = Timer.new()
 	timer.wait_time = 0.5
 	timer.one_shot = true
-	timer.timeout.connect(flash.queue_free)
+	timer.timeout.connect(flash.call_deferred.bind("queue_free"))
 	flash.add_child(timer)
 	timer.start()
 

@@ -57,7 +57,7 @@ func destroy():
 		SoundManager.play_random_pitch("enemy_destroy", -8.0, 0.15)
 	
 	enemy_destroyed.emit(points, position)
-	queue_free()
+	call_deferred("queue_free")
 
 func _on_area_entered(area):
 	if area.is_in_group("player_bullets"):

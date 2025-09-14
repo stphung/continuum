@@ -99,4 +99,4 @@ func _on_life_timer_timeout():
 	tween.tween_callback(queue_free)
 
 func _on_screen_exited():
-	queue_free()
+	call_deferred("queue_free")

@@ -114,6 +114,7 @@ func _on_apply_button_pressed():
 	timer.wait_time = 1.0
 	timer.one_shot = true
 	timer.timeout.connect(_reset_apply_button)
+	timer.timeout.connect(timer.call_deferred.bind("queue_free"))
 	add_child(timer)
 	timer.start()
 

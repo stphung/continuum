@@ -43,7 +43,11 @@ func test_enemy_destruction_on_zero_health():
 
 	enemy.take_damage(1)
 
-	assert_that(enemy.is_queued_for_deletion()).is_true()
+	# Wait for deferred queue_free to take effect
+	await get_tree().process_frame
+
+	# Check that enemy instance is no longer valid (has been freed)
+	assert_that(is_instance_valid(enemy)).is_false()
 
 func test_enemy_destruction_emits_signal():
 	var signal_data = [false, 0, Vector2.ZERO]  # [emitted, points, position]

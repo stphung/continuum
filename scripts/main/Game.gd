@@ -40,12 +40,12 @@ func spawn_player():
 	if player_scene:
 		# Remove old player instance if it exists
 		if current_player and is_instance_valid(current_player):
-			current_player.queue_free()
+			current_player.call_deferred("queue_free")
 			await current_player.tree_exited
 		
 		# Remove the placeholder Player node from scene if it exists
 		if has_node("Player"):
-			$Player.queue_free()
+			$Player.call_deferred("queue_free")
 		
 		# Create new player
 		current_player = player_scene.instantiate()
@@ -145,7 +145,7 @@ func clear_screen_with_bomb():
 	# Clear all enemy bullets too
 	for bullet in $Bullets.get_children():
 		if bullet.is_in_group("enemy_bullets"):
-			bullet.queue_free()
+			bullet.call_deferred("queue_free")
 
 	# Create massive bomb explosion effect
 	EffectManager.create_explosion("bomb", Vector2(400, 450), $Effects)
@@ -164,6 +164,7 @@ func respawn_player():
 	timer.wait_time = 1.0
 	timer.one_shot = true
 	timer.timeout.connect(spawn_player)
+	timer.timeout.connect(timer.call_deferred.bind("queue_free"))
 	add_child(timer)
 	timer.start()
 
@@ -175,7 +176,7 @@ func game_over_sequence():
 
 
 	if current_player and is_instance_valid(current_player):
-		current_player.queue_free()
+		current_player.call_deferred("queue_free")
 		current_player = null
 
 func _on_restart_button_pressed():

@@ -221,7 +221,7 @@ func collect_powerup(powerup):
 	if has_node("/root/SoundManager"):
 		SoundManager.play_sound("powerup", -8.0, randf_range(0.9, 1.1))
 	
-	powerup.queue_free()
+	powerup.call_deferred("queue_free")
 
 func adjust_fire_rate():
 	# Adjust shooting timer based on weapon type and level
@@ -250,4 +250,4 @@ func show_upgrade_effect(text):
 	flash_tween.tween_property(self, "modulate", Color(1, 1, 1, 1), 0.1)
 
 func destroy():
-	queue_free()
+	call_deferred("queue_free")
