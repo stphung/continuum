@@ -4,7 +4,25 @@ This file provides comprehensive guidance to Claude Code (claude.ai/code) when w
 
 ## Project Overview
 
-Continuum is a professional-grade vertical scrolling shmup built in Godot 4.4, demonstrating modern game development architecture and innovative technical solutions. The project emphasizes clean code practices, comprehensive testing, and zero-dependency audio generation.
+Continuum is a professional-grade vertical scrolling shmup built in Godot 4.4, demonstrating modern game development architecture and innovative technical solutions. The project emphasizes clean code practices, comprehensive testing, zero-dependency audio generation, and professional SCons build system integration.
+
+### Build System Requirements
+
+This project uses **SCons** as its primary build system for professional automation:
+
+```bash
+# Install SCons (one-time setup)
+pip install scons
+
+# Core build commands
+scons test              # Execute complete test suite
+scons validate          # Run comprehensive project validation
+scons build-dev         # Build development version
+scons build-release     # Build optimized release version
+scons help              # Show all available commands
+```
+
+**Important**: Always use `scons test` instead of `./run_tests.sh` (which no longer exists). The SCons build system provides professional-grade automation for testing, validation, asset processing, and builds.
 
 ## Claude Code Subagent Integration
 
@@ -622,6 +640,30 @@ Strategy: Removed fragile implementation-detail tests, retained functional behav
 - Use `debugger` agent for test failure analysis and resolution
 
 ## Development Patterns
+
+### SCons Build System Architecture
+
+The project uses a professional SCons build system with modular Python components:
+
+**Core Build Files:**
+- `SConstruct` - Main build configuration and target definitions
+- `site_scons/godot_integration.py` - Godot export automation and project validation
+- `site_scons/assets.py` - Asset processing and validation pipeline
+- `site_scons/validation.py` - Comprehensive project quality assurance
+
+**Build System Integration:**
+```python
+# All build functions return 0 for success, non-zero for failure (SCons standard)
+# Functions are integrated as environment methods via AddMethod()
+env.GodotRunTests()        # Execute test suite
+env.ValidateAllAssets()    # Asset validation
+env.RunComprehensiveValidation()  # Full project validation
+```
+
+**Testing Integration:**
+- Tests run directly through Godot + gdUnit4 (no shell script dependency)
+- Pre-commit hooks use `scons test` for quality assurance
+- All test execution is controlled by SCons environment
 
 ### Adding New Game Features
 

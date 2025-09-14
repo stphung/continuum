@@ -34,6 +34,7 @@ Experience a completely procedural soundscape:
 
 ### **System Requirements**
 - Godot Engine 4.4.1 or newer
+- SCons build system (`pip install scons`)
 - Windows, macOS, or Linux
 
 ### **Installation & Play**
@@ -47,6 +48,9 @@ cd continuum
 
 # Launch the game
 /Applications/Godot.app/Contents/MacOS/Godot --path .
+
+# Or use the professional build system
+scons help  # Show all available commands
 ```
 
 ### **Controls**
@@ -89,6 +93,7 @@ Pause:    Escape key
 - **Mathematical Difficulty Scaling**: Algorithmic wave progression for balanced challenge
 
 ### **Development Quality**
+- **Professional Build System**: SCons integration for advanced build automation
 - **Modern Package Management**: Dependencies managed with gd-plug
 - **Comprehensive Testing**: Professional testing framework with gdUnit4
 - **Automated Quality Assurance**: Pre-commit hooks ensure code quality
@@ -101,14 +106,32 @@ Pause:    Escape key
 ./plug.gd install
 
 # Run tests to verify setup
-./run_tests.sh
+scons test
+
+# Run comprehensive project validation
+scons validate
 
 # Open in Godot Editor for modifications
 /Applications/Godot.app/Contents/MacOS/Godot --path . --editor
 ```
 
+### **SCons Build System**
+Professional build automation with comprehensive targets:
+```bash
+scons test              # Execute complete test suite
+scons validate          # Run project validation
+scons build-dev         # Build development version
+scons build-release     # Build optimized release
+scons help             # Show all available commands
+```
+
 ### **Project Structure**
 ```
+SConstruct       # Main SCons build configuration
+site_scons/      # SCons build modules
+  ├── assets.py    # Asset processing and validation
+  ├── godot_integration.py  # Godot export automation
+  └── validation.py # Comprehensive quality assurance
 scenes/          # Game scenes (player, enemies, projectiles)
 scripts/         # Game logic organized by system
   ├── autoloads/   # Global systems (audio, effects, enemy management)
@@ -129,9 +152,12 @@ The game is designed for easy modification:
 ### **Testing Your Changes**
 ```bash
 # Run the complete test suite
-./run_tests.sh
+scons test
 
-# Run specific test categories
+# Run comprehensive project validation
+scons validate
+
+# Direct Godot testing (advanced)
 /Applications/Godot.app/Contents/MacOS/Godot --path . --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add test/unit
 ```
 
@@ -160,8 +186,9 @@ Continuum is open source and welcomes contributions:
 1. **Fork the Repository**: Create your own copy to work on
 2. **Install Development Tools**: Run `./plug.gd install` for the full development environment
 3. **Make Your Changes**: Add features, fix bugs, or improve existing systems
-4. **Run Tests**: Ensure your changes don't break existing functionality with `./run_tests.sh`
-5. **Submit a Pull Request**: Share your improvements with the community
+4. **Run Tests**: Ensure your changes don't break existing functionality with `scons test`
+5. **Validate Quality**: Run `scons validate` to ensure comprehensive quality assurance
+6. **Submit a Pull Request**: Share your improvements with the community
 
 ### **Contribution Areas**
 - **Gameplay**: New enemy types, weapon systems, or power-up mechanics

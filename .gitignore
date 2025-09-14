@@ -35,6 +35,14 @@ Thumbs.db
 # Test reports
 reports/
 
+# SCons build system files
+.sconsign.dblite
+.sconf_temp/
+config.log
+build/
+dist/
+.temp/
+
 # gd-plug managed dependencies
 .plugged/
 addons/gdUnit4/
