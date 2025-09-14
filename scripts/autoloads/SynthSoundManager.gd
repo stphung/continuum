@@ -2,6 +2,7 @@ extends Node
 
 var audio_players = {}
 var sample_rate = 44100.0
+var active_streams = []
 
 func _ready():
 	# Create audio players for different sound types (including menu sounds)
@@ -17,12 +18,27 @@ func _ready():
 func play_sound(sound_name: String, volume_db: float = 0.0, pitch: float = 1.0):
 	if sound_name in audio_players:
 		var player = audio_players[sound_name]
+
+		# Clean up old stream before assigning new one
+		if player.stream:
+			var old_stream = player.stream
+			if old_stream in active_streams:
+				active_streams.erase(old_stream)
+			# Clear PCM data to free memory
+			if is_instance_valid(old_stream):
+				old_stream.data.clear()
+
 		var stream = generate_sound(sound_name)
 		if stream:
+			active_streams.append(stream)
 			player.stream = stream
 			player.volume_db = volume_db
 			player.pitch_scale = pitch
 			player.play()
+
+			# Connect to finished signal to cleanup stream when done
+			if not player.finished.is_connected(_on_sound_finished):
+				player.finished.connect(_on_sound_finished.bind(player))
 
 func play_random_pitch(sound_name: String, volume_db: float = 0.0, pitch_range: float = 0.1):
 	var random_pitch = randf_range(1.0 - pitch_range, 1.0 + pitch_range)
@@ -358,11 +374,59 @@ func create_beep(duration: float, freq: float) -> AudioStreamWAV:
 
 func stop_sound(sound_name: String):
 	if sound_name in audio_players:
-		audio_players[sound_name].stop()
+		var player = audio_players[sound_name]
+		player.stop()
+		# Clean up stream reference when stopping
+		if player.stream and player.stream in active_streams:
+			active_streams.erase(player.stream)
+		player.stream = null
 
 func stop_all_sounds():
 	for player in audio_players.values():
-		player.stop()
+		if is_instance_valid(player):
+			player.stop()
+			# Clean up stream reference when stopping all
+			if player.stream:
+				var stream = player.stream
+				if stream in active_streams:
+					active_streams.erase(stream)
+				# Clear PCM data to free memory
+				if is_instance_valid(stream):
+					stream.data.clear()
+				player.stream = null
+
+func _on_sound_finished(player: AudioStreamPlayer):
+	# Clean up stream reference when sound finishes playing
+	if player.stream:
+		var stream = player.stream
+		if stream in active_streams:
+			active_streams.erase(stream)
+		# Clear PCM data to free memory
+		if is_instance_valid(stream):
+			stream.data.clear()
+		player.stream = null
+
+func _exit_tree():
+	# Clean up all active streams on exit
+	stop_all_sounds()
+
+	# Explicitly free all AudioStreamWAV resources
+	for stream in active_streams:
+		if is_instance_valid(stream):
+			stream.data.clear()  # Clear PCM data
+	active_streams.clear()
+
+	# Clean up audio players
+	for player in audio_players.values():
+		if is_instance_valid(player):
+			if player.stream:
+				# Ensure stream reference is cleared before freeing player
+				var stream = player.stream
+				player.stream = null
+				if is_instance_valid(stream):
+					stream.data.clear()
+			player.call_deferred("queue_free")
+	audio_players.clear()
 
 # Menu Audio Generation Functions - Professional Title Screen System
 
@@ -373,6 +437,7 @@ func preload_menu_sounds():
 	for sound in menu_sounds:
 		var stream = generate_sound(sound)
 		if audio_players.has(sound):
+			active_streams.append(stream)
 			audio_players[sound].stream = stream
 
 func create_menu_navigate_sound() -> AudioStreamWAV:

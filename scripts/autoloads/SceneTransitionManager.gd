@@ -221,3 +221,18 @@ func transition_to_options() -> bool:
 func transition_to_credits() -> bool:
 	"""Quick transition to credits screen"""
 	return await transition_to_scene("res://scenes/menus/CreditsScreen.tscn", false)
+
+func _exit_tree():
+	# Clean up tween and other resources on exit
+	if tween:
+		tween.kill()
+		tween = null
+
+	# Clean up UI elements
+	if fade_overlay and is_instance_valid(fade_overlay):
+		fade_overlay.queue_free()
+		fade_overlay = null
+
+	if loading_label and is_instance_valid(loading_label):
+		loading_label.queue_free()
+		loading_label = null

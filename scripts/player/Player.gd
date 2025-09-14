@@ -204,13 +204,13 @@ func collect_powerup(powerup):
 		"bomb":
 			if game.has_method("add_bomb"):
 				game.add_bomb()
-			else:
+			elif "bombs" in game:
 				game.bombs += 1
 			show_upgrade_effect("BOMB +1")
 		"life":
 			if game.has_method("add_life"):
 				game.add_life()
-			else:
+			elif "lives" in game:
 				game.lives += 1
 			show_upgrade_effect("LIFE +1")
 	
