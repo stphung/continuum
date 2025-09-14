@@ -52,3 +52,7 @@ addons/gdUnit4/
 
 # Keep gd-plug itself
 !addons/gd-plug/
+
+# Android AAR libraries (downloaded in CI)
+android/libs/debug/godot-lib.template_debug.aar
+android/libs/release/godot-lib.template_release.aar

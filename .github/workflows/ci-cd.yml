@@ -162,6 +162,12 @@ jobs:
           mv templates/* ~/.local/share/godot/export_templates/4.4.1.stable/
           rm -f Godot_v4.4.1-stable_export_templates.tpz
 
+      - name: Install Android Build Template AAR Libraries
+        run: |
+          mkdir -p android/libs/debug android/libs/release
+          unzip -j ~/.local/share/godot/export_templates/4.4.1.stable/android_source.zip "libs/debug/godot-lib.template_debug.aar" -d android/libs/debug/
+          unzip -j ~/.local/share/godot/export_templates/4.4.1.stable/android_source.zip "libs/release/godot-lib.template_release.aar" -d android/libs/release/
+
       - name: Import project assets
         run: godot --path . --headless --import --quit-after 1 || true
 
