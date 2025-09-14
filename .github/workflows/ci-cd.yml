@@ -133,54 +133,23 @@ jobs:
         with:
           lfs: true
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - name: Android Build with dulvui/godot-android-export
+        uses: dulvui/godot-android-export@v1
         with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
-
-      - name: Accept Android SDK Licenses
-        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-
-      - name: Install Android Dependencies
-        run: |
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0"
-
-      - name: Setup Godot
-        uses: lihop/setup-godot@v2
-        with:
-          version: '4.4.1'
-
-      - name: Setup Android Export Templates
-        run: |
-          mkdir -p ~/.local/share/godot/export_templates/4.4.1.stable
-          wget -q https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz
-          unzip Godot_v4.4.1-stable_export_templates.tpz
-          mv templates/* ~/.local/share/godot/export_templates/4.4.1.stable/
-          rm -f Godot_v4.4.1-stable_export_templates.tpz
-
-      - name: Install Android Build Template AAR Libraries
-        run: |
-          mkdir -p android/libs/debug android/libs/release
-          unzip -j ~/.local/share/godot/export_templates/4.4.1.stable/android_source.zip "libs/debug/godot-lib.template_debug.aar" -d android/libs/debug/
-          unzip -j ~/.local/share/godot/export_templates/4.4.1.stable/android_source.zip "libs/release/godot-lib.template_release.aar" -d android/libs/release/
-
-      - name: Import project assets
-        run: godot --path . --headless --import --quit-after 1 || true
-
-      - name: Android Build
-        run: |
-          mkdir -p build/android
-          godot --headless --verbose --export-debug "Android" build/android/continuum.apk
+          godot-version: '4.4.1'
+          godot-export-name: 'Android'
+          godot-package-name: 'com.continuum.game'
+          godot-project-name: 'Continuum'
+          android-min-sdk: '21'
+          android-target-sdk: '34'
+          android-build-tools: '34.0.0'
+          android-sdk-platform: 'android-34'
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: android
-          path: build/android
+          path: dist/
 
   create-release:
     name: Create Release
