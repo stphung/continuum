@@ -59,8 +59,8 @@ pre-commit install
 # Execute quality checks manually
 pre-commit run --all-files
 
-# Skip hooks for emergency commits (use sparingly)
-git commit --no-verify -m "Emergency fix"
+# NEVER bypass pre-commit hooks - all commits must pass quality gates
+# If tests fail, fix them before committing - no exceptions
 
 # Update hook versions
 pre-commit autoupdate
@@ -276,6 +276,8 @@ func create_frequency_sweep(start_freq: float, end_freq: float, duration: float)
 ### Version Control Best Practices
 - Use semantic commit messages describing the change impact
 - Test all changes with the automated test suite before committing
+- **NEVER bypass pre-commit hooks** - all commits must pass quality gates
+- Fix failing tests before committing - no exceptions or workarounds
 - Keep commits focused and atomic (one feature/fix per commit)
 - Use feature branches for significant changes or experiments
 

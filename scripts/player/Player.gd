@@ -13,7 +13,9 @@ var weapon_level = 1
 var weapon_type = "vulcan"
 
 func _ready():
-	screen_size = get_viewport_rect().size
+	# Only set screen_size if it hasn't been set by external code (like tests)
+	if screen_size == null:
+		screen_size = get_viewport_rect().size
 	position = Vector2(screen_size.x / 2, screen_size.y - 100)
 	add_to_group("player")
 	adjust_fire_rate()  # Initialize fire rate
@@ -36,7 +38,7 @@ func _process(delta):
 
 func handle_movement(delta):
 	var velocity = Vector2.ZERO
-	
+
 	if Input.is_action_pressed("move_up"):
 		velocity.y -= 1
 	if Input.is_action_pressed("move_down"):
@@ -45,12 +47,14 @@ func handle_movement(delta):
 		velocity.x -= 1
 	if Input.is_action_pressed("move_right"):
 		velocity.x += 1
-	
+
 	if velocity.length() > 0:
 		velocity = velocity.normalized() * speed
 		position += velocity * delta
-		position.x = clamp(position.x, 20, screen_size.x - 20)
-		position.y = clamp(position.y, 20, screen_size.y - 20)
+
+	# Always enforce screen boundaries regardless of movement
+	position.x = clamp(position.x, 20, screen_size.x - 20)
+	position.y = clamp(position.y, 20, screen_size.y - 20)
 
 func handle_shooting():
 	if Input.is_action_pressed("shoot") and can_shoot:
@@ -58,7 +62,7 @@ func handle_shooting():
 
 func handle_bomb():
 	if Input.is_action_just_pressed("bomb"):
-		emit_signal("use_bomb")
+		use_bomb.emit()
 
 func _on_shoot_timer_timeout():
 	if Input.is_action_pressed("shoot") and can_shoot:
@@ -81,25 +85,25 @@ func fire_weapon():
 func fire_vulcan():
 	match weapon_level:
 		1:
-			emit_signal("shoot", $MuzzlePosition.global_position, Vector2.UP, "vulcan")
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
 		2:
-			emit_signal("shoot", $LeftMuzzle.global_position, Vector2.UP, "vulcan")
-			emit_signal("shoot", $RightMuzzle.global_position, Vector2.UP, "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2.UP, "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2.UP, "vulcan")
 		3:
-			emit_signal("shoot", $MuzzlePosition.global_position, Vector2.UP, "vulcan")
-			emit_signal("shoot", $LeftMuzzle.global_position, Vector2(-0.1, -1).normalized(), "vulcan")
-			emit_signal("shoot", $RightMuzzle.global_position, Vector2(0.1, -1).normalized(), "vulcan")
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.1, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.1, -1).normalized(), "vulcan")
 		_:
-			emit_signal("shoot", $MuzzlePosition.global_position, Vector2.UP, "vulcan")
-			emit_signal("shoot", $LeftMuzzle.global_position, Vector2(-0.2, -1).normalized(), "vulcan")
-			emit_signal("shoot", $RightMuzzle.global_position, Vector2(0.2, -1).normalized(), "vulcan")
-			emit_signal("shoot", $LeftMuzzle.global_position, Vector2(-0.1, -1).normalized(), "vulcan")
-			emit_signal("shoot", $RightMuzzle.global_position, Vector2(0.1, -1).normalized(), "vulcan")
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.2, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.2, -1).normalized(), "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.1, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.1, -1).normalized(), "vulcan")
 
 func fire_laser():
 	# Laser always fires a single, powerful beam regardless of level
 	# Higher levels increase damage and pierce through more enemies
-	emit_signal("shoot", $MuzzlePosition.global_position, Vector2.UP, "laser")
+	shoot.emit($MuzzlePosition.global_position, Vector2.UP, "laser")
 
 func _on_area_entered(area):
 	if invulnerable:
@@ -122,7 +126,7 @@ func take_damage():
 	destroy_ship()
 	
 	# Emit the hit signal - Game.gd will handle lives/respawn/game over logic
-	emit_signal("player_hit")
+	player_hit.emit()
 
 func create_death_explosion():
 	EffectManager.create_explosion("player_death", position, get_parent())

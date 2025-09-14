@@ -35,7 +35,8 @@ Thumbs.db
 # Test reports
 reports/
 
-# gd-plug generated addons (exclude only managed addons, not the package manager itself)
+# gd-plug managed dependencies
+.plugged/
 addons/gdUnit4/
 
 # Keep gd-plug itself

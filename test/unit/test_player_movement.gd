@@ -35,7 +35,7 @@ func test_player_invulnerability_prevents_damage():
 	player.invulnerable = true
 	var signal_monitor = monitor_signals(player)
 
-	var mock_enemy = MockEnemy.new()
+	var mock_enemy = auto_free(MockEnemy.new())
 	player._on_area_entered(mock_enemy)
 
 	# Check signal was not emitted
@@ -45,7 +45,7 @@ func test_player_takes_damage_when_vulnerable():
 	player.invulnerable = false
 	var signal_monitor = monitor_signals(player)
 
-	var mock_enemy = MockEnemy.new()
+	var mock_enemy = auto_free(MockEnemy.new())
 	player._on_area_entered(mock_enemy)
 
 	# Check signal was emitted

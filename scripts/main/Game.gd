@@ -20,6 +20,18 @@ func _ready():
 	_setup_enemy_system()
 
 func create_starfield():
+	# Clear existing stars first to avoid duplicates
+	for star in stars:
+		if is_instance_valid(star):
+			star.get_parent().remove_child(star)
+			star.queue_free()
+	stars.clear()
+
+	# Clear any existing stars in the Stars node
+	for child in $Stars.get_children():
+		$Stars.remove_child(child)
+		child.queue_free()
+
 	for i in range(50):
 		var star = ColorRect.new()
 		var size = randf_range(1, 3)
@@ -66,8 +78,11 @@ func spawn_player():
 
 
 func _setup_enemy_system():
-	EnemyManager.connect("enemy_destroyed", _on_enemy_destroyed)
-	EnemyManager.connect("wave_announcement", _on_wave_announcement)
+	# Only connect signals if not already connected
+	if not EnemyManager.enemy_destroyed.is_connected(_on_enemy_destroyed):
+		EnemyManager.connect("enemy_destroyed", _on_enemy_destroyed)
+	if not EnemyManager.wave_announcement.is_connected(_on_wave_announcement):
+		EnemyManager.connect("wave_announcement", _on_wave_announcement)
 	EnemyManager.setup_for_game($Enemies)
 
 	# Connect the existing timers to the EnemyManager (check if not already connected)
@@ -149,7 +164,7 @@ func clear_screen_with_bomb():
 			bullet.queue_free()
 
 	# Create massive bomb explosion effect
-	EffectManager.create_explosion("bomb", Vector2(400, 450), self)
+	EffectManager.create_explosion("bomb", Vector2(400, 450), $Effects)
 
 func _on_player_hit():
 	lives -= 1

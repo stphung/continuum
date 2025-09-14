@@ -132,17 +132,13 @@ func test_powerup_scale_animation():
 
 	var initial_scale = powerup.scale
 
-	# Let scale animation run
-	await get_tree().create_timer(0.5).timeout
+	# Let scale animation run - pulse animation should change scale
+	await get_tree().create_timer(1.0).timeout
 
 	# Scale should have changed due to pulsing animation
-	# Note: Check if tween exists as the animation should be active
-	var has_tween = false
-	for child in powerup.get_children():
-		if child is Tween:
-			has_tween = true
-			break
-	assert_that(has_tween).is_true()
+	# Since tweens run continuously, the scale should be different from initial
+	var scale_changed = powerup.scale != initial_scale
+	assert_that(scale_changed).is_true()
 
 func test_powerup_rotation_animation():
 	var powerup = auto_free(PowerUp.instantiate())
@@ -151,11 +147,10 @@ func test_powerup_rotation_animation():
 
 	var initial_rotation = powerup.rotation
 
-	# Simulate time for rotation
-	for i in range(60):
-		powerup._process(0.016)
+	# Wait for the tween-based rotation animation to run
+	await get_tree().create_timer(0.5).timeout
 
-	# Should have some rotation
+	# Should have some rotation due to the rotation tween
 	assert_that(powerup.rotation).is_not_equal(initial_rotation)
 
 class MockGame extends Node2D:

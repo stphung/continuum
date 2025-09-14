@@ -14,51 +14,66 @@ func before_test():
 func test_vulcan_weapon_level_1_single_shot():
 	player.weapon_type = "vulcan"
 	player.weapon_level = 1
-	var signal_monitor = monitor_signals(player)
 
+	# Connect signal to a simple counter to verify emission
+	var signal_count = [0]  # Use array for reference semantics
+	player.shoot.connect(func(pos, dir, weapon): signal_count[0] += 1)
+
+	# Ensure muzzle position node exists
+	assert_that(player.has_node("MuzzlePosition")).is_true()
+
+	# Test the actual method
 	player.fire_vulcan()
 
 	# Check signal was emitted once for single shot
-	await assert_signal(player).is_emitted("shoot")
+	assert_that(signal_count[0]).is_equal(1)
 
 func test_vulcan_weapon_level_2_dual_shot():
 	player.weapon_type = "vulcan"
 	player.weapon_level = 2
-	var signal_monitor = monitor_signals(player)
+
+	var signal_count = [0]
+	player.shoot.connect(func(pos, dir, weapon): signal_count[0] += 1)
 
 	player.fire_vulcan()
 
-	# Check signal was emitted (level 2 shoots from left and right muzzles)
-	await assert_signal(player).is_emitted("shoot")
+	# Check signal was emitted twice (level 2 shoots from left and right muzzles)
+	assert_that(signal_count[0]).is_equal(2)
 
 func test_vulcan_weapon_level_3_spread_shot():
 	player.weapon_type = "vulcan"
 	player.weapon_level = 3
-	var signal_monitor = monitor_signals(player)
+
+	var signal_count = [0]
+	player.shoot.connect(func(pos, dir, weapon): signal_count[0] += 1)
 
 	player.fire_vulcan()
 
-	# Check signal was emitted for spread shot
-	await assert_signal(player).is_emitted("shoot")
+	# Check signal was emitted 3 times for spread shot
+	assert_that(signal_count[0]).is_equal(3)
 
 func test_vulcan_weapon_max_level_wide_spread():
 	player.weapon_type = "vulcan"
 	player.weapon_level = 5
-	var signal_monitor = monitor_signals(player)
+
+	var signal_count = [0]
+	player.shoot.connect(func(pos, dir, weapon): signal_count[0] += 1)
 
 	player.fire_vulcan()
 
-	# Check signal was emitted for max level spread
-	await assert_signal(player).is_emitted("shoot")
+	# Check signal was emitted 5 times for max level spread
+	assert_that(signal_count[0]).is_equal(5)
 
 func test_laser_weapon_single_beam():
 	player.weapon_type = "laser"
-	var signal_monitor = monitor_signals(player)
+
+	var signal_count = [0]
+	player.shoot.connect(func(pos, dir, weapon): signal_count[0] += 1)
 
 	player.fire_laser()
 
-	# Check signal was emitted for laser
-	await assert_signal(player).is_emitted("shoot")
+	# Check signal was emitted once for laser
+	assert_that(signal_count[0]).is_equal(1)
 
 func test_laser_bullet_damage_scaling():
 	var laser = auto_free(LaserBullet.instantiate())
@@ -75,8 +90,8 @@ func test_laser_bullet_piercing_mechanics():
 	laser._ready()
 
 	# Create mock enemies
-	var enemy1 = MockEnemy.new()
-	var enemy2 = MockEnemy.new()
+	var enemy1 = auto_free(MockEnemy.new())
+	var enemy2 = auto_free(MockEnemy.new())
 
 	# First hit should not destroy laser
 	laser._on_area_entered(enemy1)

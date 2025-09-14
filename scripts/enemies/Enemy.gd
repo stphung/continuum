@@ -52,7 +52,7 @@ func destroy():
 	if has_node("/root/SoundManager"):
 		SoundManager.play_random_pitch("enemy_destroy", -8.0, 0.15)
 	
-	emit_signal("enemy_destroyed", points, position)
+	enemy_destroyed.emit(points, position)
 	queue_free()
 
 func _on_area_entered(area):

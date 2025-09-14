@@ -90,11 +90,26 @@ func _create_bomb_explosion(pos: Vector2, effects_parent: Node):
 		var shockwave = _create_shockwave_ring(pos, ring_i)
 		effects_parent.add_child(shockwave)
 
-		var ring_tween = effects_parent.create_tween()
-		ring_tween.tween_delay(ring_i * 0.1)
-		ring_tween.parallel().tween_property(shockwave, "scale", Vector2(8, 8), 0.8)
-		ring_tween.parallel().tween_property(shockwave, "modulate:a", 0, 0.8)
-		ring_tween.tween_callback(shockwave.queue_free)
+		# Create timer-based delay for rings
+		if ring_i > 0:
+			var timer = Timer.new()
+			timer.wait_time = ring_i * 0.1
+			timer.one_shot = true
+			effects_parent.add_child(timer)
+			timer.timeout.connect(func():
+				var ring_tween = effects_parent.create_tween()
+				ring_tween.tween_property(shockwave, "scale", Vector2(8, 8), 0.8)
+				ring_tween.parallel().tween_property(shockwave, "modulate:a", 0, 0.8)
+				ring_tween.tween_callback(shockwave.queue_free)
+				timer.queue_free()
+			)
+			timer.start()
+		else:
+			# First ring starts immediately
+			var ring_tween = effects_parent.create_tween()
+			ring_tween.tween_property(shockwave, "scale", Vector2(8, 8), 0.8)
+			ring_tween.parallel().tween_property(shockwave, "modulate:a", 0, 0.8)
+			ring_tween.tween_callback(shockwave.queue_free)
 
 	_create_screen_flash_sequence(effects_parent)
 	_schedule_cleanup([mega_explosion], effects_parent, 2.0)
@@ -172,10 +187,24 @@ func _create_screen_flash_sequence(parent: Node):
 		pulse_flash.color = Color(1, 0.9, 0.2, 0.2)
 		parent.add_child(pulse_flash)
 
-		var pulse_tween = parent.create_tween()
-		pulse_tween.tween_delay(pulse_i * 0.15)
-		pulse_tween.tween_property(pulse_flash, "modulate:a", 0, 0.1)
-		pulse_tween.tween_callback(pulse_flash.queue_free)
+		# Create timer-based delay for pulses
+		if pulse_i > 0:
+			var timer = Timer.new()
+			timer.wait_time = pulse_i * 0.15
+			timer.one_shot = true
+			parent.add_child(timer)
+			timer.timeout.connect(func():
+				var pulse_tween = parent.create_tween()
+				pulse_tween.tween_property(pulse_flash, "modulate:a", 0, 0.1)
+				pulse_tween.tween_callback(pulse_flash.queue_free)
+				timer.queue_free()
+			)
+			timer.start()
+		else:
+			# First pulse starts immediately
+			var pulse_tween = parent.create_tween()
+			pulse_tween.tween_property(pulse_flash, "modulate:a", 0, 0.1)
+			pulse_tween.tween_callback(pulse_flash.queue_free)
 
 func _schedule_cleanup(particles: Array, parent: Node, delay: float):
 	var cleanup_timer = Timer.new()
