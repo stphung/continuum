@@ -117,19 +117,54 @@ func _on_area_entered(area):
 func take_damage():
 	# Always create explosion effect for visual feedback
 	create_death_explosion()
-	
+
 	# Play player hit sound
 	if has_node("/root/SoundManager"):
 		SoundManager.play_sound("player_hit", -5.0)
-	
+
+	# Drop power-ups equivalent to current upgrades
+	drop_power_ups()
+
 	# Always destroy ship immediately on any hit
 	destroy_ship()
-	
+
 	# Emit the hit signal - Game.gd will handle lives/respawn/game over logic
 	player_hit.emit()
 
 func create_death_explosion():
 	EffectManager.create_explosion("player_death", position, get_parent())
+
+func drop_power_ups():
+	"""Drop power-ups equivalent to current player upgrades when dying"""
+	var powerup_scene = preload("res://scenes/pickups/PowerUp.tscn")
+	var parent = get_parent()
+
+	# Drop weapon upgrade power-ups equal to weapon level - 1 (level 1 is default)
+	var weapon_upgrades_to_drop = weapon_level - 1
+	for i in range(weapon_upgrades_to_drop):
+		var powerup = powerup_scene.instantiate()
+		powerup.powerup_type = "weapon_upgrade"
+		powerup.update_appearance()
+
+		# Position power-ups in a spread around death location
+		var spread_angle = (i * TAU / max(weapon_upgrades_to_drop, 1)) + randf_range(-0.5, 0.5)
+		var spread_distance = randf_range(30, 60)
+		var offset = Vector2(cos(spread_angle), sin(spread_angle)) * spread_distance
+		powerup.position = position + offset
+
+		parent.add_child(powerup)
+
+	# Drop weapon switch power-up if player has laser (since vulcan is default)
+	if weapon_type == "laser":
+		var laser_powerup = powerup_scene.instantiate()
+		laser_powerup.powerup_type = "weapon_switch"
+		laser_powerup.update_appearance()
+
+		# Position slightly offset from death location
+		var laser_offset = Vector2(randf_range(-40, 40), randf_range(-20, 20))
+		laser_powerup.position = position + laser_offset
+
+		parent.add_child(laser_powerup)
 
 func destroy_ship():
 	# Make ship invisible immediately

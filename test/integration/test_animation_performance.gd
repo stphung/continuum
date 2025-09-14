@@ -321,12 +321,10 @@ func test_concurrent_animations_performance():
 			credits_screen.setup_entrance_animation()
 			credits_screen.setup_auto_scroll()
 
-			# Simulate user interactions
+			# Simulate user interactions (without await inside lambda)
 			for i in range(20):
 				title_screen.navigate_down()
-				credits_screen.manual_scroll(10)
-				await get_tree().process_frame
-		,
+				credits_screen.manual_scroll(10),
 		"Concurrent Animations Stress Test"
 	)
 
@@ -339,8 +337,7 @@ func test_rapid_animation_creation_destruction():
 		func():
 			var tween = create_tween()
 			tween.tween_property(self, "position", Vector2.ZERO, 0.01)
-			tween.kill()
-		,
+			tween.kill(),
 		"Rapid Animation Creation/Destruction"
 	)
 
@@ -354,8 +351,7 @@ func test_extreme_scroll_performance():
 	await _measure_performance_during_rapid_input(
 		func():
 			# Extreme scroll values
-			credits_screen.manual_scroll(randf_range(-500, 500))
-		,
+			credits_screen.manual_scroll(randf_range(-500, 500)),
 		"Extreme Scroll Performance Test"
 	)
 
@@ -376,18 +372,16 @@ func test_realistic_user_interaction_performance():
 				# Menu navigation
 				for i in range(4):
 					title_screen.navigate_down()
-					await get_tree().process_frame
+					# await get_tree().process_frame - removed from lambda
 
 				# Menu selection simulation
 				title_screen.activate_current_button()
-				await get_tree().process_frame
+				# await get_tree().process_frame - removed from lambda
 
 				# Credits interaction
 				credits_screen.manual_scroll(30)
-				await get_tree().process_frame
-				credits_screen.toggle_auto_scroll()
-				await get_tree().process_frame
-		,
+				# await get_tree().process_frame - removed from lambda
+				credits_screen.toggle_auto_scroll(),
 		"Realistic User Interaction"
 	)
 
@@ -578,8 +572,7 @@ func test_performance_consistency_across_runs():
 		await _measure_performance_during_rapid_input(
 			func():
 				title_screen.navigate_down()
-				title_screen.navigate_up()
-			,
+				title_screen.navigate_up(),
 			"Consistency Test Run " + str(run)
 		)
 
@@ -630,8 +623,7 @@ func test_gpu_resource_efficiency():
 				test_button.size = Vector2(100, 30)
 				add_child(test_button)
 				auto_free(test_button)
-				title_screen.animate_button_highlight(test_button, true)
-		,
+				title_screen.animate_button_highlight(test_button, true),
 		"GPU Resource Efficiency Test"
 	)
 

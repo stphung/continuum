@@ -10,8 +10,8 @@ config_version=5
 
 [application]
 
-config/name="Raiden Clone"
-config/description="A vertical shooter inspired by Raiden"
+config/name="Continuum"
+config/description="Continuum - Professional vertical scrolling shmup showcasing modern game development architecture"
 run/main_scene="res://scenes/main/Main.tscn"
 config/features=PackedStringArray("4.4")
 config/icon="res://icon.svg"
@@ -21,7 +21,6 @@ config/icon="res://icon.svg"
 SoundManager="*res://scripts/autoloads/SynthSoundManager.gd"
 EffectManager="*res://scripts/autoloads/VisualEffects.gd"
 EnemyManager="*res://scripts/autoloads/EnemyManager.gd"
-KioskManager="*res://scripts/autoloads/KioskManager.gd"
 SceneTransitionManager="*res://scripts/autoloads/SceneTransitionManager.gd"
 
 [display]

@@ -68,11 +68,11 @@ func setup_initial_animations():
 	# Animate menu container with delay
 	title_tween.tween_property(menu_container, "position:y", menu_container.position.y - 50, 0.8)
 	title_tween.tween_property(menu_container, "modulate:a", 1.0, 0.8)
-	title_tween.tween_delay(0.3)
+	title_tween.tween_interval(0.3)
 
 	# Animate instructions last
 	title_tween.tween_property(instructions, "modulate:a", 1.0, 0.5)
-	title_tween.tween_delay(0.8)
+	title_tween.tween_interval(0.8)
 
 	# Animation complete
 	title_tween.tween_callback(_on_animation_complete)

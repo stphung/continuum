@@ -172,15 +172,6 @@ func game_over_sequence():
 	$UI/GameOverPanel.visible = true
 	$UI/GameOverPanel/FinalScoreLabel.text = "Final Score: " + str(score)
 
-	# Report score to kiosk system if active
-	if has_node("/root/KioskManager") and KioskManager.is_kiosk_active():
-		var metadata = {
-			"survival_time": Time.get_ticks_msec() / 1000.0,
-			"enemies_defeated": EnemyManager.get_enemies_destroyed_count() if EnemyManager.has_method("get_enemies_destroyed_count") else 0,
-			"weapon_level": current_player.weapon_level if current_player and is_instance_valid(current_player) else 1,
-			"weapon_type": current_player.weapon_type if current_player and is_instance_valid(current_player) else "vulcan"
-		}
-		KioskManager.high_score_manager.add_score("PLAYER", score, metadata)
 
 	if current_player and is_instance_valid(current_player):
 		current_player.queue_free()
@@ -189,22 +180,6 @@ func game_over_sequence():
 func _on_restart_button_pressed():
 	get_tree().reload_current_scene()
 
-# Kiosk Mode Support Methods
-func pause_game():
-	"""Pause game for kiosk mode transitions"""
-	set_process(false)
-	$EnemySpawnTimer.paused = true
-	$WaveTimer.paused = true
-
-func resume_game():
-	"""Resume game from kiosk mode"""
-	set_process(true)
-	$EnemySpawnTimer.paused = false
-	$WaveTimer.paused = false
-
-func get_current_score() -> int:
-	"""Get current game score (for kiosk system)"""
-	return score
 
 func get_player_weapon_info() -> Dictionary:
 	"""Get player weapon information for AI system"""

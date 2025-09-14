@@ -72,6 +72,63 @@ func test_player_invulnerability_duration():
 	await get_tree().create_timer(5.2).timeout
 	assert_that(player.invulnerable).is_false()
 
+func test_power_up_drops_on_death():
+	# Setup player with weapon upgrades
+	player.weapon_level = 3
+	player.weapon_type = "laser"
+	var initial_powerups = get_tree().get_nodes_in_group("powerups").size()
+
+	# Trigger player death
+	player.take_damage()
+
+	# Wait for power-ups to be created
+	await get_tree().process_frame
+
+	# Check that power-ups were dropped
+	var final_powerups = get_tree().get_nodes_in_group("powerups").size()
+	var power_ups_dropped = final_powerups - initial_powerups
+
+	# Should drop 2 weapon upgrades (level 3 - 1) + 1 weapon switch (laser)
+	assert_that(power_ups_dropped).is_equal(3)
+
+func test_power_up_drops_weapon_upgrades_only():
+	# Setup player with only weapon upgrades (no laser)
+	player.weapon_level = 4
+	player.weapon_type = "vulcan"
+	var initial_powerups = get_tree().get_nodes_in_group("powerups").size()
+
+	# Trigger player death
+	player.take_damage()
+
+	# Wait for power-ups to be created
+	await get_tree().process_frame
+
+	# Check that only weapon upgrade power-ups were dropped
+	var final_powerups = get_tree().get_nodes_in_group("powerups").size()
+	var power_ups_dropped = final_powerups - initial_powerups
+
+	# Should drop 3 weapon upgrades (level 4 - 1), no weapon switch
+	assert_that(power_ups_dropped).is_equal(3)
+
+func test_no_power_up_drops_at_level_1():
+	# Setup player at level 1 (default)
+	player.weapon_level = 1
+	player.weapon_type = "vulcan"
+	var initial_powerups = get_tree().get_nodes_in_group("powerups").size()
+
+	# Trigger player death
+	player.take_damage()
+
+	# Wait for power-ups to be created
+	await get_tree().process_frame
+
+	# Check that no power-ups were dropped
+	var final_powerups = get_tree().get_nodes_in_group("powerups").size()
+	var power_ups_dropped = final_powerups - initial_powerups
+
+	# Should drop 0 power-ups (level 1 - 1 = 0)
+	assert_that(power_ups_dropped).is_equal(0)
+
 class MockEnemy extends Area2D:
 	func _init():
 		add_to_group("enemies")

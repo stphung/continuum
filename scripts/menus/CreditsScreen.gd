@@ -52,7 +52,8 @@ func setup_auto_scroll():
 		return
 
 	# Wait for entrance animation to complete
-	await entrance_tween.finished
+	if entrance_tween != null:
+		await entrance_tween.finished
 
 	# Calculate total scroll distance
 	var content_height = credits_content.get_minimum_size().y
@@ -71,14 +72,14 @@ func setup_auto_scroll():
 	scroll_tween.tween_property(scroll_container, "scroll_vertical", max_scroll, scroll_down_time)
 
 	# Pause at bottom
-	scroll_tween.tween_delay(2.0)
+	scroll_tween.tween_interval(2.0)
 
 	# Scroll back to top
 	var scroll_up_time = max_scroll / (scroll_speed * 1.5)  # Slightly faster return
 	scroll_tween.tween_property(scroll_container, "scroll_vertical", 0, scroll_up_time)
 
 	# Pause at top before repeating
-	scroll_tween.tween_delay(3.0)
+	scroll_tween.tween_interval(3.0)
 
 func _input(event):
 	"""Handle user input for navigation and scroll control"""
@@ -174,7 +175,8 @@ func _on_back_button_pressed():
 	exit_tween.tween_property(credits_content, "modulate:a", 0.0, 0.5)
 
 	# Wait for exit animation
-	await exit_tween.finished
+	if exit_tween != null:
+		await exit_tween.finished
 
 	# Return to title screen
 	if has_node("/root/SceneTransitionManager"):

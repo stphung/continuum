@@ -21,6 +21,8 @@ func _ready():
 
 func setup_difficulty_options():
 	"""Initialize the difficulty dropdown options"""
+	if difficulty_option == null:
+		return
 	difficulty_option.clear()
 	difficulty_option.add_item("Easy")
 	difficulty_option.add_item("Normal")
