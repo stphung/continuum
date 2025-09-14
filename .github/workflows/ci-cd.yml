@@ -143,15 +143,17 @@ jobs:
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
 
-      - name: Install Android Build Template Libraries
+      - name: Install Android Build Template
         run: |
-          mkdir -p android/libs/debug android/libs/release
-          unzip -j ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_source.zip \
-            "libs/debug/godot-lib.template_debug.aar" \
-            -d android/libs/debug/
-          unzip -j ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_source.zip \
-            "libs/release/godot-lib.template_release.aar" \
-            -d android/libs/release/
+          # Backup existing android directory
+          if [ -d "android" ]; then
+            mv android android.backup
+          fi
+          # Extract fresh android template
+          unzip -q ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_source.zip -d android_temp
+          mv android_temp android
+          # Create build directory that Godot expects
+          mkdir -p android/build
 
       - name: Import project assets
         run: |
