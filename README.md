@@ -231,7 +231,7 @@ Continuum is licensed under GPL v3.0, making it free and open source software. Y
 - Distribute your modifications
 - Use it for learning game development
 
-See [LICENSE](LICENSE) for complete terms.
+See [LICENSE.md](LICENSE.md) for complete terms.
 
 ## 🎵 **Soundtrack Notes**
 
