@@ -155,6 +155,13 @@ jobs:
 
       - name: Configure Godot Android Settings
         run: |
+          # Create debug keystore first
+          keytool -genkey -v -keystore /tmp/debug.keystore \
+            -alias androiddebugkey \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass android -keypass android \
+            -dname "CN=Android Debug,O=Android,C=US"
+
           # Create Godot editor settings directory
           mkdir -p ~/.config/godot
 
@@ -169,6 +176,7 @@ jobs:
           export/android/force_system_user = false
           export/android/timestamping_authority_url = ""
           export/android/shutdown_adb_on_exit = true
+          export/android/android_build_tools_ver = "33.0.2"
           EOF
 
       - name: Import project assets
