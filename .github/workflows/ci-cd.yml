@@ -154,6 +154,14 @@ jobs:
         with:
           version: '4.4.1'
 
+      - name: Setup Android Export Templates
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates/4.4.1.stable
+          wget -q https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz
+          unzip Godot_v4.4.1-stable_export_templates.tpz
+          mv templates/* ~/.local/share/godot/export_templates/4.4.1.stable/
+          rm -f Godot_v4.4.1-stable_export_templates.tpz
+
       - name: Import project assets
         run: godot --path . --headless --import --quit-after 1 || true
 
