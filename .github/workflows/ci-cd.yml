@@ -147,7 +147,7 @@ jobs:
 
       - name: Install Android Dependencies
         run: |
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-33" "build-tools;33.0.2"
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0"
 
       - name: Setup Godot
         uses: lihop/setup-godot@v2
