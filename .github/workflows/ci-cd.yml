@@ -180,6 +180,14 @@ jobs:
           export/android/android_build_tools_ver = "33.0.2"
           EOF
 
+      - name: Temporarily Hide Test Files
+        run: |
+          # Move test files outside project directory to prevent parsing errors
+          if [ -d "test" ]; then
+            mv test /tmp/test_backup_$GITHUB_RUN_ID
+            echo "Test files moved outside project directory before import"
+          fi
+
       - name: Import project assets
         run: |
           godot --path . --headless --import --quit-after 1 || true
@@ -214,18 +222,14 @@ jobs:
         run: |
           mkdir -v -p build/android
 
-          # Temporarily move test files OUTSIDE project directory to prevent parsing errors
-          echo "=== Temporarily moving test files ==="
-          if [ -d "test" ]; then
-            mv test /tmp/test_backup_$GITHUB_RUN_ID
-            echo "Test files moved outside project directory"
-          fi
-
           echo "=== Attempting APK Export ==="
           # Export with debug configuration with maximum verbosity
           godot --headless --verbose --export-debug "Android" build/android/$EXPORT_NAME.apk
 
-          # Restore test files after export
+      - name: Restore Test Files
+        if: always()
+        run: |
+          # Restore test files after Android export (always run this step)
           if [ -d "/tmp/test_backup_$GITHUB_RUN_ID" ]; then
             mv /tmp/test_backup_$GITHUB_RUN_ID test
             echo "Test files restored"
