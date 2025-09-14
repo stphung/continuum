@@ -32,9 +32,6 @@ Thumbs.db
 *.tmp
 *.temp
 
-# Test reports
-reports/
-
 # SCons build system files
 .sconsign.dblite
 .sconf_temp/
@@ -42,6 +39,12 @@ config.log
 build/
 dist/
 .temp/
+
+# Godot editor settings (user-specific)
+Godot/
+
+# Test reports and generated files
+reports/
 
 # gd-plug managed dependencies
 .plugged/
