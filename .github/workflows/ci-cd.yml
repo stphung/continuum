@@ -167,10 +167,12 @@ jobs:
           EOF
 
       - name: Setup Release Keystore (if available)
+        env:
+          KEYSTORE_BASE64: ${{ secrets.SECRET_RELEASE_KEYSTORE_BASE64 }}
         run: |
-          if [ -n "${{ secrets.SECRET_RELEASE_KEYSTORE_BASE64 }}" ]; then
+          if [ -n "$KEYSTORE_BASE64" ]; then
             echo "Setting up release keystore..."
-            echo ${{ secrets.SECRET_RELEASE_KEYSTORE_BASE64 }} | base64 --decode > /tmp/release.keystore
+            echo "$KEYSTORE_BASE64" | base64 --decode > /tmp/release.keystore
             ls -la /tmp/release.keystore
           else
             echo "No release keystore configured, using debug build"
@@ -212,16 +214,20 @@ jobs:
           cat ~/.config/godot/editor_settings-4.4.tres
 
       - name: Android Build
+        env:
+          KEYSTORE_BASE64: ${{ secrets.SECRET_RELEASE_KEYSTORE_BASE64 }}
+          KEYSTORE_USER: ${{ secrets.SECRET_RELEASE_KEYSTORE_USER }}
+          KEYSTORE_PASSWORD: ${{ secrets.SECRET_RELEASE_KEYSTORE_PASSWORD }}
         run: |
           mkdir -v -p build/android
 
           # Configure keystore settings if available (following official Godot CI pattern)
-          if [ -n "${{ secrets.SECRET_RELEASE_KEYSTORE_BASE64 }}" ]; then
+          if [ -n "$KEYSTORE_BASE64" ]; then
             echo "=== Configuring Release Build with Keystore ==="
             # Update export preset with keystore settings
-            sed 's@keystore/release=".*"@keystore/release="/tmp/release.keystore"@g' -i export_presets.cfg
-            sed 's@keystore/release_user=".*"@keystore/release_user="${{ secrets.SECRET_RELEASE_KEYSTORE_USER }}"@g' -i export_presets.cfg
-            sed 's@keystore/release_password=".*"@keystore/release_password="${{ secrets.SECRET_RELEASE_KEYSTORE_PASSWORD }}"@g' -i export_presets.cfg
+            sed "s@keystore/release=\".*\"@keystore/release=\"/tmp/release.keystore\"@g" -i export_presets.cfg
+            sed "s@keystore/release_user=\".*\"@keystore/release_user=\"$KEYSTORE_USER\"@g" -i export_presets.cfg
+            sed "s@keystore/release_password=\".*\"@keystore/release_password=\"$KEYSTORE_PASSWORD\"@g" -i export_presets.cfg
             sed 's@package/signed=false@package/signed=true@g' -i export_presets.cfg
 
             EXPORT_TYPE="release"
