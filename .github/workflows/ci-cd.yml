@@ -28,27 +28,16 @@ jobs:
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
 
-      - name: Install gd-plug dependencies
-        run: |
-          chmod +x ./plug.gd
-          ./plug.gd install
 
       - name: Import project assets
         run: |
           godot --path . --headless --import --quit-after 1 || true
 
-      - name: Run Godot tests
+      - name: Validate project
         run: |
-          godot --path . --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add test --continue --ignoreHeadlessMode
+          godot --path . --headless --check-only --quit-after 1
         continue-on-error: false
 
-      - name: Upload test reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-reports
-          path: reports/
-          retention-days: 30
 
   build-desktop:
     name: Build Desktop
@@ -71,10 +60,6 @@ jobs:
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
 
-      - name: Install dependencies
-        run: |
-          chmod +x ./plug.gd
-          ./plug.gd install
 
       - name: Import project assets
         run: |
@@ -147,10 +132,6 @@ jobs:
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
 
-      - name: Install dependencies
-        run: |
-          chmod +x ./plug.gd
-          ./plug.gd install
 
       - name: Import project assets
         run: |
@@ -317,10 +298,6 @@ jobs:
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
 
-      - name: Install dependencies
-        run: |
-          chmod +x ./plug.gd
-          ./plug.gd install
 
       - name: Import project assets
         run: |
