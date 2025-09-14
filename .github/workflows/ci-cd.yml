@@ -140,6 +140,27 @@ jobs:
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
 
+      - name: Setup Android SDK
+        run: |
+          # Set up Android SDK paths for Godot
+          export ANDROID_SDK_ROOT=/usr/lib/android-sdk
+          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+
+          # Create godot settings directory
+          mkdir -p ~/.config/godot
+
+          # Configure Godot editor settings with Android SDK paths
+          cat > ~/.config/godot/editor_settings-4.4.tres << EOF
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/android_sdk_path = "/usr/lib/android-sdk"
+          export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"
+          export/android/debug_keystore = "/usr/lib/android-sdk/.android/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          EOF
+
       - name: Import project assets
         run: |
           godot --path . --headless --import --quit-after 1 || true
@@ -147,6 +168,8 @@ jobs:
       - name: Android Build
         run: |
           mkdir -v -p build/android
+          export ANDROID_SDK_ROOT=/usr/lib/android-sdk
+          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
           godot --headless --verbose --export-release "Android" build/android/$EXPORT_NAME.apk
 
       - name: Upload Artifact
