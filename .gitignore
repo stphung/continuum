@@ -31,3 +31,12 @@ Thumbs.db
 # OS generated files
 *.tmp
 *.temp
+
+# Test reports
+reports/
+
+# gd-plug generated addons (exclude only managed addons, not the package manager itself)
+addons/gdUnit4/
+
+# Keep gd-plug itself
+!addons/gd-plug/

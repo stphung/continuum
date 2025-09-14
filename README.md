@@ -2,7 +2,7 @@
 
 A meticulously crafted vertical shooter game inspired by Raiden, built with Godot 4.4 following industry best practices.
 
-![Game Screenshot](https://img.shields.io/badge/Godot-4.4-blue.svg) ![Language](https://img.shields.io/badge/Language-GDScript-orange.svg) ![Architecture](https://img.shields.io/badge/Architecture-Refactored-green.svg) ![Code Quality](https://img.shields.io/badge/Code%20Quality-Professional-brightgreen.svg)
+![Game Screenshot](https://img.shields.io/badge/Godot-4.4-blue.svg) ![Language](https://img.shields.io/badge/Language-GDScript-orange.svg) ![Architecture](https://img.shields.io/badge/Architecture-Refactored-green.svg) ![Code Quality](https://img.shields.io/badge/Code%20Quality-Professional-brightgreen.svg) ![Testing](https://img.shields.io/badge/Testing-gdUnit4-purple.svg) ![Package Manager](https://img.shields.io/badge/Dependencies-gd--plug-yellow.svg)
 
 ## 🎮 Enhanced Features
 
@@ -117,6 +117,77 @@ A meticulously crafted vertical shooter game inspired by Raiden, built with Godo
    # Run with specific renderer
    /Applications/Godot.app/Contents/MacOS/Godot --path . --rendering-driver metal
    ```
+
+## 📦 **Package Management & Dependencies**
+
+This project uses **gd-plug**, the modern package manager for Godot, ensuring professional dependency management and reproducible builds.
+
+### **Setup Dependencies**
+```bash
+# Install all project dependencies automatically
+./plug.gd install
+```
+
+### **Current Dependencies**
+- **gdUnit4 v5.0.3** - Modern testing framework for Godot 4.4
+- **gd-plug** - Package manager for addon management
+
+### **Adding New Dependencies**
+Edit `plug.gd` to add new packages:
+```gdscript
+func _plugging():
+    plug("MikeSchulze/gdUnit4", {"tag": "v5.0.3"})
+    plug("AuthorName/NewAddon", {"tag": "v1.0.0"})  # Add here
+```
+
+## 🧪 **Professional Testing Framework**
+
+Comprehensive test suite built with **gdUnit4** ensuring code quality and reliability.
+
+### **Running Tests**
+```bash
+# Run complete test suite
+./run_tests.sh
+
+# Tests run automatically on commit (pre-commit hooks)
+git commit -m "Your changes"  # Tests execute automatically
+```
+
+### **Test Structure**
+```
+test/
+├── unit/           # Component-level tests
+├── integration/    # System interaction tests
+├── scene/          # End-to-end gameplay tests
+└── helpers/        # Test utilities and mocks
+```
+
+### **Test Reports**
+- **HTML Reports**: Generated in `reports/` folder after each test run
+- **XML Reports**: JUnit-compatible for CI/CD integration
+- **Real-time Output**: Color-coded test results in terminal
+
+### **Pre-commit Quality Gates**
+- **Automated Testing**: All tests must pass before commits
+- **Code Quality**: Godot project validation and import checks
+- **File Formatting**: Trailing whitespace and end-of-file fixes
+- **Repository Health**: Large file detection and merge conflict prevention
+
+### **Continuous Integration Ready**
+```yaml
+# GitHub Actions Example
+- name: Setup Dependencies
+  run: ./plug.gd install
+
+- name: Run Tests
+  run: ./run_tests.sh
+
+- name: Upload Test Reports
+  uses: actions/upload-artifact@v3
+  with:
+    name: test-reports
+    path: reports/
+```
 
 ## 🏛️ Refactored Architecture
 

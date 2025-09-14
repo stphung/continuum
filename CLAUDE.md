@@ -20,7 +20,44 @@ This is a Godot 4.4 vertical shooter game inspired by Raiden. It's a 2D arcade-s
 /Applications/Godot.app/Contents/MacOS/Godot --path . --rendering-driver metal
 ```
 
-### Testing and Validation
+### Package Management (gd-plug)
+```bash
+# Install all project dependencies
+./plug.gd install
+
+# Update dependencies to latest versions
+./plug.gd update
+
+# Clean install (remove and reinstall all)
+./plug.gd clean && ./plug.gd install
+```
+
+### Testing with gdUnit4
+```bash
+# Run complete test suite
+./run_tests.sh
+
+# Run tests with detailed output
+/Applications/Godot.app/Contents/MacOS/Godot --path . --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add test --continue --ignoreHeadlessMode
+
+# Generate test reports only
+./run_tests.sh  # Reports in reports/ folder
+```
+
+### Pre-commit Quality Gates
+```bash
+# Install pre-commit hooks (for contributors)
+pip install pre-commit
+pre-commit install
+
+# Run pre-commit checks manually
+pre-commit run --all-files
+
+# Skip hooks for emergency commits
+git commit --no-verify -m "Emergency fix"
+```
+
+### Project Validation
 ```bash
 # Check for script errors without running
 /Applications/Godot.app/Contents/MacOS/Godot --path . --headless --quit-after 1
@@ -62,6 +99,19 @@ This is a Godot 4.4 vertical shooter game inspired by Raiden. It's a 2D arcade-s
 │   │   ├── Bullet.gd, LaserBullet.gd, EnemyBullet.gd
 │   └── pickups/
 │       └── PowerUp.gd          # Power-up logic with floating animations
+├── test/                       # Professional testing framework
+│   ├── unit/                   # Component-level tests
+│   │   └── test_example.gd     # Example test suite (working)
+│   ├── integration/            # System interaction tests
+│   ├── scene/                  # End-to-end gameplay tests
+│   ├── helpers/                # Test utilities and mocks
+│   └── broken/                 # Template tests (need gdUnit4 API fixes)
+├── addons/
+│   ├── gd-plug/                # Package manager (committed)
+│   └── gdUnit4/                # Testing framework (managed by gd-plug)
+├── plug.gd                     # Package configuration (version controlled)
+├── run_tests.sh                # Test runner script
+├── .pre-commit-config.yaml     # Pre-commit quality gates
 └── assets/                     # Ready for future assets
     ├── sprites/, sounds/, fonts/
 ```
@@ -121,6 +171,19 @@ This is a Godot 4.4 vertical shooter game inspired by Raiden. It's a 2D arcade-s
 - No external audio files required
 - Creates distinct sounds for: shooting, hits, explosions, power-ups, alarms
 - Uses AudioStreamWAV with 16-bit PCM data
+
+**Testing Framework - `test/` + gdUnit4**
+- **gdUnit4 v5.0.3**: Modern testing framework with GDScript and C# support
+- **Professional Test Structure**: unit/, integration/, scene/, helpers/
+- **Automated Quality Gates**: Pre-commit hooks run tests before every commit
+- **Comprehensive Reports**: HTML and XML reports with JUnit compatibility
+- **CI/CD Ready**: Headless test execution for GitHub Actions integration
+
+**Package Management - gd-plug + `plug.gd`**
+- **Modern Dependency Management**: Industry-standard package manager for Godot
+- **Version Locked Dependencies**: Pinned versions ensure reproducible builds
+- **Clean Version Control**: Only config tracked, dependencies auto-installed
+- **Developer Friendly**: Simple `./plug.gd install` sets up complete environment
 
 ### Enhanced Scene Structure
 - **Main Scene**: `scenes/main/Game.tscn` - Primary game scene

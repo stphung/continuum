@@ -66,6 +66,10 @@ bomb={
 ]
 }
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gd-plug/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")
+
 [rendering]
 
 renderer/rendering_method="mobile"
