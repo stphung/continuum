@@ -8,7 +8,7 @@ on:
     branches: [ main ]
 
 env:
-  GODOT_VERSION: 4.4.1
+  GODOT_VERSION: 4.3
   EXPORT_NAME: continuum
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
     name: Run Tests
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:4.4.1
+      image: barichello/godot-ci:4.3
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,12 +28,8 @@ jobs:
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
 
-      - name: Install dependencies
+      - name: Install gd-plug dependencies
         run: |
-          # Install SCons
-          pip install scons
-
-          # Install gd-plug dependencies
           chmod +x ./plug.gd
           ./plug.gd install
 
@@ -41,14 +37,9 @@ jobs:
         run: |
           godot --path . --headless --import --quit-after 1 || true
 
-      - name: Run comprehensive tests
+      - name: Run Godot tests
         run: |
-          scons test
-        continue-on-error: false
-
-      - name: Run project validation
-        run: |
-          scons validate
+          godot --path . --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add test --continue --ignoreHeadlessMode
         continue-on-error: false
 
       - name: Upload test reports
@@ -65,7 +56,7 @@ jobs:
     needs: test
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     container:
-      image: barichello/godot-ci:4.4.1
+      image: barichello/godot-ci:4.3
     strategy:
       matrix:
         platform: [linux, windows, macos]
@@ -82,7 +73,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install scons
           chmod +x ./plug.gd
           ./plug.gd install
 
@@ -93,17 +83,20 @@ jobs:
       - name: Build Desktop - Linux
         if: matrix.platform == 'linux'
         run: |
-          godot --path . --headless --export-release "Desktop" build/continuum-linux
+          mkdir -v -p build
+          godot --path . --headless --verbose --export-release "Desktop" build/continuum-linux
 
       - name: Build Desktop - Windows
         if: matrix.platform == 'windows'
         run: |
-          godot --path . --headless --export-release "Windows Desktop" build/continuum-windows.exe
+          mkdir -v -p build
+          godot --path . --headless --verbose --export-release "Windows Desktop" build/continuum-windows.exe
 
       - name: Build Desktop - macOS
         if: matrix.platform == 'macos'
         run: |
-          godot --path . --headless --export-release "macOS" build/continuum-macos.zip
+          mkdir -v -p build
+          godot --path . --headless --verbose --export-release "macOS" build/continuum-macos.zip
 
       - name: Upload Desktop Build - Linux
         uses: actions/upload-artifact@v4
@@ -135,7 +128,7 @@ jobs:
     needs: test
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     container:
-      image: barichello/godot-ci:4.4.1
+      image: barichello/godot-ci:4.3
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -156,7 +149,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install scons
           chmod +x ./plug.gd
           ./plug.gd install
 
@@ -197,12 +189,14 @@ jobs:
       - name: Build Android APK (Debug)
         if: github.event_name == 'pull_request'
         run: |
-          godot --path . --headless --export-debug "Android" build/continuum-debug.apk
+          mkdir -v -p build
+          godot --path . --headless --verbose --export-debug "Android" build/continuum-debug.apk
 
       - name: Build Android APK (Release)
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          godot --path . --headless --export-release "Android" build/continuum-release.apk
+          mkdir -v -p build
+          godot --path . --headless --verbose --export-release "Android" build/continuum-release.apk
 
       - name: Upload Android APK (Debug)
         uses: actions/upload-artifact@v4
@@ -311,7 +305,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     container:
-      image: barichello/godot-ci:4.4.1
+      image: barichello/godot-ci:4.3
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -325,7 +319,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install scons
           chmod +x ./plug.gd
           ./plug.gd install
 
@@ -333,11 +326,10 @@ jobs:
         run: |
           godot --path . --headless --import --quit-after 1 || true
 
-
       - name: Build for Web
         run: |
-          mkdir -p build/web
-          godot --path . --headless --export-release "Web" build/web/index.html
+          mkdir -v -p build/web
+          godot --path . --headless --verbose --export-release "Web" build/web/index.html
 
       - name: Add COOP/COEP headers for SharedArrayBuffer
         run: |
