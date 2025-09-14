@@ -161,6 +161,32 @@ jobs:
           export/android/debug_keystore_pass = "android"
           EOF
 
+      - name: Install Android Build Template
+        run: |
+          # Extract android_source.zip from export templates
+          echo "=== Installing Android Build Template ==="
+
+          # Find the export templates directory
+          TEMPLATE_DIR="/root/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          echo "Template directory: $TEMPLATE_DIR"
+          ls -la "$TEMPLATE_DIR"
+
+          # Extract android_source.zip to android/build directory
+          mkdir -p android/build
+
+          if [ -f "$TEMPLATE_DIR/android_source.zip" ]; then
+            echo "Extracting android_source.zip..."
+            cd android/build
+            unzip -q "$TEMPLATE_DIR/android_source.zip"
+            echo "Android build template installed successfully"
+            ls -la
+            cd ../..
+          else
+            echo "ERROR: android_source.zip not found in templates"
+            echo "Available files in templates:"
+            find "$TEMPLATE_DIR" -name "*android*" -type f
+          fi
+
           echo "=== Android SDK Configuration ==="
           echo "ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT"
           echo "JAVA_HOME: $JAVA_HOME"
