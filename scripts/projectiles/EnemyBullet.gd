@@ -10,4 +10,4 @@ func _process(delta):
 	position += direction * speed * delta
 
 func _on_screen_exited():
-	queue_free()
+	call_deferred("queue_free")

@@ -64,7 +64,7 @@ func _on_area_entered(area):
 		take_damage(1)
 
 func _on_screen_exited():
-	queue_free()
+	call_deferred("queue_free")
 
 func _on_shoot_timer_timeout():
 	shoot()

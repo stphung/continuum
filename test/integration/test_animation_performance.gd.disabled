@@ -277,10 +277,15 @@ func test_tween_cleanup_memory():
 	"""Test tween cleanup prevents memory leaks"""
 	var initial_memory = _get_memory_usage()
 
+	# Create a test node for tweening
+	var test_node = Node2D.new()
+	add_child(test_node)
+	auto_free(test_node)
+
 	# Create and destroy many tweens
 	for i in range(STRESS_TEST_ITERATIONS):
 		var tween = create_tween()
-		tween.tween_property(self, "modulate", Color.WHITE, 0.01)
+		tween.tween_property(test_node, "modulate", Color.WHITE, 0.01)
 		await tween.finished
 		tween.kill()
 

@@ -86,7 +86,7 @@ func spawn_wave():
 func _spawn_line_formation():
 	for i in range(enemies_per_wave + wave_number):
 		var timer = Timer.new()
-		timer.wait_time = i * 0.2
+		timer.wait_time = max(0.1, i * 0.2)  # Ensure minimum wait time
 		timer.one_shot = true
 		timer.timeout.connect(func(): spawn_enemy(400 - 200 + i * 40))
 		enemies_container.add_child(timer)
@@ -95,7 +95,7 @@ func _spawn_line_formation():
 func _spawn_v_formation():
 	for i in range(enemies_per_wave + wave_number):
 		var timer = Timer.new()
-		timer.wait_time = i * 0.1
+		timer.wait_time = max(0.05, i * 0.1)  # Ensure minimum wait time
 		timer.one_shot = true
 		var x = 400 + (i - (enemies_per_wave + wave_number) / 2) * 60
 		timer.timeout.connect(func(): spawn_enemy(x - 400))

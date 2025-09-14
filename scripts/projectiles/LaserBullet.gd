@@ -40,7 +40,7 @@ func _on_area_entered(area):
 		
 		# Pierce through multiple enemies
 		if enemies_hit >= pierce_count:
-			queue_free()
+			call_deferred("queue_free")
 
 func create_impact_effect():
 	var flash = CPUParticles2D.new()
@@ -64,4 +64,4 @@ func create_impact_effect():
 	timer.start()
 
 func _on_screen_exited():
-	queue_free()
+	call_deferred("queue_free")

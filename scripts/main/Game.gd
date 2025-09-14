@@ -139,7 +139,8 @@ func _on_player_use_bomb():
 func clear_screen_with_bomb():
 	# Destroy all enemies (they will create their own explosions)
 	for enemy in $Enemies.get_children():
-		enemy.destroy()
+		if enemy.has_method("destroy"):
+			enemy.destroy()
 
 	# Clear all enemy bullets too
 	for bullet in $Bullets.get_children():
