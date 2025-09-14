@@ -170,6 +170,7 @@ jobs:
           [gd_resource type="EditorSettings" load_steps=1 format=3]
           [resource]
           export/android/android_sdk_path = "/usr/lib/android-sdk"
+          export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"
           export/android/debug_keystore = "/tmp/debug.keystore"
           export/android/debug_keystore_pass = "android"
           export/android/debug_keystore_user = "androiddebugkey"
