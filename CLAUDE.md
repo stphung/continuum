@@ -6,6 +6,78 @@ This file provides comprehensive guidance to Claude Code (claude.ai/code) when w
 
 Continuum is a professional-grade vertical scrolling shmup built in Godot 4.4, demonstrating modern game development architecture and innovative technical solutions. The project emphasizes clean code practices, comprehensive testing, and zero-dependency audio generation.
 
+## Claude Code Subagent Integration
+
+### Subagent Usage Guidelines
+
+Claude Code should proactively use specialized subagents to achieve higher quality work and faster development cycles:
+
+#### **Mandatory Subagent Usage**
+- **Code Review**: Always use `code-reviewer` agent after implementing significant features
+- **Testing**: Use `test-automator` agent for comprehensive test creation and validation
+- **Architecture Review**: Use `architect-review` agent for system design decisions
+- **Debugging**: Use `debugger` agent when encountering errors or test failures
+- **Performance**: Use `performance-engineer` agent for optimization and scalability analysis
+
+#### **Parallel Execution Strategy**
+When multiple independent tasks are required, execute subagents in parallel:
+- Run `code-reviewer` and `test-automator` simultaneously after feature completion
+- Execute `performance-engineer` and `security-auditor` together for production readiness
+- Combine `frontend-developer` and `backend-architect` for full-stack features
+- Use `architect-review` and `code-reviewer` in parallel for comprehensive quality assurance
+
+#### **Specialized Agent Mapping for Game Development**
+- **Audio/Music Systems**: Use `ai-engineer` or `data-scientist` agents for procedural audio work and DSP algorithms
+- **Game Development**: Use `unity-developer` agent for game-specific patterns and optimizations
+- **Performance Critical Code**: Use `performance-engineer` agent for optimization work and memory management
+- **Database/Persistence**: Use `database-optimizer` agent for save game and leaderboard systems
+- **API Development**: Use `fastapi-pro` or `backend-architect` agents for online features
+- **Testing Automation**: Use `test-automator` agent for comprehensive gdUnit4 test generation
+- **Visual Effects**: Use `performance-engineer` agent for particle system optimization
+- **Enemy AI**: Use `ai-engineer` agent for behavior trees and state machines
+
+#### **Quality Assurance Protocol**
+1. Implement feature with appropriate domain-specific agent
+2. Run `code-reviewer` agent for code quality assessment
+3. Execute `test-automator` agent for comprehensive testing
+4. Use `performance-engineer` agent for optimization verification
+5. Apply `architect-review` agent for architectural consistency
+6. Run `security-auditor` agent for security assessment when applicable
+
+#### **Parallel Task Examples**
+```
+# Good: Parallel execution
+- Launch code-reviewer AND test-automator simultaneously after feature completion
+- Run performance-engineer AND security-auditor together for production assessment
+- Execute architect-review AND code-reviewer in parallel for comprehensive quality checks
+
+# Avoid: Sequential execution when parallel is possible
+- Running code-reviewer, then test-automator, then performance-engineer separately
+- Sequential quality checks that could be done simultaneously
+```
+
+### **Development Workflow with Subagents**
+
+#### **Feature Implementation Workflow**
+1. **Planning Phase**: Use `architect-review` agent to validate design decisions
+2. **Implementation Phase**: Use domain-specific agents (e.g., `ai-engineer` for enemy AI)
+3. **Quality Phase**: Run `code-reviewer` AND `test-automator` agents in parallel
+4. **Optimization Phase**: Use `performance-engineer` agent for performance validation
+5. **Integration Phase**: Use `architect-review` agent to ensure system consistency
+
+#### **Bug Fixing Workflow**
+1. **Analysis Phase**: Use `debugger` agent to identify root cause
+2. **Solution Phase**: Use appropriate domain agent for fix implementation
+3. **Validation Phase**: Run `test-automator` AND `code-reviewer` agents in parallel
+4. **Regression Phase**: Use `test-automator` agent for comprehensive regression testing
+
+#### **Refactoring Workflow**
+1. **Assessment Phase**: Use `architect-review` agent to evaluate current architecture
+2. **Planning Phase**: Use `legacy-modernizer` agent for refactoring strategy
+3. **Implementation Phase**: Use `code-reviewer` agent during refactoring process
+4. **Testing Phase**: Use `test-automator` agent to ensure functionality preservation
+5. **Performance Phase**: Use `performance-engineer` agent to validate improvements
+
 ## Development Commands
 
 ### Running the Game
@@ -76,6 +148,24 @@ pre-commit autoupdate
 
 # Profile performance (development builds)
 /Applications/Godot.app/Contents/MacOS/Godot --path . --debug-stringnames --verbose
+```
+
+### Using Claude Code Subagents
+```bash
+# After implementing new audio synthesis features
+# Claude should automatically use ai-engineer and performance-engineer agents in parallel
+
+# After adding new game mechanics
+# Claude should use unity-developer and test-automator agents simultaneously
+
+# Before production deployment
+# Claude should run security-auditor and performance-engineer in parallel
+
+# For comprehensive quality assurance
+# Claude should execute code-reviewer, test-automator, and architect-review agents together
+
+# When debugging complex issues
+# Claude should use debugger agent followed by appropriate domain-specific agents
 ```
 
 ## Professional Architecture
@@ -163,29 +253,50 @@ test/
 - Create mock objects for isolated component testing
 - Verify both positive and negative test cases
 
+**Automated Quality Assurance with Subagents**
+- Use `test-automator` agent for comprehensive test suite generation
+- Apply `code-reviewer` agent for test quality assessment
+- Execute `performance-engineer` agent for test performance optimization
+- Run multiple agents in parallel for faster quality assurance cycles
+- Use `debugger` agent for test failure analysis and resolution
+
 ## Development Patterns
 
 ### Adding New Game Features
 
-**New Enemy Types**
-1. Create new enemy scene inheriting from Enemy.tscn
-2. Extend Enemy.gd with custom movement patterns in `_process(delta)`
-3. Configure spawn parameters in EnemyManager.gd
-4. Add destruction effects in VisualEffects.gd
-5. Generate appropriate audio in SynthSoundManager.gd
+**Subagent-Driven Development Workflow**
+1. **Planning**: Use `architect-review` agent to validate feature design and integration
+2. **Implementation**: Use domain-specific agents (e.g., `ai-engineer` for enemy AI, `performance-engineer` for optimization)
+3. **Quality Assurance**: Run `code-reviewer` AND `test-automator` agents in parallel
+4. **Performance Validation**: Use `performance-engineer` agent for optimization verification
+5. **Architecture Review**: Apply `architect-review` agent for system consistency
 
-**New Weapon Systems**
-1. Create projectile scene inheriting from Area2D
-2. Implement collision detection and damage logic
-3. Add weapon switching logic in Player.gd
-4. Configure fire rates and upgrade paths
-5. Generate weapon-specific audio effects
+**Parallel Development Strategy**
+- Multiple agents should work simultaneously when tasks are independent
+- Prefer parallel execution over sequential for faster development cycles
+- Use specialized agents for their specific domain expertise
+- Execute comprehensive quality checks with multiple agents running together
 
-**New Power-Up Types**
-1. Add power-up type to PowerUp.gd enum
-2. Implement collection effects in Player.gd
-3. Add floating animation parameters
-4. Configure visual and audio feedback
+**New Enemy Types** (with Subagent Integration)
+1. Use `architect-review` agent to plan enemy integration with existing systems
+2. Create enemy scene and implement movement patterns using `ai-engineer` agent
+3. Configure spawn parameters and destruction effects
+4. Run `code-reviewer` AND `test-automator` agents in parallel for quality assurance
+5. Use `performance-engineer` agent to optimize enemy behavior and memory usage
+
+**New Weapon Systems** (with Subagent Integration)
+1. Use `architect-review` agent to design weapon system architecture
+2. Implement projectile logic and collision detection with `performance-engineer` guidance
+3. Add weapon switching and progression logic
+4. Execute `test-automator` agent for comprehensive weapon testing
+5. Run `code-reviewer` agent to ensure code quality and maintainability
+
+**New Power-Up Types** (with Subagent Integration)
+1. Plan power-up effects and integration using `architect-review` agent
+2. Implement collection mechanics and visual feedback
+3. Use `test-automator` agent to create comprehensive power-up tests
+4. Apply `performance-engineer` agent for animation and effect optimization
+5. Run `code-reviewer` agent for final quality assessment
 
 ### Code Quality Standards
 
