@@ -282,4 +282,4 @@ One of Continuum's unique features is its completely procedural audio system. Ev
 
 ---
 
-**Experience the evolution of shmup gameplay - download, play, and modify Continuum today!**
+**Experience the evolution of shmup gameplay - download, play, and modify Continuum today!**Test changelog generation functionality
