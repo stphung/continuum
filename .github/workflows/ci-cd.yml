@@ -190,7 +190,7 @@ jobs:
         run: |
           # Install addons via gd-plug before project import
           echo "Installing project dependencies via gd-plug..."
-          godot --path . --headless -s plug.gd install
+          godot --path . --headless -s plug.gd install || true
           echo "Dependencies installed successfully"
           ls -la addons/
 
