@@ -279,7 +279,12 @@ func adjust_fire_rate():
 		"laser":
 			$ShootTimer.wait_time = max(0.2, 0.3 - (weapon_level - 1) * 0.02)   # Slower but gets faster with levels
 		"plasma":
-			$ShootTimer.wait_time = max(0.06, 0.12 - (weapon_level - 1) * 0.01)  # Fast machine gun style, gets very fast
+			if weapon_level == 1:
+				# Level 1: Rapid individual shots
+				$ShootTimer.wait_time = max(0.08, 0.12 - (weapon_level - 1) * 0.01)
+			else:
+				# Level 2+: Continuous beams - longer intervals since each beam lasts 0.8 seconds
+				$ShootTimer.wait_time = max(0.4, 0.6 - (weapon_level - 2) * 0.05)  # Beams every 0.4-0.6 seconds
 
 func show_upgrade_effect(text):
 	var label = Label.new()
