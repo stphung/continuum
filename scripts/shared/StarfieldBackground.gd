@@ -29,6 +29,9 @@ func _ready():
 	stars_container.name = "StarsContainer"
 	add_child(stars_container)
 
+	# Auto-detect viewport dimensions if they seem incorrect
+	update_to_viewport_size()
+
 	# Initialize the starfield
 	create_starfield()
 
@@ -129,12 +132,8 @@ func set_screen_dimensions(width: float, height: float):
 	screen_width = width
 	screen_height = height
 
-	# Reposition existing stars to fit new dimensions
-	for star in stars:
-		if is_instance_valid(star):
-			# Keep stars proportionally positioned
-			star.position.x = minf(star.position.x, width)
-			star.position.y = minf(star.position.y, height)
+	# Recreate starfield to properly fill new dimensions
+	create_starfield()
 
 func add_stars(count: int):
 	"""Add additional stars to the existing starfield"""
@@ -184,6 +183,13 @@ func create_twinkling_effect():
 func reset_starfield():
 	"""Reset the starfield to initial state"""
 	create_starfield()
+
+func update_to_viewport_size():
+	"""Auto-detect and use current viewport dimensions"""
+	var viewport = get_viewport()
+	if viewport:
+		var viewport_size = viewport.get_visible_rect().size
+		set_screen_dimensions(viewport_size.x, viewport_size.y)
 
 # Utility methods for external control
 func get_star_count() -> int:
