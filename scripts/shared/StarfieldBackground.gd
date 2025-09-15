@@ -12,8 +12,8 @@ class_name StarfieldBackground
 @export var max_star_size: float = 3.0
 @export var min_alpha: float = 0.3
 @export var max_alpha: float = 0.8
-@export var screen_width: float = 800.0
-@export var screen_height: float = 900.0
+@export var screen_width: float = 720.0
+@export var screen_height: float = 1280.0
 @export var star_color: Color = Color.WHITE
 @export var animated: bool = true
 
