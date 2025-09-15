@@ -357,6 +357,8 @@ jobs:
         with:
           # Checkout the new tag if it was created by auto-version, otherwise use current ref
           ref: ${{ needs.auto-version.outputs.new_tag || github.ref }}
+          fetch-tags: true
+          fetch-depth: 0  # Fetch full history for changelog generation
 
       - name: Download Linux Build
         uses: actions/download-artifact@v4
@@ -410,7 +412,7 @@ jobs:
 
           # If no changes (empty changelog), add a default message
           if [ -z "$CHANGELOG" ]; then
-            CHANGELOG="- Minor updates and improvements"
+            CHANGELOG="- No significant changes"
           fi
 
           # Save to output with proper escaping
