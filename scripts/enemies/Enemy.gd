@@ -55,20 +55,24 @@ func setup_from_type_data():
 			$Sprite.polygon = enemy_type_data.sprite_polygon
 		$Sprite.scale = Vector2.ONE * enemy_type_data.sprite_scale
 
-	# Update collision
+	# Update collision (deferred to avoid physics query conflicts)
 	if has_node("CollisionShape2D") and $CollisionShape2D.shape is CircleShape2D:
-		($CollisionShape2D.shape as CircleShape2D).radius = enemy_type_data.collision_radius
+		call_deferred("update_collision_radius", enemy_type_data.collision_radius)
 
 	# Update shooting
 	if weapon_type != "none":
 		$ShootTimer.wait_time = enemy_type_data.fire_rate
+
+func update_collision_radius(radius: float):
+	# Use set_deferred to avoid physics state conflicts
+	($CollisionShape2D.shape as CircleShape2D).set_deferred("radius", radius)
 
 func _process(delta):
 	time_alive += delta
 	spawn_timer += delta
 
 	# Handle spawning for support carriers
-	if enemy_type_data and enemy_type_data.spawns_enemies and spawn_timer >= 3.0:
+	if enemy_type_data and enemy_type_data.spawns_enemies and spawn_timer >= 2.0:
 		spawn_drone()
 		spawn_timer = 0.0
 
@@ -118,12 +122,12 @@ func take_damage(damage):
 			hit_sound = enemy_type_data.hit_sound
 		SoundManager.play_random_pitch(hit_sound, -12.0, 0.2)
 
-	# Visual damage feedback
+	# Visual damage feedback - flash white then return to normal
 	update_damage_visuals()
 
 	var tween = create_tween()
-	tween.tween_property(self, "modulate", Color(1, 1, 1, 1), 0.1)
-	tween.tween_property(self, "modulate", Color(1, 0.5, 0.5, 1), 0.1)
+	tween.tween_property(self, "modulate", Color(2.0, 2.0, 2.0, 1), 0.05)  # Bright white flash
+	tween.tween_property(self, "modulate", Color(1, 1, 1, 1), 0.15)  # Return to normal
 
 	if health <= 0:
 		destroy()
@@ -152,7 +156,8 @@ func destroy():
 
 func _on_area_entered(area):
 	if area.is_in_group("player_bullets"):
-		take_damage(1)
+		# Damage is handled by the bullet itself to avoid double-hits
+		pass
 
 func _on_screen_exited():
 	call_deferred("queue_free")

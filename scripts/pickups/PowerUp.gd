@@ -10,11 +10,11 @@ var drift_direction: Vector2
 var wave_offset: float
 
 var powerup_colors = {
-	"vulcan_powerup": Color(1, 0, 0, 1),      # Red for vulcan
-	"laser_powerup": Color(0, 0.5, 1, 1),     # Blue for laser
-	"chain_powerup": Color(0.8, 0.9, 1, 1),   # Electric blue-white for chain
-	"bomb": Color(1, 1, 0, 1),                # Yellow for bomb
-	"life": Color(0, 1, 0, 1)                 # Green for life
+	"vulcan_powerup": Color(1, 0.2, 0.1, 1),     # Bright orange-red for vulcan
+	"laser_powerup": Color(0.1, 0.7, 1, 1),      # Bright cyan for laser
+	"chain_powerup": Color(1, 0.3, 1, 1),        # Bright magenta for chain
+	"bomb": Color(1, 0.9, 0.1, 1),               # Bright yellow for bomb
+	"life": Color(0.2, 1, 0.2, 1)                # Bright green for life
 }
 
 var powerup_letters = {

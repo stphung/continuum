@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyTypeData" format=3 uid="uid://elite_heavy123"]
+
+[ext_resource type="Script" path="res://scripts/enemies/EnemyTypeData.gd" id="1_elite_heavy"]
+
+[resource]
+script = ExtResource("1_elite_heavy")
+enemy_name = "Elite Heavy Gunner"
+base_health = 12
+base_speed = 100.0
+base_points = 600
+movement_pattern = "stop_and_shoot"
+weapon_type = "rapid_fire"
+fire_rate = 0.5
+damage_reduction = 0.2
+special_abilities = ["elite_variant", "defensive_positioning", "armor_plating"]
+sprite_color = Color(1.0, 0.0, 0.0, 1)
+sprite_polygon = PackedVector2Array(-20, -15, -10, -25, 10, -25, 20, -15, 20, 15, 10, 25, -10, 25, -20, 15)
+collision_radius = 25.0
+sprite_scale = 1.4
+spawn_weight = 0.15
+min_wave = 15
+max_simultaneous = 2
+spawns_enemies = false
+spawned_enemy_type = ""
+hit_sound = "enemy_hit"
+destroy_sound = "enemy_destroy"
+attack_sound = "heavy_fire"

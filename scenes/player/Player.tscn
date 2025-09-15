@@ -12,13 +12,102 @@ points = PackedVector2Array(-12, 15, 0, -15, 12, 15)
 script = ExtResource("1")
 
 [node name="Sprite" type="Polygon2D" parent="."]
-color = Color(0.3, 0.6, 1, 1)
-polygon = PackedVector2Array(0, -20, -15, 20, -10, 15, -5, 20, 0, 10, 5, 20, 10, 15, 15, 20, 0, -20)
+color = Color(0.2, 0.5, 0.9, 1)
+polygon = PackedVector2Array(0, -25, -3, -18, -8, -10, -16, 5, -18, 12, -15, 18, -6, 18, -2, 20, 0, 12, 2, 20, 6, 18, 15, 18, 18, 12, 16, 5, 8, -10, 3, -18, 0, -25)
 
 [node name="Engine" type="Polygon2D" parent="."]
 z_index = -1
 color = Color(1, 0.5, 0, 1)
-polygon = PackedVector2Array(-5, 20, -3, 30, 0, 25, 3, 30, 5, 20)
+polygon = PackedVector2Array(-6, 20, -4, 32, 0, 27, 4, 32, 6, 20)
+
+[node name="Cockpit" type="Polygon2D" parent="."]
+z_index = 1
+color = Color(0.1, 0.2, 0.6, 0.8)
+polygon = PackedVector2Array(0, -22, -4, -15, -6, -8, -4, -2, 0, 5, 4, -2, 6, -8, 4, -15, 0, -22)
+
+[node name="LeftWingAccent" type="Polygon2D" parent="."]
+z_index = 1
+color = Color(0.2, 0.8, 1, 1)
+polygon = PackedVector2Array(-16, 4, -17, 6, -16.5, 8, -15, 7)
+
+[node name="RightWingAccent" type="Polygon2D" parent="."]
+z_index = 1
+color = Color(0.2, 0.8, 1, 1)
+polygon = PackedVector2Array(16, 4, 17, 6, 16.5, 8, 15, 7)
+
+[node name="LeftEngineNacelle" type="Polygon2D" parent="."]
+z_index = 0
+color = Color(0.15, 0.3, 0.5, 1)
+polygon = PackedVector2Array(-12, 16, -10, 24, -6, 22, -8, 18)
+
+[node name="RightEngineNacelle" type="Polygon2D" parent="."]
+z_index = 0
+color = Color(0.15, 0.3, 0.5, 1)
+polygon = PackedVector2Array(12, 16, 10, 24, 6, 22, 8, 18)
+
+[node name="WeaponPortCenter" type="Polygon2D" parent="."]
+z_index = 2
+color = Color(0.05, 0.1, 0.2, 1)
+polygon = PackedVector2Array(-1, -20, -1, -26, 1, -26, 1, -20)
+
+[node name="WeaponPortLeft" type="Polygon2D" parent="."]
+z_index = 2
+color = Color(0.05, 0.1, 0.2, 1)
+polygon = PackedVector2Array(-11, -12, -9, -14, -9, -10, -11, -12)
+
+[node name="WeaponPortRight" type="Polygon2D" parent="."]
+z_index = 2
+color = Color(0.05, 0.1, 0.2, 1)
+polygon = PackedVector2Array(11, -12, 9, -14, 9, -10, 11, -12)
+
+[node name="PanelLineLeft" type="Polygon2D" parent="."]
+z_index = 1
+color = Color(0.15, 0.35, 0.7, 0.6)
+polygon = PackedVector2Array(-8, -5, -6, -3, -6, 8, -8, 10)
+
+[node name="PanelLineRight" type="Polygon2D" parent="."]
+z_index = 1
+color = Color(0.15, 0.35, 0.7, 0.6)
+polygon = PackedVector2Array(8, -5, 6, -3, 6, 8, 8, 10)
+
+[node name="MainThrusterParticles" type="CPUParticles2D" parent="."]
+position = Vector2(0, 30)
+emitting = false
+amount = 80
+lifetime = 1.5
+direction = Vector2(0, 1)
+spread = 35.0
+initial_velocity_min = 150.0
+initial_velocity_max = 250.0
+scale_amount_min = 1.0
+scale_amount_max = 3.0
+color = Color(1, 0.5, 0.1, 1)
+
+[node name="ForwardThrusterParticles" type="CPUParticles2D" parent="."]
+position = Vector2(0, -25)
+emitting = false
+amount = 60
+lifetime = 1.2
+direction = Vector2(0, 1)
+spread = 40.0
+initial_velocity_min = 120.0
+initial_velocity_max = 200.0
+scale_amount_min = 1.0
+scale_amount_max = 2.5
+color = Color(0.1, 0.8, 1, 1)
+
+[node name="BrakingParticles" type="CPUParticles2D" parent="."]
+position = Vector2(0, -10)
+emitting = false
+amount = 40
+lifetime = 1.0
+direction = Vector2(0, -1)
+spread = 60.0
+initial_velocity_min = 80.0
+initial_velocity_max = 140.0
+scale_amount_min = 0.8
+scale_amount_max = 2.0
+color = Color(1, 0.6, 0.2, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("ConvexPolygonShape2D_1")

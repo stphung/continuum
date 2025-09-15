@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_2j7fw")
 enemy_name = "Guard Drone"
-base_health = 2
+base_health = 4
 base_speed = 100.0
 base_points = 150
 movement_pattern = "zigzag"
@@ -13,7 +13,7 @@ weapon_type = "single_shot"
 fire_rate = 2.5
 damage_reduction = 0.0
 special_abilities = []
-sprite_color = Color(0.2, 0.4, 0.8, 1)
+sprite_color = Color(0.1, 0.8, 1.0, 1)
 sprite_polygon = PackedVector2Array(-12, -15, 0, -20, 12, -15, 15, 0, 12, 15, 0, 20, -12, 15, -15, 0)
 collision_radius = 20.0
 sprite_scale = 1.0

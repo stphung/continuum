@@ -3,8 +3,8 @@
 [ext_resource type="Script" path="res://scripts/projectiles/PlasmaBullet.gd" id="1"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_1"]
-radius = 3.0
-height = 16.0
+radius = 4.0
+height = 20.0
 
 [node name="PlasmaBullet" type="Area2D" groups=["player_bullets"]]
 script = ExtResource("1")

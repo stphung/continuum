@@ -10,6 +10,7 @@ var lives = 3
 var bombs = 3
 var game_over = false
 var current_player = null
+var starfield_background: StarfieldBackground
 
 func _ready():
 	randomize()
@@ -22,15 +23,15 @@ func setup_starfield_background():
 	"""Initialize the reusable StarfieldBackground component"""
 	var starfield_scene = preload("res://scenes/shared/StarfieldBackground.tscn")
 	if starfield_scene:
-		var starfield = starfield_scene.instantiate()
+		starfield_background = starfield_scene.instantiate()
 		# Insert starfield between background and other elements
-		add_child(starfield)
-		move_child(starfield, 1)  # Position after Background (index 0)
+		add_child(starfield_background)
+		move_child(starfield_background, 1)  # Position after Background (index 0)
 
 		# Configure for game scene
-		starfield.set_screen_dimensions(720, 1280)
-		starfield.star_count = 50
-		starfield.star_speed = 100
+		starfield_background.set_screen_dimensions(720, 1280)
+		starfield_background.star_count = 50
+		starfield_background.star_speed = 100
 
 func _process(delta):
 	# Starfield animation is now handled by the StarfieldBackground component
@@ -97,6 +98,13 @@ func _on_wave_announcement(wave_num: int):
 	tween.tween_property(label, "modulate:a", 1, 0.5)
 	tween.tween_property(label, "modulate:a", 0, 1.0)
 	tween.tween_callback(label.queue_free)
+
+	# Increase starfield speed with each wave for sense of acceleration
+	if starfield_background:
+		# Increase speed by 15% each wave, starting from wave 2
+		if wave_num > 1:
+			var speed_multiplier = 1.0 + (wave_num - 1) * 0.15
+			starfield_background.set_star_speed(100 * speed_multiplier)
 
 func _on_enemy_destroyed(points, pos):
 	score += points

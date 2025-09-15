@@ -1,5 +1,24 @@
 extends Node
 
+# Safe cleanup function to prevent physics state errors
+func safe_cleanup_node(node: Node):
+	if not is_instance_valid(node):
+		return
+
+	# If it's an Area2D, disable monitoring before freeing to prevent physics state conflicts
+	if node is Area2D:
+		var area = node as Area2D
+		call_deferred("_disable_area_monitoring", area)
+	else:
+		# For non-Area2D nodes, just queue free them normally
+		node.call_deferred("queue_free")
+
+func _disable_area_monitoring(area: Area2D):
+	if is_instance_valid(area):
+		area.monitoring = false
+		area.monitorable = false
+		area.call_deferred("queue_free")
+
 func create_explosion(type: String, pos: Vector2, effects_parent: Node):
 	match type:
 		"enemy_destroy":
@@ -100,7 +119,7 @@ func _create_bomb_explosion(pos: Vector2, effects_parent: Node):
 				var ring_tween = effects_parent.create_tween()
 				ring_tween.tween_property(shockwave, "scale", Vector2(8, 8), 0.8)
 				ring_tween.parallel().tween_property(shockwave, "modulate:a", 0, 0.8)
-				ring_tween.tween_callback(shockwave.queue_free)
+				ring_tween.tween_callback(func(): safe_cleanup_node(shockwave))
 				timer.queue_free()
 			)
 			timer.start()
@@ -196,7 +215,7 @@ func _create_screen_flash_sequence(parent: Node):
 			timer.timeout.connect(func():
 				var pulse_tween = parent.create_tween()
 				pulse_tween.tween_property(pulse_flash, "modulate:a", 0, 0.1)
-				pulse_tween.tween_callback(pulse_flash.queue_free)
+				pulse_tween.tween_callback(func(): safe_cleanup_node(pulse_flash))
 				timer.queue_free()
 			)
 			timer.start()
@@ -213,7 +232,7 @@ func _schedule_cleanup(particles: Array, parent: Node, delay: float):
 	cleanup_timer.timeout.connect(func():
 		for particle in particles:
 			if is_instance_valid(particle):
-				particle.queue_free()
+				safe_cleanup_node(particle)
 		cleanup_timer.queue_free()
 	)
 	parent.add_child(cleanup_timer)

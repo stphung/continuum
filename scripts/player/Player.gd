@@ -12,6 +12,17 @@ var invulnerable = false
 var weapon_level = 1
 var weapon_type = "vulcan"
 
+# Movement animation variables
+var current_velocity = Vector2.ZERO
+var banking_angle = 0.0
+var max_banking_angle = 20.0  # Maximum tilt in degrees
+var banking_smoothing = 8.0
+var engine_glow_intensity = 1.0
+var target_engine_intensity = 1.0
+var is_main_thrusting = false  # Backward movement (main engine)
+var is_forward_thrusting = false  # Forward movement (forward thrusters)
+var is_braking = false  # Downward movement (air brakes)
+
 func _ready():
 	# Only set screen_size if it hasn't been set by external code (like tests)
 	if screen_size == null:
@@ -32,7 +43,8 @@ func _process(delta):
 	handle_movement(delta)
 	handle_shooting()
 	handle_bomb()
-	
+	update_visual_animations(delta)
+
 	if invulnerable:
 		modulate.a = sin(Time.get_ticks_msec() * 0.02) * 0.5 + 0.5
 
@@ -51,6 +63,14 @@ func handle_movement(delta):
 	if velocity.length() > 0:
 		velocity = velocity.normalized() * speed
 		position += velocity * delta
+
+	# Store current velocity for visual animations
+	current_velocity = velocity
+
+	# Update movement states for visual effects
+	is_forward_thrusting = Input.is_action_pressed("move_up")  # Moving forward/up on screen
+	is_main_thrusting = Input.is_action_pressed("move_down")  # Moving backward/down on screen
+	is_braking = Input.is_action_pressed("move_down")  # Also counts as braking
 
 	# Always enforce screen boundaries regardless of movement
 	position.x = clamp(position.x, 20, screen_size.x - 20)
@@ -271,11 +291,11 @@ func adjust_fire_rate():
 	# Adjust shooting timer based on weapon type and level
 	match weapon_type:
 		"vulcan":
-			$ShootTimer.wait_time = max(0.08, 0.15 - (weapon_level - 1) * 0.01)  # Gets faster with levels
+			$ShootTimer.wait_time = max(0.15, 0.25 - (weapon_level - 1) * 0.02)  # Faster spread fire rate
 		"laser":
-			$ShootTimer.wait_time = max(0.2, 0.3 - (weapon_level - 1) * 0.02)   # Slower but gets faster with levels
+			$ShootTimer.wait_time = max(0.18, 0.28 - (weapon_level - 1) * 0.02)  # Increased laser rate
 		"chain":
-			$ShootTimer.wait_time = max(0.15, 0.25 - (weapon_level - 1) * 0.02)  # Medium speed, gets faster with levels
+			$ShootTimer.wait_time = max(0.2, 0.3 - (weapon_level - 1) * 0.02)  # Faster chain targeting
 
 func show_upgrade_effect(text):
 	var label = Label.new()
@@ -297,3 +317,73 @@ func show_upgrade_effect(text):
 
 func destroy():
 	call_deferred("queue_free")
+
+func update_visual_animations(delta):
+	# Banking animation - use asymmetric scaling for 3D perspective effect
+	var banking_intensity = 0.0
+	if current_velocity.x != 0:
+		banking_intensity = current_velocity.x / speed  # -1 to 1
+
+	# Reset polygon to new detailed fighter-jet shape
+	$Sprite.polygon = PackedVector2Array([
+		Vector2(0, -25), Vector2(-3, -18), Vector2(-8, -10), Vector2(-18, 5),
+		Vector2(-20, 12), Vector2(-15, 18), Vector2(-8, 20), Vector2(-3, 22),
+		Vector2(0, 15), Vector2(3, 22), Vector2(8, 20), Vector2(15, 18),
+		Vector2(20, 12), Vector2(18, 5), Vector2(8, -10), Vector2(3, -18), Vector2(0, -25)
+	])
+
+	# Apply 3D banking perspective using transform scaling + subtle rotation
+	if abs(banking_intensity) > 0.05:
+		# Banking creates asymmetric horizontal scaling + perspective rotation
+		var scale_factor = 1.0 + abs(banking_intensity) * 0.3  # 30% scale change max
+		var perspective_skew = banking_intensity * 0.15  # Subtle perspective skew
+
+		# Banking right: left side compresses, right side stretches
+		# Banking left: right side compresses, left side stretches
+		var scale_x = 1.0 + banking_intensity * 0.2  # Horizontal scaling
+		var scale_y = 1.0 - abs(banking_intensity) * 0.1  # Slight vertical compression
+
+		# Apply asymmetric scaling to simulate 3D perspective
+		$Sprite.scale = Vector2(scale_x, scale_y)
+
+		# Add subtle rotation for banking effect (much less than before)
+		rotation = lerp(rotation, deg_to_rad(banking_intensity * 8.0), 12.0 * delta)
+	else:
+		# Return to neutral
+		$Sprite.scale = Vector2(1.0, 1.0)
+		rotation = lerp(rotation, 0.0, 8.0 * delta)
+
+	# INSANE engine glow - only for forward movement
+	if current_velocity.length() > 0:
+		if is_forward_thrusting:
+			target_engine_intensity = 8.0  # INSANE glow for forward movement only
+			$Engine.modulate = Color(1, 0.2, 0, 1) * target_engine_intensity  # Ultra bright orange
+		else:
+			target_engine_intensity = 1.5  # Subtle for other directions
+			$Engine.modulate = Color(1, 0.5, 0, 1) * target_engine_intensity
+	else:
+		target_engine_intensity = 1.0
+		$Engine.modulate = Color(1, 0.5, 0, 1) * target_engine_intensity
+
+	engine_glow_intensity = lerp(engine_glow_intensity, target_engine_intensity, 15.0 * delta)
+
+	# MASSIVE forward thrust particles (when moving up/forward) - ULTIMATE DRAMA
+	if is_forward_thrusting:
+		if not $MainThrusterParticles.emitting:
+			$MainThrusterParticles.emitting = true
+		# INSANE particle increase - make it impossible to miss
+		$MainThrusterParticles.amount = 300 + int(abs(current_velocity.y) / speed * 200)
+
+		# EXTREME velocity and scale for maximum visibility
+		$MainThrusterParticles.initial_velocity_min = 300.0
+		$MainThrusterParticles.initial_velocity_max = 600.0
+		$MainThrusterParticles.scale_amount_min = 2.0
+		$MainThrusterParticles.scale_amount_max = 6.0
+		$MainThrusterParticles.lifetime = 2.0  # Longer lasting
+		$MainThrusterParticles.spread = 45.0  # Wider spread
+	else:
+		$MainThrusterParticles.emitting = false
+
+	# NO backward movement effects - completely disabled
+	$ForwardThrusterParticles.emitting = false
+	$BrakingParticles.emitting = false

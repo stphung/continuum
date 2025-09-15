@@ -5,15 +5,15 @@
 [resource]
 script = ExtResource("1_4l0hx")
 enemy_name = "Interceptor"
-base_health = 1
-base_speed = 300.0
+base_health = 3
+base_speed = 400.0
 base_points = 250
 movement_pattern = "dive"
 weapon_type = "none"
 fire_rate = 0.0
 damage_reduction = 0.0
 special_abilities = ["collision_damage"]
-sprite_color = Color(1.0, 0.5, 0.1, 1)
+sprite_color = Color(1.0, 0.8, 0.0, 1)
 sprite_polygon = PackedVector2Array(0, -25, -8, -10, -5, 10, 0, 20, 5, 10, 8, -10)
 collision_radius = 18.0
 sprite_scale = 1.0

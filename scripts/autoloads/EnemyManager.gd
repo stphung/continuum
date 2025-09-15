@@ -30,7 +30,10 @@ func load_enemy_types():
 		"heavy_gunner": "res://resources/enemies/heavy_gunner.tres",
 		"interceptor": "res://resources/enemies/interceptor.tres",
 		"fortress_ship": "res://resources/enemies/fortress_ship.tres",
-		"support_carrier": "res://resources/enemies/support_carrier.tres"
+		"support_carrier": "res://resources/enemies/support_carrier.tres",
+		"elite_scout_fighter": "res://resources/enemies/elite_scout_fighter.tres",
+		"elite_guard_drone": "res://resources/enemies/elite_guard_drone.tres",
+		"elite_heavy_gunner": "res://resources/enemies/elite_heavy_gunner.tres"
 	}
 
 	for type_name in type_files.keys():

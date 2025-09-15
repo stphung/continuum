@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_6n2jz")
 enemy_name = "Support Carrier"
-base_health = 4
+base_health = 10
 base_speed = 120.0
 base_points = 400
 movement_pattern = "straight"
@@ -13,7 +13,7 @@ weapon_type = "single_shot"
 fire_rate = 3.0
 damage_reduction = 0.0
 special_abilities = ["drone_deployment"]
-sprite_color = Color(0.6, 0.2, 0.8, 1)
+sprite_color = Color(0.8, 0.1, 1.0, 1)
 sprite_polygon = PackedVector2Array(-25, -20, -10, -25, 10, -25, 25, -20, 30, -10, 25, 0, 30, 10, 25, 20, 10, 25, -10, 25, -25, 20, -30, 10, -25, 0, -30, -10)
 collision_radius = 30.0
 sprite_scale = 1.3

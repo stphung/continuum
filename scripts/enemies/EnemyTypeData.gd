@@ -31,13 +31,13 @@ class_name EnemyTypeData
 @export var attack_sound: String = ""
 
 func get_scaled_health(wave_number: int) -> int:
-	# Scale health based on wave progression
-	var wave_multiplier = 1.0 + (wave_number / 10.0)
+	# Scale health based on wave progression (reduced from 10% to 5% per wave)
+	var wave_multiplier = 1.0 + (wave_number / 20.0)
 	return int(base_health * wave_multiplier)
 
 func get_scaled_speed(wave_number: int) -> float:
-	# Scale speed based on wave progression (capped)
-	var wave_bonus = min(wave_number * 5, 100)  # Max +100 speed
+	# Scale speed based on wave progression (capped at +50)
+	var wave_bonus = min(wave_number * 3, 50)  # Max +50 speed
 	return base_speed + wave_bonus
 
 func get_scaled_points(wave_number: int) -> int:

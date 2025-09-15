@@ -1,16 +1,49 @@
-[gd_scene load_steps=3 format=3 uid="uid://ci4vvpn0w5sa1"]
+[gd_scene load_steps=6 format=3 uid="uid://ci4vvpn0w5sa1"]
 
 [ext_resource type="Script" path="res://scripts/projectiles/EnemyBullet.gd" id="1"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 5.0
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_1"]
+blend_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_2"]
+blend_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_3"]
+blend_mode = 1
+
 [node name="EnemyBullet" type="Area2D" groups=["enemy_bullets"]]
 script = ExtResource("1")
 
+[node name="OuterGlow" type="Polygon2D" parent="."]
+material = SubResource("CanvasItemMaterial_1")
+z_index = -2
+color = Color(1, 0.3, 0, 1)
+polygon = PackedVector2Array(15, 0, 13.858, 5.741, 10.607, 10.607, 5.741, 13.858, 0, 15, -5.741, 13.858, -10.607, 10.607, -13.858, 5.741, -15, 0, -13.858, -5.741, -10.607, -10.607, -5.741, -13.858, 0, -15, 5.741, -13.858, 10.607, -10.607, 13.858, -5.741)
+
+[node name="MiddleGlow" type="Polygon2D" parent="."]
+material = SubResource("CanvasItemMaterial_2")
+z_index = -1
+color = Color(1, 0.4, 0, 1)
+polygon = PackedVector2Array(10, 0, 9.239, 3.827, 7.071, 7.071, 3.827, 9.239, 0, 10, -3.827, 9.239, -7.071, 7.071, -9.239, 3.827, -10, 0, -9.239, -3.827, -7.071, -7.071, -3.827, -9.239, 0, -10, 3.827, -9.239, 7.071, -7.071, 9.239, -3.827)
+
+[node name="InnerGlow" type="Polygon2D" parent="."]
+material = SubResource("CanvasItemMaterial_3")
+z_index = 0
+color = Color(1, 0.6, 0.2, 1)
+polygon = PackedVector2Array(7, 0, 6.467, 2.679, 4.949, 4.949, 2.679, 6.467, 0, 7, -2.679, 6.467, -4.949, 4.949, -6.467, 2.679, -7, 0, -6.467, -2.679, -4.949, -4.949, -2.679, -6.467, 0, -7, 2.679, -6.467, 4.949, -4.949, 6.467, -2.679)
+
 [node name="Sprite" type="Polygon2D" parent="."]
-color = Color(1, 0.5, 0, 1)
-polygon = PackedVector2Array(-3, -3, -3, 3, 3, 3, 3, -3)
+z_index = 1
+color = Color(1, 0.7, 0.3, 1)
+polygon = PackedVector2Array(5, 0, 4.619, 1.913, 3.536, 3.536, 1.913, 4.619, 0, 5, -1.913, 4.619, -3.536, 3.536, -4.619, 1.913, -5, 0, -4.619, -1.913, -3.536, -3.536, -1.913, -4.619, 0, -5, 1.913, -4.619, 3.536, -3.536, 4.619, -1.913)
+
+[node name="Core" type="Polygon2D" parent="."]
+z_index = 2
+color = Color(1, 0.9, 0.7, 1)
+polygon = PackedVector2Array(3, 0, 2.771, 1.147, 2.121, 2.121, 1.147, 2.771, 0, 3, -1.147, 2.771, -2.121, 2.121, -2.771, 1.147, -3, 0, -2.771, -1.147, -2.121, -2.121, -1.147, -2.771, 0, -3, 1.147, -2.771, 2.121, -2.121, 2.771, -1.147)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_1")

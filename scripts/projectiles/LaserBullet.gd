@@ -54,9 +54,8 @@ func setup_beam_visuals():
 		Vector2(core_width, -8)
 	])
 
-	# Adjust collision shape to match beam width
-	var collision_shape = $CollisionShape2D.shape as CapsuleShape2D
-	collision_shape.radius = beam_width
+	# Adjust collision shape to match beam width (deferred to avoid physics query conflicts)
+	call_deferred("update_collision_shape", beam_width)
 
 	# Enhanced visual effects for higher levels
 	if weapon_level >= 3:
@@ -65,6 +64,11 @@ func setup_beam_visuals():
 		$Sprite.modulate = Color(1.2, 1.2, 1.0, 1.0)  # Slightly overbrightened
 	if weapon_level >= 5:
 		$Core.modulate = Color(1.5, 1.5, 1.5, 1.0)  # Super bright core
+
+func update_collision_shape(beam_width: float):
+	var collision_shape = $CollisionShape2D.shape as CapsuleShape2D
+	# Use set_deferred to avoid physics state conflicts
+	collision_shape.set_deferred("radius", beam_width)
 
 func _process(delta):
 	position += direction * speed * delta

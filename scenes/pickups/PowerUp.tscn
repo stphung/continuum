@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/pickups/PowerUp.gd" id="1"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
-radius = 15.0
+radius = 20.0
 
 [node name="PowerUp" type="Area2D" groups=["powerups"]]
 script = ExtResource("1")
@@ -14,19 +14,19 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -15.0
-offset_top = -15.0
-offset_right = 15.0
-offset_bottom = 15.0
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
 color = Color(0, 1, 0, 1)
 
 [node name="CircleSprite" type="Polygon2D" parent="."]
 color = Color(0, 1, 0, 1)
-polygon = PackedVector2Array(15, 0, 14.27, 4.64, 11.47, 9.68, 6.87, 13.33, 1.31, 14.94, -4.64, 14.27, -9.68, 11.47, -13.33, 6.87, -14.94, 1.31, -14.94, -1.31, -13.33, -6.87, -9.68, -11.47, -4.64, -14.27, 1.31, -14.94, 6.87, -13.33, 11.47, -9.68, 14.27, -4.64, 15, 0)
+polygon = PackedVector2Array(20, 0, 19.02, 6.18, 15.29, 12.91, 9.16, 17.77, 1.75, 19.92, -6.18, 19.02, -12.91, 15.29, -17.77, 9.16, -19.92, 1.75, -19.92, -1.75, -17.77, -9.16, -12.91, -15.29, -6.18, -19.02, 1.75, -19.92, 9.16, -17.77, 15.29, -12.91, 19.02, -6.18, 20, 0)
 
 [node name="OutlineRing" type="Polygon2D" parent="."]
-color = Color(1, 1, 1, 0.3)
-polygon = PackedVector2Array(17, 0, 16.17, 5.26, 13.0, 10.97, 7.79, 15.11, 1.48, 16.94, -5.26, 16.17, -10.97, 13.0, -15.11, 7.79, -16.94, 1.48, -16.94, -1.48, -15.11, -7.79, -10.97, -13.0, -5.26, -16.17, 1.48, -16.94, 7.79, -15.11, 13.0, -10.97, 16.17, -5.26, 17, 0, 15, 0, 14.27, -4.64, 11.47, -9.68, 6.87, -13.33, 1.31, -14.94, -4.64, -14.27, -9.68, -11.47, -13.33, -6.87, -14.94, -1.31, -14.94, 1.31, -13.33, 6.87, -9.68, 11.47, -4.64, 14.27, 1.31, 14.94, 6.87, 13.33, 11.47, 9.68, 14.27, 4.64, 15, 0)
+color = Color(1, 1, 1, 0.5)
+polygon = PackedVector2Array(22.5, 0, 21.44, 6.97, 17.25, 14.54, 10.33, 20.04, 1.96, 22.46, -6.97, 21.44, -14.54, 17.25, -20.04, 10.33, -22.46, 1.96, -22.46, -1.96, -20.04, -10.33, -14.54, -17.25, -6.97, -21.44, 1.96, -22.46, 10.33, -20.04, 17.25, -14.54, 21.44, -6.97, 22.5, 0, 20, 0, 19.02, -6.18, 15.29, -12.91, 9.16, -17.77, 1.75, -19.92, -6.18, -19.02, -12.91, -15.29, -17.77, -9.16, -19.92, -1.75, -19.92, 1.75, -17.77, 9.16, -12.91, 15.29, -6.18, 19.02, 1.75, 19.92, 9.16, 17.77, 15.29, 12.91, 19.02, 6.18, 20, 0)
 
 [node name="LetterLabel" type="Label" parent="."]
 anchors_preset = 8
@@ -34,14 +34,14 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -10.0
-offset_top = -12.0
-offset_right = 10.0
-offset_bottom = 12.0
+offset_left = -15.0
+offset_top = -16.0
+offset_right = 15.0
+offset_bottom = 16.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 20
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 28
 text = "P"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -50,7 +50,7 @@ vertical_alignment = 1
 shape = SubResource("CircleShape2D_1")
 
 [node name="LifeTimer" type="Timer" parent="."]
-wait_time = 5.0
+wait_time = 10.0
 one_shot = true
 autostart = true
 
