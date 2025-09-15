@@ -379,6 +379,43 @@ jobs:
           name: android
           path: ./artifacts/android
 
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          # Get the current tag
+          CURRENT_TAG=${GITHUB_REF#refs/tags/}
+
+          # Get the previous tag (sorted by version)
+          PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -A1 "^${CURRENT_TAG}$" | tail -1)
+
+          # If no previous tag found, get the first tag or initial commit
+          if [ -z "$PREVIOUS_TAG" ] || [ "$PREVIOUS_TAG" = "$CURRENT_TAG" ]; then
+            PREVIOUS_TAG=$(git tag --sort=version:refname | head -1)
+            if [ -z "$PREVIOUS_TAG" ]; then
+              PREVIOUS_TAG=$(git rev-list --max-parents=0 HEAD)
+            fi
+          fi
+
+          echo "Generating changelog from $PREVIOUS_TAG to $CURRENT_TAG"
+
+          # Generate changelog (filter out [skip-version] commits)
+          CHANGELOG=$(git log --pretty=format:"- %s" ${PREVIOUS_TAG}..${CURRENT_TAG} | grep -v '\[skip-version\]' | head -20)
+
+          # If no changes (empty changelog), add a default message
+          if [ -z "$CHANGELOG" ]; then
+            CHANGELOG="- Minor updates and improvements"
+          fi
+
+          # Save to output with proper escaping
+          {
+            echo "changelog<<EOF"
+            echo "$CHANGELOG"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+          echo "Previous tag: $PREVIOUS_TAG"
+          echo "Current tag: $CURRENT_TAG"
+
       - name: Create Release Archives
         run: |
           cd artifacts
@@ -399,6 +436,9 @@ jobs:
             ## 🎮 Continuum Release ${GITHUB_REF#refs/tags/}
 
             **Professional vertical scrolling shmup built in Godot 4.4**
+
+            ### 📝 What's Changed Since Last Release
+            ${{ steps.changelog.outputs.changelog }}
 
             ### 🚀 Play Options
             - **🌐 Web**: [Play Online](https://stphung.github.io/continuum/) (Instant browser play)
