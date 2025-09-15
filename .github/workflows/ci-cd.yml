@@ -251,11 +251,10 @@ jobs:
           ls -la /github/home/.local/share/godot/keystores/ || echo "Keystore directory not found"
 
       - name: Android Build
-        # Temporarily disable keystore for debug build testing
-        # env:
-        #   KEYSTORE_BASE64: ${{ secrets.SECRET_RELEASE_KEYSTORE_BASE64 }}
-        #   KEYSTORE_USER: ${{ secrets.SECRET_RELEASE_KEYSTORE_USER }}
-        #   KEYSTORE_PASSWORD: ${{ secrets.SECRET_RELEASE_KEYSTORE_PASSWORD }}
+        env:
+          KEYSTORE_BASE64: ${{ secrets.SECRET_RELEASE_KEYSTORE_BASE64 }}
+          KEYSTORE_USER: ${{ secrets.SECRET_RELEASE_KEYSTORE_USER }}
+          KEYSTORE_PASSWORD: ${{ secrets.SECRET_RELEASE_KEYSTORE_PASSWORD }}
         run: |
           mkdir -v -p build/android
 
