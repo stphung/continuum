@@ -222,11 +222,11 @@ jobs:
           cat ~/.config/godot/editor_settings-4.4.tres
 
       - name: Android Build
-        env:
-          # Temporarily disable keystore for debug build testing
-          # KEYSTORE_BASE64: ${{ secrets.SECRET_RELEASE_KEYSTORE_BASE64 }}
-          # KEYSTORE_USER: ${{ secrets.SECRET_RELEASE_KEYSTORE_USER }}
-          # KEYSTORE_PASSWORD: ${{ secrets.SECRET_RELEASE_KEYSTORE_PASSWORD }}
+        # Temporarily disable keystore for debug build testing
+        # env:
+        #   KEYSTORE_BASE64: ${{ secrets.SECRET_RELEASE_KEYSTORE_BASE64 }}
+        #   KEYSTORE_USER: ${{ secrets.SECRET_RELEASE_KEYSTORE_USER }}
+        #   KEYSTORE_PASSWORD: ${{ secrets.SECRET_RELEASE_KEYSTORE_PASSWORD }}
         run: |
           mkdir -v -p build/android
 
