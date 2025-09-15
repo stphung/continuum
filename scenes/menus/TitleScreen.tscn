@@ -41,12 +41,6 @@ theme_override_font_sizes/font_size = 64
 text = "CONTINUUM"
 horizontal_alignment = 1
 
-[node name="GameSubtitle" type="Label" parent="UI/MainContainer/TitleContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Professional Shmup Engine"
-horizontal_alignment = 1
-modulate = Color(0.8, 0.8, 0.8, 1)
 
 [node name="Spacer1" type="Control" parent="UI/MainContainer/TitleContainer"]
 layout_mode = 2
