@@ -149,6 +149,13 @@ jobs:
           mkdir -v -p android/build
           unzip -q ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable/android_source.zip -d android/build
 
+          # Create build version info to prevent "no version info for it exists" error
+          echo "${GODOT_VERSION}.stable" > android/build/.build_version
+
+          # List installed template files for debugging
+          echo "Android build template installed:"
+          find android/build -type f | head -20
+
       - name: Configure Godot Android Settings
         run: |
           # Create Godot editor settings directory
