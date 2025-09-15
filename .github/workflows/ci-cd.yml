@@ -178,14 +178,6 @@ jobs:
             echo "No release keystore configured, using debug build"
           fi
 
-      - name: Temporarily Hide Test Files
-        run: |
-          # Move test files outside project directory to prevent parsing errors
-          if [ -d "test" ]; then
-            mv test /tmp/test_backup_$GITHUB_RUN_ID
-            echo "Test files moved outside project directory before import"
-          fi
-
       - name: Install Project Dependencies
         run: |
           # Install addons via gd-plug before project import
@@ -297,15 +289,6 @@ jobs:
             godot --headless --verbose --export-release "$EXPORT_PRESET" "$OUTPUT_FILE"
           else
             godot --headless --verbose --export-debug "$EXPORT_PRESET" "$OUTPUT_FILE"
-          fi
-
-      - name: Restore Test Files
-        if: always()
-        run: |
-          # Restore test files after Android export (always run this step)
-          if [ -d "/tmp/test_backup_$GITHUB_RUN_ID" ]; then
-            mv /tmp/test_backup_$GITHUB_RUN_ID test
-            echo "Test files restored"
           fi
 
       - name: Upload Artifact
