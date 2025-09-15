@@ -227,13 +227,13 @@ Built using official **Godot CI/CD best practices**:
 2. **📦 Latest Release**: [GitHub Releases](https://github.com/stphung/continuum/releases) - Stable multi-platform builds
 3. **🚧 Development Builds**: [GitHub Actions Artifacts](https://github.com/stphung/continuum/actions) - Latest successful builds
 
-**Build Status**: [![CI/CD Pipeline](https://github.com/stphung/continuum/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/stphung/continuum/actions/workflows/ci-cd.yml) [![Auto Version](https://github.com/stphung/continuum/actions/workflows/auto-version.yml/badge.svg)](https://github.com/stphung/continuum/actions/workflows/auto-version.yml) **All platforms operational** ✅
+**Build Status**: [![CI/CD Pipeline](https://github.com/stphung/continuum/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/stphung/continuum/actions/workflows/ci-cd.yml) **All platforms operational with auto-versioning** ✅
 
 ### **🤖 Automatic Release System**
 
 Continuum features a **fully automated release pipeline** that eliminates manual version management:
 
-**🔄 Workflow**: `git push` → **CI/CD builds** → **auto version bump** → **release creation** → **multi-platform downloads**
+**🔄 Workflow**: `git push` → **CI/CD builds** → **auto version bump** → **immediate release creation** → **multi-platform downloads**
 
 **📈 Version Strategy**:
 - **Patch Increment**: Every successful push to main automatically creates `v1.1.1` → `v1.1.2` → `v1.1.3`
@@ -242,6 +242,7 @@ Continuum features a **fully automated release pipeline** that eliminates manual
 - **Zero Configuration**: No manual tags or version files required
 
 **🎯 Benefits**:
+- **Single Workflow**: All building, versioning, and release creation in one streamlined process
 - **Instant Releases**: New Android APK + all platforms available within ~3 minutes of push
 - **Consistent Versioning**: Never forget to tag releases or create builds
 - **Developer Friendly**: Focus on code, not release management

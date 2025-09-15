@@ -223,21 +223,26 @@ SECRET_RELEASE_KEYSTORE_PASSWORD: [Keystore password]
 - **Solution**: Verify keystore credentials in GitHub repository secrets
 - **Fallback**: CI automatically switches to debug build if keystore unavailable
 
-**Automatic Versioning System Configuration:**
+**Integrated Automatic Versioning System:**
 ```yaml
-# .github/workflows/auto-version.yml
-name: Auto Version
-on:
-  workflow_run:
-    workflows: ["Continuum CI/CD"]
-    types: [completed]
-    branches: [main]
+# Integrated into .github/workflows/ci-cd.yml
+jobs:
+  # ... CI/CD builds (Linux, Windows, Web, Android) ...
+
+  auto-version:
+    name: Auto Version Bump
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [export-linux, export-windows, export-web, export-android]
+
+  create-release:
+    name: Create Release
+    needs: [export-linux, export-windows, export-web, export-android, auto-version]
 
 # Features:
+- Single workflow handles building, versioning, and releasing
 - Automatic patch version increments (v1.1.1 → v1.1.2)
 - Commit message controls: [skip-version], #major, #minor
-- Runs only after successful CI/CD completion
-- Creates git tags that trigger release workflow
+- Immediate release creation after version bump
 - Zero manual intervention required
 ```
 

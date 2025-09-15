@@ -305,11 +305,50 @@ jobs:
           name: android
           path: build/android
 
+  auto-version:
+    name: Auto Version Bump
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [export-linux, export-windows, export-web, export-android]
+    permissions:
+      contents: write
+    outputs:
+      new_tag: ${{ steps.bump.outputs.new_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check for version skip
+        id: check_skip
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          if [[ "$COMMIT_MSG" == *"[skip-version]"* ]]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "⏭️ Skipping version bump due to [skip-version] in commit message"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "✅ Proceeding with automatic version bump"
+          fi
+
+      - name: Bump version and push tag
+        id: bump
+        if: steps.check_skip.outputs.skip == 'false'
+        uses: anothrNick/github-tag-action@1.67.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch
+          WITH_V: true
+          RELEASE_BRANCHES: main
+          DRY_RUN: false
+
   create-release:
     name: Create Release
     runs-on: ubuntu-22.04
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: [export-linux, export-windows, export-web, export-android]
+    if: (startsWith(github.ref, 'refs/tags/v')) || (needs.auto-version.outputs.new_tag != '')
+    needs: [export-linux, export-windows, export-web, export-android, auto-version]
     permissions:
       contents: write
     steps:
