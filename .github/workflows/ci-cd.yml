@@ -221,6 +221,20 @@ jobs:
           echo "=== Godot Editor Settings ==="
           cat ~/.config/godot/editor_settings-4.4.tres
 
+      - name: Create Debug Keystore
+        run: |
+          # Create debug keystore directory
+          mkdir -p /github/home/.local/share/godot/keystores
+
+          # Generate debug keystore (standard Android debug keystore)
+          keytool -genkey -v -keystore /github/home/.local/share/godot/keystores/debug.keystore \
+            -storepass android -alias androiddebugkey -keypass android \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+
+          echo "Debug keystore created successfully"
+          ls -la /github/home/.local/share/godot/keystores/
+
       - name: Android Build
         # Temporarily disable keystore for debug build testing
         # env:
