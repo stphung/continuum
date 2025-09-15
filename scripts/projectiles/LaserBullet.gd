@@ -10,10 +10,10 @@ var weapon_level = 1
 
 func _ready():
 	add_to_group("player_bullets")
-	
-	# Scale properties based on weapon level
-	damage = 3 + weapon_level
-	pierce_count = 1 + weapon_level
+
+	# Scale properties based on weapon level - much more powerful now
+	damage = 4 + (weapon_level * 2)  # Level 1: 6 damage, Level 5: 14 damage
+	pierce_count = 2 + weapon_level  # Level 1: 3 pierce, Level 5: 7 pierce
 	
 	# Scale visual size based on level
 	var scale_factor = 1.0 + (weapon_level - 1) * 0.2

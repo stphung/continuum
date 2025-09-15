@@ -10,17 +10,19 @@ var drift_direction: Vector2
 var wave_offset: float
 
 var powerup_colors = {
-	"weapon_upgrade": Color(1, 0, 0, 1),
-	"weapon_switch": Color(0, 0, 1, 1),
-	"bomb": Color(1, 1, 0, 1),
-	"life": Color(0, 1, 0, 1)
+	"vulcan_powerup": Color(1, 0, 0, 1),      # Red for vulcan
+	"laser_powerup": Color(0, 0.5, 1, 1),     # Blue for laser
+	"plasma_powerup": Color(1, 0.3, 1, 1),    # Purple/magenta for plasma
+	"bomb": Color(1, 1, 0, 1),                # Yellow for bomb
+	"life": Color(0, 1, 0, 1)                 # Green for life
 }
 
 var powerup_letters = {
-	"weapon_upgrade": "P",
-	"weapon_switch": "L",
-	"bomb": "B",
-	"life": "1"
+	"vulcan_powerup": "V",    # V for vulcan
+	"laser_powerup": "L",     # L for laser
+	"plasma_powerup": "P",    # P for plasma
+	"bomb": "B",              # B for bomb
+	"life": "1"               # 1 for extra life
 }
 
 func _ready():
@@ -49,12 +51,12 @@ func _setup_floating_animation():
 	pulse_tween.tween_property(self, "scale", Vector2(1.0, 1.0), randf_range(1.0, 2.0))
 
 func randomize_type():
-	var types = ["weapon_upgrade", "weapon_switch", "bomb", "life"]
-	var weights = [0.4, 0.3, 0.2, 0.1]
-	
+	var types = ["vulcan_powerup", "laser_powerup", "plasma_powerup", "bomb", "life"]
+	var weights = [0.25, 0.25, 0.25, 0.15, 0.1]  # Equal chance for each weapon, less for bomb/life
+
 	var rand = randf()
 	var cumulative = 0.0
-	
+
 	for i in range(types.size()):
 		cumulative += weights[i]
 		if rand <= cumulative:

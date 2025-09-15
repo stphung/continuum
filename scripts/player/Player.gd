@@ -74,13 +74,18 @@ func fire_weapon():
 			fire_vulcan()
 		"laser":
 			fire_laser()
-	
+		"plasma":
+			fire_plasma()
+
 	# Play different shooting sounds for different weapons
 	if has_node("/root/SoundManager"):
-		if weapon_type == "laser":
-			SoundManager.play_random_pitch("laser", -8.0, 0.1)  # Deeper, more focused sound
-		else:
-			SoundManager.play_random_pitch("shoot", -12.0, 0.15)  # Higher pitch for vulcan
+		match weapon_type:
+			"laser":
+				SoundManager.play_random_pitch("laser", -8.0, 0.1)  # Deeper, more focused sound
+			"plasma":
+				SoundManager.play_random_pitch("laser", -6.0, 0.2)  # Medium pitch for plasma
+			"vulcan":
+				SoundManager.play_random_pitch("shoot", -12.0, 0.15)  # Higher pitch for vulcan
 
 func fire_vulcan():
 	match weapon_level:
@@ -104,6 +109,29 @@ func fire_laser():
 	# Laser always fires a single, powerful beam regardless of level
 	# Higher levels increase damage and pierce through more enemies
 	shoot.emit($MuzzlePosition.global_position, Vector2.UP, "laser")
+
+func fire_plasma():
+	# Plasma fires fast shots that get homing behavior at higher levels
+	match weapon_level:
+		1:
+			# Level 1: Single forward shot (fast machine gun style)
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "plasma")
+		2:
+			# Level 2: Dual shots with slight spread
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.05, -1).normalized(), "plasma")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.05, -1).normalized(), "plasma")
+		3:
+			# Level 3: Triple shot spread (homing starts here)
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "plasma")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.1, -1).normalized(), "plasma")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.1, -1).normalized(), "plasma")
+		_:
+			# Level 4-5: Wide spread with strong homing
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "plasma")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.15, -1).normalized(), "plasma")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.15, -1).normalized(), "plasma")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.05, -1).normalized(), "plasma")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.05, -1).normalized(), "plasma")
 
 func _on_area_entered(area):
 	if area.is_in_group("enemies") or area.is_in_group("enemy_bullets"):
@@ -140,11 +168,18 @@ func drop_power_ups():
 	var powerup_scene = preload("res://scenes/pickups/PowerUp.tscn")
 	var parent = get_parent()
 
-	# Drop weapon upgrade power-ups equal to weapon level - 1 (level 1 is default)
+	# Drop weapon power-ups equal to weapon level - 1 (level 1 is default)
 	var weapon_upgrades_to_drop = weapon_level - 1
 	for i in range(weapon_upgrades_to_drop):
 		var powerup = powerup_scene.instantiate()
-		powerup.powerup_type = "weapon_upgrade"
+		# Drop the same weapon type the player had
+		match weapon_type:
+			"vulcan":
+				powerup.powerup_type = "vulcan_powerup"
+			"laser":
+				powerup.powerup_type = "laser_powerup"
+			"plasma":
+				powerup.powerup_type = "plasma_powerup"
 		powerup.update_appearance()
 
 		# Position power-ups in a spread around death location
@@ -155,17 +190,6 @@ func drop_power_ups():
 
 		parent.add_child(powerup)
 
-	# Drop weapon switch power-up if player has laser (since vulcan is default)
-	if weapon_type == "laser":
-		var laser_powerup = powerup_scene.instantiate()
-		laser_powerup.powerup_type = "weapon_switch"
-		laser_powerup.update_appearance()
-
-		# Position slightly offset from death location
-		var laser_offset = Vector2(randf_range(-40, 40), randf_range(-20, 20))
-		laser_powerup.position = position + laser_offset
-
-		parent.add_child(laser_powerup)
 
 func destroy_ship():
 	# Make ship invisible immediately
@@ -192,14 +216,38 @@ func _on_invulnerability_timer_timeout():
 func collect_powerup(powerup):
 	var game = get_parent()
 	match powerup.powerup_type:
-		"weapon_upgrade":
-			weapon_level = min(weapon_level + 1, 5)
-			show_upgrade_effect("WEAPON LV " + str(weapon_level))
-			# Adjust fire rate based on weapon type and level
+		"vulcan_powerup":
+			if weapon_type == "vulcan":
+				# Same weapon type: upgrade level
+				weapon_level = min(weapon_level + 1, 5)
+				show_upgrade_effect("VULCAN LV " + str(weapon_level))
+			else:
+				# Different weapon type: switch and reset to level 1
+				weapon_type = "vulcan"
+				weapon_level = 1
+				show_upgrade_effect("VULCAN")
 			adjust_fire_rate()
-		"weapon_switch":
-			weapon_type = "laser" if weapon_type == "vulcan" else "vulcan"
-			show_upgrade_effect(weapon_type.to_upper())
+		"laser_powerup":
+			if weapon_type == "laser":
+				# Same weapon type: upgrade level
+				weapon_level = min(weapon_level + 1, 5)
+				show_upgrade_effect("LASER LV " + str(weapon_level))
+			else:
+				# Different weapon type: switch and reset to level 1
+				weapon_type = "laser"
+				weapon_level = 1
+				show_upgrade_effect("LASER")
+			adjust_fire_rate()
+		"plasma_powerup":
+			if weapon_type == "plasma":
+				# Same weapon type: upgrade level
+				weapon_level = min(weapon_level + 1, 5)
+				show_upgrade_effect("PLASMA LV " + str(weapon_level))
+			else:
+				# Different weapon type: switch and reset to level 1
+				weapon_type = "plasma"
+				weapon_level = 1
+				show_upgrade_effect("PLASMA")
 			adjust_fire_rate()
 		"bomb":
 			if game.has_method("add_bomb"):
@@ -213,14 +261,14 @@ func collect_powerup(powerup):
 			elif "lives" in game:
 				game.lives += 1
 			show_upgrade_effect("LIFE +1")
-	
+
 	if game.has_method("update_ui"):
 		game.update_ui()
-	
+
 	# Play power-up collection sound
 	if has_node("/root/SoundManager"):
 		SoundManager.play_sound("powerup", -8.0, randf_range(0.9, 1.1))
-	
+
 	powerup.call_deferred("queue_free")
 
 func adjust_fire_rate():
@@ -230,6 +278,8 @@ func adjust_fire_rate():
 			$ShootTimer.wait_time = max(0.08, 0.15 - (weapon_level - 1) * 0.01)  # Gets faster with levels
 		"laser":
 			$ShootTimer.wait_time = max(0.2, 0.3 - (weapon_level - 1) * 0.02)   # Slower but gets faster with levels
+		"plasma":
+			$ShootTimer.wait_time = max(0.06, 0.12 - (weapon_level - 1) * 0.01)  # Fast machine gun style, gets very fast
 
 func show_upgrade_effect(text):
 	var label = Label.new()

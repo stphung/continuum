@@ -2,6 +2,7 @@ extends Node2D
 
 @export var bullet_scene: PackedScene = preload("res://scenes/projectiles/Bullet.tscn") if ResourceLoader.exists("res://scenes/projectiles/Bullet.tscn") else null
 @export var laser_bullet_scene: PackedScene = preload("res://scenes/projectiles/LaserBullet.tscn") if ResourceLoader.exists("res://scenes/projectiles/LaserBullet.tscn") else null
+@export var plasma_bullet_scene: PackedScene = preload("res://scenes/projectiles/PlasmaBullet.tscn") if ResourceLoader.exists("res://scenes/projectiles/PlasmaBullet.tscn") else null
 @export var powerup_scene: PackedScene = preload("res://scenes/pickups/PowerUp.tscn") if ResourceLoader.exists("res://scenes/pickups/PowerUp.tscn") else null
 
 var score = 0
@@ -112,17 +113,26 @@ func spawn_powerup(pos):
 		$PowerUps.add_child(powerup)
 
 func _on_player_shoot(bullet_position, bullet_direction, weapon_type = "vulcan"):
-	var scene_to_use = bullet_scene if weapon_type == "vulcan" else laser_bullet_scene
-	
+	var scene_to_use
+	match weapon_type:
+		"vulcan":
+			scene_to_use = bullet_scene
+		"laser":
+			scene_to_use = laser_bullet_scene
+		"plasma":
+			scene_to_use = plasma_bullet_scene
+		_:
+			scene_to_use = bullet_scene  # Default to vulcan
+
 	if scene_to_use:
 		var bullet = scene_to_use.instantiate()
 		bullet.position = bullet_position
 		bullet.direction = bullet_direction
-		
-		# Pass weapon level to laser bullets for scaling
-		if weapon_type == "laser" and current_player and is_instance_valid(current_player):
+
+		# Pass weapon level to laser and plasma bullets for scaling
+		if (weapon_type == "laser" or weapon_type == "plasma") and current_player and is_instance_valid(current_player):
 			bullet.weapon_level = current_player.weapon_level
-		
+
 		$Bullets.add_child(bullet)
 
 func _on_player_use_bomb():

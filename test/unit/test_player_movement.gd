@@ -88,8 +88,8 @@ func test_power_up_drops_on_death():
 	var final_powerups = get_tree().get_nodes_in_group("powerups").size()
 	var power_ups_dropped = final_powerups - initial_powerups
 
-	# Should drop 2 weapon upgrades (level 3 - 1) + 1 weapon switch (laser)
-	assert_that(power_ups_dropped).is_equal(3)
+	# Should drop 2 laser powerups (level 3 - 1)
+	assert_that(power_ups_dropped).is_equal(2)
 
 func test_power_up_drops_weapon_upgrades_only():
 	# Setup player with only weapon upgrades (no laser)

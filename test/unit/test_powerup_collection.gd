@@ -46,41 +46,56 @@ func test_powerup_drift_movement():
 	assert_that(x_difference).is_greater(0.0)
 
 func test_weapon_upgrade_collection():
+	# Test upgrading same weapon type
+	player.weapon_type = "vulcan"
+	player.weapon_level = 2
 	var powerup = auto_free(PowerUp.instantiate())
-	powerup.powerup_type = "weapon_upgrade"
+	powerup.powerup_type = "vulcan_powerup"
 	var initial_level = player.weapon_level
 
 	player.collect_powerup(powerup)
 
+	# Should upgrade to next level
 	assert_that(player.weapon_level).is_equal(initial_level + 1)
+	assert_that(player.weapon_type).is_equal("vulcan")
 
 func test_weapon_upgrade_max_level():
+	player.weapon_type = "laser"
 	player.weapon_level = 5
 	var powerup = auto_free(PowerUp.instantiate())
-	powerup.powerup_type = "weapon_upgrade"
+	powerup.powerup_type = "laser_powerup"
 
 	player.collect_powerup(powerup)
 
 	# Should not exceed max level of 5
 	assert_that(player.weapon_level).is_equal(5)
-
-func test_weapon_switch_collection():
-	player.weapon_type = "vulcan"
-	var powerup = auto_free(PowerUp.instantiate())
-	powerup.powerup_type = "weapon_switch"
-
-	player.collect_powerup(powerup)
-
 	assert_that(player.weapon_type).is_equal("laser")
 
-func test_weapon_switch_back_to_vulcan():
-	player.weapon_type = "laser"
+func test_weapon_switch_collection():
+	# Test switching from vulcan to laser
+	player.weapon_type = "vulcan"
+	player.weapon_level = 3
 	var powerup = auto_free(PowerUp.instantiate())
-	powerup.powerup_type = "weapon_switch"
+	powerup.powerup_type = "laser_powerup"
 
 	player.collect_powerup(powerup)
 
-	assert_that(player.weapon_type).is_equal("vulcan")
+	# Should switch to laser and reset to level 1
+	assert_that(player.weapon_type).is_equal("laser")
+	assert_that(player.weapon_level).is_equal(1)
+
+func test_weapon_switch_to_plasma():
+	# Test switching from laser to plasma
+	player.weapon_type = "laser"
+	player.weapon_level = 4
+	var powerup = auto_free(PowerUp.instantiate())
+	powerup.powerup_type = "plasma_powerup"
+
+	player.collect_powerup(powerup)
+
+	# Should switch to plasma and reset to level 1
+	assert_that(player.weapon_type).is_equal("plasma")
+	assert_that(player.weapon_level).is_equal(1)
 
 func test_bomb_powerup_collection():
 	var powerup = auto_free(PowerUp.instantiate())
@@ -102,7 +117,7 @@ func test_life_powerup_collection():
 
 func test_powerup_destruction_after_collection():
 	var powerup = auto_free(PowerUp.instantiate())
-	powerup.powerup_type = "weapon_upgrade"
+	powerup.powerup_type = "vulcan_powerup"
 
 	player.collect_powerup(powerup)
 
@@ -118,7 +133,7 @@ func test_fire_rate_adjustment_after_upgrade():
 
 	# Upgrade weapon
 	var powerup = auto_free(PowerUp.instantiate())
-	powerup.powerup_type = "weapon_upgrade"
+	powerup.powerup_type = "vulcan_powerup"
 	player.collect_powerup(powerup)
 
 	# Fire rate should be faster (lower wait time)

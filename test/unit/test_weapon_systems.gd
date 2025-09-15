@@ -80,8 +80,8 @@ func test_laser_bullet_damage_scaling():
 	laser.weapon_level = 3
 	laser._ready()
 
-	assert_that(laser.damage).is_equal(6)  # 3 base + 3 level
-	assert_that(laser.pierce_count).is_equal(4)  # 1 base + 3 level
+	assert_that(laser.damage).is_equal(10)  # 4 + (3 * 2) = 10
+	assert_that(laser.pierce_count).is_equal(5)  # 2 + 3 = 5
 
 func test_laser_bullet_piercing_mechanics():
 	var laser = auto_free(LaserBullet.instantiate())

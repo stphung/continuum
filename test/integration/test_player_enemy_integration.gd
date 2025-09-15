@@ -79,11 +79,12 @@ func test_laser_bullet_exhaustion():
 	test_enemy._ready()
 
 	var laser = auto_free(LaserBullet.instantiate())
-	laser.weapon_level = 1  # pierce count = 2
+	laser.weapon_level = 1  # pierce count = 3 (2 + 1)
 	game.get_node("Bullets").add_child(laser)
 	laser._ready()
 
-	# Hit enemy twice
+	# Hit enemy three times to exhaust pierce count
+	laser._on_area_entered(test_enemy)
 	laser._on_area_entered(test_enemy)
 	laser._on_area_entered(test_enemy)
 
@@ -157,7 +158,7 @@ func test_powerup_collection_integration():
 	game.get_node("PowerUps").add_child(powerup)
 	powerup._ready()
 	# Set powerup type AFTER _ready() to avoid randomization override
-	powerup.powerup_type = "weapon_upgrade"
+	powerup.powerup_type = "vulcan_powerup"
 	powerup.update_appearance()
 
 	# Simulate collection directly
@@ -223,25 +224,42 @@ func test_weapon_type_switching():
 	var player_ref = game.current_player
 	player_ref.invulnerable = false  # Disable invulnerability for testing
 	var initial_weapon = player_ref.weapon_type
+	var initial_level = player_ref.weapon_level
 
-	# Create weapon switch powerup
-	var powerup = auto_free(PowerUp.instantiate())
-	powerup.position = player_ref.position
-	game.get_node("PowerUps").add_child(powerup)
-	powerup._ready()
+	# Test switching to laser weapon
+	var laser_powerup = auto_free(PowerUp.instantiate())
+	laser_powerup.position = player_ref.position
+	game.get_node("PowerUps").add_child(laser_powerup)
+	laser_powerup._ready()
 	# Set powerup type AFTER _ready() to avoid randomization override
-	powerup.powerup_type = "weapon_switch"
-	powerup.update_appearance()
+	laser_powerup.powerup_type = "laser_powerup"
+	laser_powerup.update_appearance()
 
 	# Collect powerup directly
-	player_ref.collect_powerup(powerup)
+	player_ref.collect_powerup(laser_powerup)
 
 	await get_tree().process_frame
 
-	# Weapon should have switched
-	assert_that(player_ref.weapon_type).is_not_equal(initial_weapon)
-	var expected_weapon = "laser" if initial_weapon == "vulcan" else "vulcan"
-	assert_that(player_ref.weapon_type).is_equal(expected_weapon)
+	# Weapon should have switched to laser and reset to level 1
+	assert_that(player_ref.weapon_type).is_equal("laser")
+	assert_that(player_ref.weapon_level).is_equal(1)
+
+	# Test switching to plasma weapon
+	var plasma_powerup = auto_free(PowerUp.instantiate())
+	plasma_powerup.position = player_ref.position
+	game.get_node("PowerUps").add_child(plasma_powerup)
+	plasma_powerup._ready()
+	plasma_powerup.powerup_type = "plasma_powerup"
+	plasma_powerup.update_appearance()
+
+	# Collect powerup directly
+	player_ref.collect_powerup(plasma_powerup)
+
+	await get_tree().process_frame
+
+	# Weapon should have switched to plasma and reset to level 1
+	assert_that(player_ref.weapon_type).is_equal("plasma")
+	assert_that(player_ref.weapon_level).is_equal(1)
 
 func test_bomb_powerup_increases_bombs():
 	# Spawn player
