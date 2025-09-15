@@ -246,7 +246,11 @@ jobs:
           echo "Output file: $OUTPUT_FILE"
 
           echo "Export preset configuration:"
-          cat export_presets.cfg | grep -A 50 "preset.3"
+          if [ "$EXPORT_TYPE" = "release" ]; then
+            cat export_presets.cfg | grep -A 50 "preset.4"
+          else
+            cat export_presets.cfg | grep -A 50 "preset.3"
+          fi
 
           echo "=== Attempting APK Export ==="
           # Export with appropriate configuration
