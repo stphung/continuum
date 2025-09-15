@@ -200,6 +200,7 @@ All platforms build successfully in parallel with optimized times:
 
 ### **🔧 Robust CI/CD Features**
 - **Zero-Failure Builds**: 4/4 platforms build successfully on every commit
+- **Automatic Versioning**: Every push to main automatically increments patch version and creates releases
 - **Comprehensive Testing**: Pre-commit hooks + automated test suite + validation
 - **Smart Dependency Management**: Automated gd-plug installation with gdUnit4
 - **Android Build Templates**: Full Android SDK integration with custom keystore support
@@ -208,7 +209,8 @@ All platforms build successfully in parallel with optimized times:
 
 ### **🎯 Production Deployment**
 - **GitHub Pages**: Automatic web deployment on main branch pushes
-- **Release Automation**: Git tags trigger multi-platform release creation
+- **Auto-Release Pipeline**: Every push → CI/CD → version bump → release creation → multi-platform builds
+- **Version Control**: Automatic patch increments (v1.1.1 → v1.1.2) with manual major/minor override
 - **Debug & Release Modes**: Android supports both debug (active) and release builds
 - **Cross-Platform Assets**: Unified builds work across all target platforms
 
@@ -225,7 +227,25 @@ Built using official **Godot CI/CD best practices**:
 2. **📦 Latest Release**: [GitHub Releases](https://github.com/stphung/continuum/releases) - Stable multi-platform builds
 3. **🚧 Development Builds**: [GitHub Actions Artifacts](https://github.com/stphung/continuum/actions) - Latest successful builds
 
-**Build Status**: [![CI/CD Pipeline](https://github.com/stphung/continuum/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/stphung/continuum/actions/workflows/ci-cd.yml) **All platforms operational** ✅
+**Build Status**: [![CI/CD Pipeline](https://github.com/stphung/continuum/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/stphung/continuum/actions/workflows/ci-cd.yml) [![Auto Version](https://github.com/stphung/continuum/actions/workflows/auto-version.yml/badge.svg)](https://github.com/stphung/continuum/actions/workflows/auto-version.yml) **All platforms operational** ✅
+
+### **🤖 Automatic Release System**
+
+Continuum features a **fully automated release pipeline** that eliminates manual version management:
+
+**🔄 Workflow**: `git push` → **CI/CD builds** → **auto version bump** → **release creation** → **multi-platform downloads**
+
+**📈 Version Strategy**:
+- **Patch Increment**: Every successful push to main automatically creates `v1.1.1` → `v1.1.2` → `v1.1.3`
+- **Manual Override**: Include `#major` or `#minor` in commit message for bigger bumps
+- **Skip Versioning**: Add `[skip-version]` to commit message to skip automatic versioning
+- **Zero Configuration**: No manual tags or version files required
+
+**🎯 Benefits**:
+- **Instant Releases**: New Android APK + all platforms available within ~3 minutes of push
+- **Consistent Versioning**: Never forget to tag releases or create builds
+- **Developer Friendly**: Focus on code, not release management
+- **Production Ready**: Every release includes comprehensive testing and quality gates
 
 ## 🤝 **Contributing**
 

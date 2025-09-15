@@ -185,18 +185,21 @@ gh run download <run-id> --name android
 ls -la *.apk  # Verify APK size (~27MB expected)
 ```
 
-**CI/CD Production Status: ✅ ALL PLATFORMS OPERATIONAL**
+**CI/CD Production Status: ✅ ALL PLATFORMS OPERATIONAL + AUTO-VERSIONING**
 - **🪟 Windows Export**: ~1m15s (Cross-compiled from Ubuntu) ✅
 - **🐧 Linux Export**: ~1m8s (Native Ubuntu build) ✅
 - **📱 Android Export**: ~1m41s (ARM64 APK with debug signing) ✅
 - **🌐 Web Export**: ~1m25s (Auto-deployed to GitHub Pages) ✅
+- **🤖 Auto Versioning**: Automatic patch increments + release creation ✅
 
 **Key Implementation Achievements:**
 - **100% Build Success Rate**: All 4 platforms build successfully on every commit
+- **Automatic Release Pipeline**: Push → CI/CD → version bump → release → downloads (3min total)
 - **Android Debug APK**: 27.1 MB APK successfully created and uploaded as artifact
 - **Professional Keystore Management**: Ready for release builds when credentials verified
 - **Robust Error Handling**: Comprehensive fallback mechanisms prevent CI failures
 - **Official Godot CI Integration**: Following barichello/godot-ci:4.4.1 best practices
+- **Zero-Configuration Versioning**: Automatic patch increments with manual override support
 
 **Android Build Details:**
 - **Debug Build**: Currently active, using auto-generated debug keystore ✅
@@ -220,6 +223,47 @@ SECRET_RELEASE_KEYSTORE_PASSWORD: [Keystore password]
 - **Solution**: Verify keystore credentials in GitHub repository secrets
 - **Fallback**: CI automatically switches to debug build if keystore unavailable
 
+**Automatic Versioning System Configuration:**
+```yaml
+# .github/workflows/auto-version.yml
+name: Auto Version
+on:
+  workflow_run:
+    workflows: ["Continuum CI/CD"]
+    types: [completed]
+    branches: [main]
+
+# Features:
+- Automatic patch version increments (v1.1.1 → v1.1.2)
+- Commit message controls: [skip-version], #major, #minor
+- Runs only after successful CI/CD completion
+- Creates git tags that trigger release workflow
+- Zero manual intervention required
+```
+
+**Version Control Commands:**
+```bash
+# Standard push (auto-increments patch version)
+git commit -m "Fix player collision detection"
+git push origin main
+# Result: v1.1.1 → v1.1.2 → auto-release
+
+# Skip automatic versioning
+git commit -m "Update documentation [skip-version]"
+git push origin main
+# Result: No version bump, no release
+
+# Manual major version bump
+git commit -m "Complete weapon system rewrite #major"
+git push origin main
+# Result: v1.1.2 → v2.0.0 → auto-release
+
+# Manual minor version bump
+git commit -m "Add new enemy type #minor"
+git push origin main
+# Result: v1.1.2 → v1.2.0 → auto-release
+```
+
 **CI/CD Troubleshooting Workflow:**
 1. **Always monitor builds** after pushing CI/CD changes (`gh run watch <run-id>`)
 2. **Use `gh run watch`** for real-time progress tracking of all 4 platforms
@@ -227,8 +271,8 @@ SECRET_RELEASE_KEYSTORE_PASSWORD: [Keystore password]
 4. **Verify artifacts** are generated correctly (`gh run download <run-id>`)
 5. **Test deployment endpoints** (GitHub Pages, Android APK downloads)
 6. **Document fixes** in commit messages for future reference
-7. **Monitor release creation** when tags are pushed
-8. **Validate asset uploads** in GitHub releases (multi-platform archives)
+7. **Monitor version bumps** with `gh run list | grep "Auto Version"`
+8. **Validate automatic releases** are created correctly after version bumps
 
 ### Using Claude Code Subagents
 ```bash
