@@ -451,26 +451,5 @@ jobs:
 
             ### 📝 What's Changed Since Last Release
             ${{ steps.changelog.outputs.changelog }}
-
-            ### 🚀 Play Options
-            - **🌐 Web**: [Play Online](https://stphung.github.io/continuum/) (Instant browser play)
-            - **🐧 Linux**: Download `continuum-linux-*.zip`
-            - **🪟 Windows**: Download `continuum-windows-*.zip`
-            - **📱 Android**: Download `continuum-android-*.zip` (contains APK file)
-            - **🌐 Web Offline**: Download `continuum-web-*.zip` for local hosting
-
-            ### ✨ Features
-            - **Dual Weapon System**: Vulcan spread + Laser piercing with 5-level progression
-            - **Zero-Dependency Audio**: All sounds generated programmatically
-            - **Dynamic Difficulty**: Mathematical wave progression scaling
-            - **Professional Architecture**: Clean code with comprehensive testing
-
-            ### 🎯 Controls
-            - **Movement**: Arrow Keys or WASD
-            - **Shoot**: Spacebar (automatic)
-            - **Bomb**: Z key
-            - **Pause**: Escape
-
-            Built with modern game development practices and innovative technical solutions.
           draft: false
           prerelease: false
