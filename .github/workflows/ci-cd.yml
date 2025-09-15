@@ -186,6 +186,14 @@ jobs:
             echo "Test files moved outside project directory before import"
           fi
 
+      - name: Install Project Dependencies
+        run: |
+          # Install addons via gd-plug before project import
+          echo "Installing project dependencies via gd-plug..."
+          godot --path . --headless -s plug.gd install
+          echo "Dependencies installed successfully"
+          ls -la addons/
+
       - name: Import project assets
         run: |
           godot --path . --headless --import --quit-after 1 || true
