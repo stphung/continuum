@@ -354,6 +354,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Checkout the new tag if it was created by auto-version, otherwise use current ref
+          ref: ${{ needs.auto-version.outputs.new_tag || github.ref }}
 
       - name: Download Linux Build
         uses: actions/download-artifact@v4
@@ -382,8 +385,12 @@ jobs:
       - name: Generate Changelog
         id: changelog
         run: |
-          # Get the current tag
-          CURRENT_TAG=${GITHUB_REF#refs/tags/}
+          # Determine current tag - use auto-version output if available, otherwise extract from GITHUB_REF
+          if [ -n "${{ needs.auto-version.outputs.new_tag }}" ]; then
+            CURRENT_TAG="${{ needs.auto-version.outputs.new_tag }}"
+          else
+            CURRENT_TAG=${GITHUB_REF#refs/tags/}
+          fi
 
           # Get the previous tag (sorted by version)
           PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -A1 "^${CURRENT_TAG}$" | tail -1)
@@ -416,24 +423,29 @@ jobs:
           echo "Previous tag: $PREVIOUS_TAG"
           echo "Current tag: $CURRENT_TAG"
 
+          # Also save current tag for use in other steps
+          echo "current_tag=$CURRENT_TAG" >> $GITHUB_OUTPUT
+
       - name: Create Release Archives
         run: |
           cd artifacts
-          zip -r ../continuum-linux-${GITHUB_REF#refs/tags/}.zip linux/
-          zip -r ../continuum-windows-${GITHUB_REF#refs/tags/}.zip windows/
-          zip -r ../continuum-web-${GITHUB_REF#refs/tags/}.zip web/
-          zip -r ../continuum-android-${GITHUB_REF#refs/tags/}.zip android/
+          TAG="${{ steps.changelog.outputs.current_tag }}"
+          zip -r ../continuum-linux-${TAG}.zip linux/
+          zip -r ../continuum-windows-${TAG}.zip windows/
+          zip -r ../continuum-web-${TAG}.zip web/
+          zip -r ../continuum-android-${TAG}.zip android/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.changelog.outputs.current_tag }}
           files: |
             continuum-linux-*.zip
             continuum-windows-*.zip
             continuum-web-*.zip
             continuum-android-*.zip
           body: |
-            ## 🎮 Continuum Release ${GITHUB_REF#refs/tags/}
+            ## 🎮 Continuum Release ${{ steps.changelog.outputs.current_tag }}
 
             **Professional vertical scrolling shmup built in Godot 4.4**
 
