@@ -15,17 +15,56 @@ func _ready():
 	damage = 4 + (weapon_level * 2)  # Level 1: 6 damage, Level 5: 14 damage
 	pierce_count = 2 + weapon_level  # Level 1: 3 pierce, Level 5: 7 pierce
 	
-	# Scale visual size based on level
-	var scale_factor = 1.0 + (weapon_level - 1) * 0.2
-	$Sprite.scale = Vector2(scale_factor, scale_factor)
-	$Glow.scale = Vector2(scale_factor, scale_factor)
-	$Core.scale = Vector2(scale_factor, scale_factor)
+	# Scale beam width dramatically based on level
+	setup_beam_visuals()
 	
 	# Add pulsing glow effect
 	var tween = create_tween()
 	tween.set_loops()
 	tween.tween_property($Glow, "modulate:a", 0.6, 0.2)
 	tween.tween_property($Glow, "modulate:a", 0.2, 0.2)
+
+func setup_beam_visuals():
+	# Calculate beam width: 6px → 48px progression
+	var beam_width = 3 + (weapon_level - 1) * 11.25  # Half-width for polygon
+	var glow_width = beam_width + 4  # Glow extends beyond main beam
+	var core_width = max(1, beam_width * 0.3)  # Core is 30% of beam width
+
+	# Update main beam polygon
+	$Sprite.polygon = PackedVector2Array([
+		Vector2(-beam_width, -10),
+		Vector2(-beam_width, 10),
+		Vector2(beam_width, 10),
+		Vector2(beam_width, -10)
+	])
+
+	# Update glow polygon (wider and longer)
+	$Glow.polygon = PackedVector2Array([
+		Vector2(-glow_width, -12),
+		Vector2(-glow_width, 12),
+		Vector2(glow_width, 12),
+		Vector2(glow_width, -12)
+	])
+
+	# Update core polygon (bright center)
+	$Core.polygon = PackedVector2Array([
+		Vector2(-core_width, -8),
+		Vector2(-core_width, 8),
+		Vector2(core_width, 8),
+		Vector2(core_width, -8)
+	])
+
+	# Adjust collision shape to match beam width
+	var collision_shape = $CollisionShape2D.shape as CapsuleShape2D
+	collision_shape.radius = beam_width
+
+	# Enhanced visual effects for higher levels
+	if weapon_level >= 3:
+		$Glow.modulate = Color(0.3, 0.7, 1.0, 0.4)  # Brighter blue glow
+	if weapon_level >= 4:
+		$Sprite.modulate = Color(1.2, 1.2, 1.0, 1.0)  # Slightly overbrightened
+	if weapon_level >= 5:
+		$Core.modulate = Color(1.5, 1.5, 1.5, 1.0)  # Super bright core
 
 func _process(delta):
 	position += direction * speed * delta

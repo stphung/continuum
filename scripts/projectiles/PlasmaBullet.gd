@@ -78,7 +78,16 @@ func find_nearest_enemy(from_pos: Vector2, max_range: float) -> Area2D:
 	return nearest_enemy
 
 func create_lightning_arc(start_pos: Vector2, end_pos: Vector2):
-	# Create a lightning arc effect using Line2D
+	# Find the game scene to add effects to
+	var game_scene = get_tree().current_scene
+	if not game_scene:
+		return
+
+	# Create a container node for the lightning effect
+	var lightning_container = Node2D.new()
+	lightning_container.global_position = Vector2.ZERO  # Use world coordinates
+
+	# Create main lightning arc using Line2D
 	var lightning = Line2D.new()
 	lightning.width = 4.0 + (weapon_level * 2.0)
 	lightning.default_color = Color(0.8, 0.9, 1.0, 0.9)  # Electric blue-white
@@ -90,32 +99,45 @@ func create_lightning_arc(start_pos: Vector2, end_pos: Vector2):
 	var offset = randf_range(-30, 30)
 	mid_point += perpendicular * offset
 
-	lightning.add_point(to_local(start_pos))
-	lightning.add_point(to_local(mid_point))
-	lightning.add_point(to_local(end_pos))
+	# Use global positions directly
+	lightning.add_point(start_pos)
+	lightning.add_point(mid_point)
+	lightning.add_point(end_pos)
 
 	# Add glow effect
 	var glow = Line2D.new()
 	glow.width = lightning.width * 2.5
 	glow.default_color = Color(0.6, 0.8, 1.0, 0.3)
 	glow.z_index = 9
-	glow.add_point(to_local(start_pos))
-	glow.add_point(to_local(mid_point))
-	glow.add_point(to_local(end_pos))
+	glow.add_point(start_pos)
+	glow.add_point(mid_point)
+	glow.add_point(end_pos)
 
-	get_parent().add_child(lightning)
-	get_parent().add_child(glow)
+	# Add to container
+	lightning_container.add_child(glow)
+	lightning_container.add_child(lightning)
 
-	# Animate and cleanup
-	var tween = create_tween()
-	tween.parallel().tween_property(lightning, "modulate:a", 0, 0.2)
-	tween.parallel().tween_property(glow, "modulate:a", 0, 0.2)
-	tween.tween_callback(func():
-		lightning.queue_free()
-		glow.queue_free()
-	)
+	# Add container to game scene
+	game_scene.add_child(lightning_container)
+
+	# Animate and cleanup - use a timer for reliable cleanup
+	var cleanup_timer = Timer.new()
+	cleanup_timer.wait_time = 0.15  # Very short flash
+	cleanup_timer.one_shot = true
+	cleanup_timer.timeout.connect(lightning_container.queue_free)
+	lightning_container.add_child(cleanup_timer)
+	cleanup_timer.start()
+
+	# Also fade out the effect
+	var tween = lightning_container.create_tween()
+	tween.tween_property(lightning_container, "modulate:a", 0, 0.1)
 
 func create_impact_effect(impact_pos: Vector2):
+	# Find the game scene to add effects to
+	var game_scene = get_tree().current_scene
+	if not game_scene:
+		return
+
 	# Electric impact effect
 	var flash = CPUParticles2D.new()
 	flash.global_position = impact_pos
@@ -130,15 +152,17 @@ func create_impact_effect(impact_pos: Vector2):
 	flash.color = Color(0.8, 0.9, 1.0, 1.0)  # Electric blue-white
 	flash.direction = Vector2(randf_range(-1, 1), randf_range(-1, 1)).normalized()
 	flash.spread = 60.0
-	get_parent().add_child(flash)
 
-	# Auto cleanup
-	var timer = Timer.new()
-	timer.wait_time = 0.4
-	timer.one_shot = true
-	timer.timeout.connect(flash.call_deferred.bind("queue_free"))
-	flash.add_child(timer)
-	timer.start()
+	# Add to game scene
+	game_scene.add_child(flash)
+
+	# Auto cleanup - ensure particle effect is cleaned up after emission
+	var cleanup_timer = Timer.new()
+	cleanup_timer.wait_time = 0.5  # Wait for particles to finish
+	cleanup_timer.one_shot = true
+	cleanup_timer.timeout.connect(flash.queue_free)
+	flash.add_child(cleanup_timer)
+	cleanup_timer.start()
 
 func _on_screen_exited():
 	call_deferred("queue_free")
