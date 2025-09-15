@@ -223,7 +223,13 @@ jobs:
       - name: Setup Debug Keystore
         run: |
           # Create debug keystore in project root (accessible as res://debug.keystore)
-          echo "Creating debug keystore in project root for Godot export..."
+          echo "Setting up debug keystore for Godot Android export..."
+
+          # Remove existing keystore if present to avoid alias conflicts
+          if [ -f debug.keystore ]; then
+            echo "Removing existing debug keystore..."
+            rm debug.keystore
+          fi
 
           # Generate standard Android debug keystore in project root
           keytool -genkey -v -keystore debug.keystore \
