@@ -27,7 +27,7 @@ func setup_starfield_background():
 		move_child(starfield, 1)  # Position after Background (index 0)
 
 		# Configure for game scene
-		starfield.set_screen_dimensions(800, 900)
+		starfield.set_screen_dimensions(720, 1280)
 		starfield.star_count = 50
 		starfield.star_speed = 100
 
@@ -50,7 +50,7 @@ func spawn_player():
 		# Create new player
 		current_player = player_scene.instantiate()
 		add_child(current_player)
-		current_player.position = Vector2(400, 800)
+		current_player.position = Vector2(360, 1100)
 		current_player.add_to_group("player")
 		current_player.connect("player_hit", _on_player_hit)
 		current_player.connect("shoot", _on_player_shoot)

@@ -100,7 +100,7 @@ func test_starfield_wrapping():
 
 			assert_that(star.position.y).is_equal(-10.0)
 			# X position should be randomized on wrap
-			assert_that(star.position.x).is_between(0.0, 800.0)
+			assert_that(star.position.x).is_between(0.0, 720.0)
 	else:
 		# Skip test if methods don't exist
 		pass
@@ -111,7 +111,7 @@ func test_player_spawn():
 
 		if game.has_method("get") and game.get("current_player") != null:
 			assert_that(game.current_player).is_not_null()
-			assert_that(game.current_player.position).is_equal(Vector2(400, 800))
+			assert_that(game.current_player.position).is_equal(Vector2(360, 1100))
 	else:
 		# Skip test if method doesn't exist
 		pass

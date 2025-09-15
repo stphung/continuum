@@ -5,7 +5,7 @@ signal player_hit(damage: int)
 signal player_died
 
 var health: int = 100
-var position: Vector2 = Vector2(400, 800)
+var position: Vector2 = Vector2(360, 1100)
 var weapon_level: int = 1
 var invulnerable: bool = false
 
