@@ -25,10 +25,10 @@ SceneTransitionManager="*res://scripts/autoloads/SceneTransitionManager.gd"
 
 [display]
 
-window/size/viewport_width=800
-window/size/viewport_height=900
+window/size/viewport_width=720
+window/size/viewport_height=1280
 window/stretch/mode="viewport"
-window/stretch/aspect="expand"
+window/stretch/aspect="keep_width"
 window/handheld/orientation="portrait"
 
 [editor_plugins]
