@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyTypeData" format=3 uid="uid://bsbmyprv61liq"]
+
+[ext_resource type="Script" path="res://scripts/enemies/EnemyTypeData.gd" id="1_rj8vh"]
+
+[resource]
+script = ExtResource("1_rj8vh")
+enemy_name = "Scout Fighter"
+base_health = 1
+base_speed = 150.0
+base_points = 100
+movement_pattern = "straight"
+weapon_type = "none"
+fire_rate = 2.0
+damage_reduction = 0.0
+special_abilities = []
+sprite_color = Color(0.8, 0.2, 0.2, 1)
+sprite_polygon = PackedVector2Array(0, -20, -15, 0, -15, 10, 0, 20, 15, 10, 15, 0)
+collision_radius = 20.0
+sprite_scale = 1.0
+spawn_weight = 1.0
+min_wave = 1
+max_simultaneous = -1
+spawns_enemies = false
+spawned_enemy_type = ""
+hit_sound = "enemy_hit"
+destroy_sound = "enemy_destroy"
+attack_sound = ""

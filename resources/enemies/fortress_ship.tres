@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyTypeData" format=3 uid="uid://bkpj7t9s8vcm3"]
+
+[ext_resource type="Script" path="res://scripts/enemies/EnemyTypeData.gd" id="1_5m1iy"]
+
+[resource]
+script = ExtResource("1_5m1iy")
+enemy_name = "Fortress Ship"
+base_health = 12
+base_speed = 50.0
+base_points = 800
+movement_pattern = "straight"
+weapon_type = "multi_directional"
+fire_rate = 2.0
+damage_reduction = 0.3
+special_abilities = ["damage_resistance", "visual_damage_states", "screen_shake_death"]
+sprite_color = Color(0.3, 0.3, 0.3, 1)
+sprite_polygon = PackedVector2Array(-25, -30, -15, -35, 15, -35, 25, -30, 30, -15, 30, 15, 25, 30, 15, 35, -15, 35, -25, 30, -30, 15, -30, -15)
+collision_radius = 35.0
+sprite_scale = 1.5
+spawn_weight = 0.3
+min_wave = 26
+max_simultaneous = 2
+spawns_enemies = false
+spawned_enemy_type = ""
+hit_sound = "enemy_hit"
+destroy_sound = "explosion_large"
+attack_sound = "heavy_cannon"

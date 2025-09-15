@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="EnemyTypeData" format=3 uid="uid://ce3y1w8r5sjkm"]
+
+[ext_resource type="Script" path="res://scripts/enemies/EnemyTypeData.gd" id="1_6n2jz"]
+
+[resource]
+script = ExtResource("1_6n2jz")
+enemy_name = "Support Carrier"
+base_health = 4
+base_speed = 120.0
+base_points = 400
+movement_pattern = "straight"
+weapon_type = "single_shot"
+fire_rate = 3.0
+damage_reduction = 0.0
+special_abilities = ["drone_deployment"]
+sprite_color = Color(0.6, 0.2, 0.8, 1)
+sprite_polygon = PackedVector2Array(-25, -20, -10, -25, 10, -25, 25, -20, 30, -10, 25, 0, 30, 10, 25, 20, 10, 25, -10, 25, -25, 20, -30, 10, -25, 0, -30, -10)
+collision_radius = 30.0
+sprite_scale = 1.3
+spawn_weight = 0.5
+min_wave = 21
+max_simultaneous = 2
+spawns_enemies = true
+spawned_enemy_type = "scout_fighter"
+hit_sound = "enemy_hit"
+destroy_sound = "enemy_destroy"
+attack_sound = "enemy_shoot"
