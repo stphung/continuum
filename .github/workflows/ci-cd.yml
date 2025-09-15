@@ -222,33 +222,17 @@ jobs:
 
       - name: Setup Debug Keystore
         run: |
-          # Create debug keystore directory
-          mkdir -p /github/home/.local/share/godot/keystores
+          # Create debug keystore in project root (accessible as res://debug.keystore)
+          echo "Creating debug keystore in project root for Godot export..."
 
-          # Check if debug keystore already exists (Docker container might have one)
-          if [ -f "/github/home/.local/share/godot/keystores/debug.keystore" ]; then
-            echo "Debug keystore already exists"
-          else
-            echo "Creating debug keystore..."
-            # Generate debug keystore (standard Android debug keystore)
-            keytool -genkey -v -keystore /github/home/.local/share/godot/keystores/debug.keystore \
-              -storepass android -alias androiddebugkey -keypass android \
-              -keyalg RSA -keysize 2048 -validity 10000 \
-              -dname "CN=Android Debug,O=Android,C=US" || {
-              echo "Failed to create keystore, checking if one exists elsewhere..."
-              # Check if Docker container has a default debug keystore
-              find /root -name "debug.keystore" 2>/dev/null || echo "No debug keystore found"
-              find /usr -name "debug.keystore" 2>/dev/null || echo "No debug keystore found in /usr"
-              # Try to use any existing keystore by copying it
-              if [ -f "/root/.android/debug.keystore" ]; then
-                echo "Found existing debug keystore, copying it..."
-                cp /root/.android/debug.keystore /github/home/.local/share/godot/keystores/debug.keystore
-              fi
-            }
-          fi
+          # Generate standard Android debug keystore in project root
+          keytool -genkey -v -keystore debug.keystore \
+            -storepass android -alias androiddebugkey -keypass android \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
 
-          echo "Debug keystore status:"
-          ls -la /github/home/.local/share/godot/keystores/ || echo "Keystore directory not found"
+          echo "Debug keystore created successfully:"
+          ls -la debug.keystore
 
       - name: Android Build
         # Release build failed: "Release Username and/or Password is invalid for the given Release Keystore"
