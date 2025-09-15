@@ -23,13 +23,29 @@ func setup_for_game(container: Node):
 	reset_game_state()
 
 func load_enemy_types():
-	# Load all enemy type configurations
-	enemy_types["scout_fighter"] = load("res://resources/enemies/scout_fighter.tres")
-	enemy_types["guard_drone"] = load("res://resources/enemies/guard_drone.tres")
-	enemy_types["heavy_gunner"] = load("res://resources/enemies/heavy_gunner.tres")
-	enemy_types["interceptor"] = load("res://resources/enemies/interceptor.tres")
-	enemy_types["fortress_ship"] = load("res://resources/enemies/fortress_ship.tres")
-	enemy_types["support_carrier"] = load("res://resources/enemies/support_carrier.tres")
+	# Load all enemy type configurations with error checking
+	var type_files = {
+		"scout_fighter": "res://resources/enemies/scout_fighter.tres",
+		"guard_drone": "res://resources/enemies/guard_drone.tres",
+		"heavy_gunner": "res://resources/enemies/heavy_gunner.tres",
+		"interceptor": "res://resources/enemies/interceptor.tres",
+		"fortress_ship": "res://resources/enemies/fortress_ship.tres",
+		"support_carrier": "res://resources/enemies/support_carrier.tres"
+	}
+
+	for type_name in type_files.keys():
+		var file_path = type_files[type_name]
+		if ResourceLoader.exists(file_path):
+			var resource = load(file_path)
+			if resource:
+				enemy_types[type_name] = resource
+				print("Loaded enemy type: ", type_name)
+			else:
+				print("Failed to load enemy type resource: ", type_name)
+		else:
+			print("Enemy type file not found: ", file_path)
+
+	print("Total enemy types loaded: ", enemy_types.size())
 
 func reset_game_state():
 	wave_number = 1
@@ -50,6 +66,7 @@ func spawn_random_enemies():
 
 func spawn_enemy(x_offset = 0, enemy_type_name: String = ""):
 	if not enemy_scene or not enemies_container:
+		print("Cannot spawn enemy: missing enemy_scene or enemies_container")
 		return
 
 	var enemy = enemy_scene.instantiate()
@@ -62,9 +79,18 @@ func spawn_enemy(x_offset = 0, enemy_type_name: String = ""):
 	if type_name == "":
 		type_name = get_random_enemy_type_for_wave()
 
-	if enemy_types.has(type_name):
+	# Try to apply enemy type data
+	if enemy_types.has(type_name) and enemy_types[type_name]:
 		enemy.enemy_type_data = enemy_types[type_name]
 		enemy.current_wave = wave_number
+		print("Spawned enemy: ", type_name)
+	else:
+		# Fallback: set basic properties directly for compatibility
+		enemy.health = 1 + (wave_number / 5)
+		enemy.speed = 150 + (wave_number * 5)
+		enemy.points = 100 + (wave_number * 10)
+		enemy.movement_pattern = "straight"
+		print("Spawned basic enemy (no type data available)")
 
 	enemies_container.add_child(enemy)
 	enemy.connect("enemy_destroyed", _on_enemy_destroyed)
@@ -89,7 +115,7 @@ func get_random_enemy_type_for_wave() -> String:
 
 	return weighted_pool[randi() % weighted_pool.size()]
 
-func get_available_enemy_types() -> Array[String]:
+func get_available_enemy_types() -> Array:
 	var available = []
 
 	for type_name in enemy_types.keys():

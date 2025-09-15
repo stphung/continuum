@@ -8,11 +8,15 @@ var enemy_bullet: Area2D
 
 func before_test():
 	enemy = auto_free(Enemy.instantiate())
+	# Set up scout fighter type data for testing
+	var scout_data = load("res://resources/enemies/scout_fighter.tres")
+	enemy.enemy_type_data = scout_data
+	enemy.current_wave = 1
 	add_child(enemy)
 	enemy._ready()
 
 func test_enemy_initial_state():
-	assert_that(enemy.health).is_equal(3)
+	assert_that(enemy.health).is_equal(1)  # Scout fighter has 1 health in wave 1
 	assert_that(enemy.speed).is_equal(150)
 	assert_that(enemy.points).is_equal(100)
 	assert_that(enemy.movement_pattern).is_equal("straight")

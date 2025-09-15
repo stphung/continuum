@@ -26,7 +26,7 @@ wait_time = 0.8
 autostart = true
 
 [node name="WaveTimer" type="Timer" parent="."]
-wait_time = 10.0
+wait_time = 30.0
 autostart = true
 
 [node name="UI" type="CanvasLayer" parent="."]

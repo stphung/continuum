@@ -2,7 +2,7 @@ extends Area2D
 
 signal enemy_destroyed(points, position)
 
-@export var enemy_type_data: EnemyTypeData
+@export var enemy_type_data: Resource
 @export var health = 3
 @export var speed = 150
 @export var points = 100
@@ -27,6 +27,11 @@ func _ready():
 	# Initialize from enemy type data if provided
 	if enemy_type_data:
 		setup_from_type_data()
+	else:
+		# Ensure enemy has basic working values even without type data
+		max_health = health
+		weapon_type = "none"
+		damage_reduction = 0.0
 
 	$ShootTimer.wait_time = randf_range(1.5, 3.0)
 

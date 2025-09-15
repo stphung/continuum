@@ -20,9 +20,17 @@ func before_test():
 	# Wait for game to fully initialize
 	await get_tree().process_frame
 
+# Helper function to create enemies with proper setup
+func create_test_enemy(enemy_type: String = "scout_fighter") -> Area2D:
+	var enemy = auto_free(Enemy.instantiate())
+	var enemy_data = load("res://resources/enemies/" + enemy_type + ".tres")
+	enemy.enemy_type_data = enemy_data
+	enemy.current_wave = 1
+	return enemy
+
 func test_player_bullet_enemy_collision():
 	# Spawn an enemy
-	enemy = auto_free(Enemy.instantiate())
+	enemy = create_test_enemy()
 	enemy.position = Vector2(400, 300)
 	game.get_node("Enemies").add_child(enemy)
 	enemy._ready()
