@@ -12,7 +12,7 @@ var wave_offset: float
 var powerup_colors = {
 	"vulcan_powerup": Color(1, 0, 0, 1),      # Red for vulcan
 	"laser_powerup": Color(0, 0.5, 1, 1),     # Blue for laser
-	"plasma_powerup": Color(1, 0.3, 1, 1),    # Purple/magenta for plasma
+	"chain_powerup": Color(0.8, 0.9, 1, 1),   # Electric blue-white for chain
 	"bomb": Color(1, 1, 0, 1),                # Yellow for bomb
 	"life": Color(0, 1, 0, 1)                 # Green for life
 }
@@ -20,7 +20,7 @@ var powerup_colors = {
 var powerup_letters = {
 	"vulcan_powerup": "V",    # V for vulcan
 	"laser_powerup": "L",     # L for laser
-	"plasma_powerup": "P",    # P for plasma
+	"chain_powerup": "C",     # C for chain
 	"bomb": "B",              # B for bomb
 	"life": "1"               # 1 for extra life
 }
@@ -51,7 +51,7 @@ func _setup_floating_animation():
 	pulse_tween.tween_property(self, "scale", Vector2(1.0, 1.0), randf_range(1.0, 2.0))
 
 func randomize_type():
-	var types = ["vulcan_powerup", "laser_powerup", "plasma_powerup", "bomb", "life"]
+	var types = ["vulcan_powerup", "laser_powerup", "chain_powerup", "bomb", "life"]
 	var weights = [0.25, 0.25, 0.25, 0.15, 0.1]  # Equal chance for each weapon, less for bomb/life
 
 	var rand = randf()

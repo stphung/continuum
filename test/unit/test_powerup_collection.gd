@@ -84,17 +84,17 @@ func test_weapon_switch_collection():
 	assert_that(player.weapon_type).is_equal("laser")
 	assert_that(player.weapon_level).is_equal(1)
 
-func test_weapon_switch_to_plasma():
-	# Test switching from laser to plasma
+func test_weapon_switch_to_chain():
+	# Test switching from laser to chain
 	player.weapon_type = "laser"
 	player.weapon_level = 4
 	var powerup = auto_free(PowerUp.instantiate())
-	powerup.powerup_type = "plasma_powerup"
+	powerup.powerup_type = "chain_powerup"
 
 	player.collect_powerup(powerup)
 
-	# Should switch to plasma and reset to level 1
-	assert_that(player.weapon_type).is_equal("plasma")
+	# Should switch to chain and reset to level 1
+	assert_that(player.weapon_type).is_equal("chain")
 	assert_that(player.weapon_level).is_equal(1)
 
 func test_bomb_powerup_collection():

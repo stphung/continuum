@@ -74,16 +74,16 @@ func fire_weapon():
 			fire_vulcan()
 		"laser":
 			fire_laser()
-		"plasma":
-			fire_plasma()
+		"chain":
+			fire_chain()
 
 	# Play different shooting sounds for different weapons
 	if has_node("/root/SoundManager"):
 		match weapon_type:
 			"laser":
 				SoundManager.play_random_pitch("laser", -8.0, 0.1)  # Deeper, more focused sound
-			"plasma":
-				SoundManager.play_random_pitch("laser", -6.0, 0.2)  # Medium pitch for plasma
+			"chain":
+				SoundManager.play_random_pitch("laser", -6.0, 0.2)  # Medium pitch for chain
 			"vulcan":
 				SoundManager.play_random_pitch("shoot", -12.0, 0.15)  # Higher pitch for vulcan
 
@@ -110,28 +110,24 @@ func fire_laser():
 	# Higher levels increase damage and pierce through more enemies
 	shoot.emit($MuzzlePosition.global_position, Vector2.UP, "laser")
 
-func fire_plasma():
-	# Plasma fires fast shots that get homing behavior at higher levels
+func fire_chain():
+	# Chain lightning fires single projectiles that chain to nearby enemies
 	match weapon_level:
 		1:
-			# Level 1: Single forward shot (fast machine gun style)
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "plasma")
+			# Level 1: Single shot, 1 chain
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "chain")
 		2:
-			# Level 2: Dual shots with slight spread
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.05, -1).normalized(), "plasma")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.05, -1).normalized(), "plasma")
+			# Level 2: Single shot, 2 chains
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "chain")
 		3:
-			# Level 3: Triple shot spread (homing starts here)
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "plasma")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.1, -1).normalized(), "plasma")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.1, -1).normalized(), "plasma")
-		_:
-			# Level 4-5: Wide spread with strong homing
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "plasma")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.15, -1).normalized(), "plasma")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.15, -1).normalized(), "plasma")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.05, -1).normalized(), "plasma")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.05, -1).normalized(), "plasma")
+			# Level 3: Single shot, 3 chains
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "chain")
+		4:
+			# Level 4: Single shot, 4 chains
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "chain")
+		5:
+			# Level 5: Single shot, 5 chains
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "chain")
 
 func _on_area_entered(area):
 	if area.is_in_group("enemies") or area.is_in_group("enemy_bullets"):
@@ -178,8 +174,8 @@ func drop_power_ups():
 				powerup.powerup_type = "vulcan_powerup"
 			"laser":
 				powerup.powerup_type = "laser_powerup"
-			"plasma":
-				powerup.powerup_type = "plasma_powerup"
+			"chain":
+				powerup.powerup_type = "chain_powerup"
 		powerup.update_appearance()
 
 		# Position power-ups in a spread around death location
@@ -238,16 +234,16 @@ func collect_powerup(powerup):
 				weapon_level = 1
 				show_upgrade_effect("LASER")
 			adjust_fire_rate()
-		"plasma_powerup":
-			if weapon_type == "plasma":
+		"chain_powerup":
+			if weapon_type == "chain":
 				# Same weapon type: upgrade level
 				weapon_level = min(weapon_level + 1, 5)
-				show_upgrade_effect("PLASMA LV " + str(weapon_level))
+				show_upgrade_effect("CHAIN LV " + str(weapon_level))
 			else:
 				# Different weapon type: switch and reset to level 1
-				weapon_type = "plasma"
+				weapon_type = "chain"
 				weapon_level = 1
-				show_upgrade_effect("PLASMA")
+				show_upgrade_effect("CHAIN")
 			adjust_fire_rate()
 		"bomb":
 			if game.has_method("add_bomb"):
@@ -278,13 +274,8 @@ func adjust_fire_rate():
 			$ShootTimer.wait_time = max(0.08, 0.15 - (weapon_level - 1) * 0.01)  # Gets faster with levels
 		"laser":
 			$ShootTimer.wait_time = max(0.2, 0.3 - (weapon_level - 1) * 0.02)   # Slower but gets faster with levels
-		"plasma":
-			if weapon_level == 1:
-				# Level 1: Rapid individual shots
-				$ShootTimer.wait_time = max(0.08, 0.12 - (weapon_level - 1) * 0.01)
-			else:
-				# Level 2+: Continuous beams - longer intervals since each beam lasts 0.8 seconds
-				$ShootTimer.wait_time = max(0.4, 0.6 - (weapon_level - 2) * 0.05)  # Beams every 0.4-0.6 seconds
+		"chain":
+			$ShootTimer.wait_time = max(0.15, 0.25 - (weapon_level - 1) * 0.02)  # Medium speed, gets faster with levels
 
 func show_upgrade_effect(text):
 	var label = Label.new()

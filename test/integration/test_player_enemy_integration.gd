@@ -244,21 +244,21 @@ func test_weapon_type_switching():
 	assert_that(player_ref.weapon_type).is_equal("laser")
 	assert_that(player_ref.weapon_level).is_equal(1)
 
-	# Test switching to plasma weapon
-	var plasma_powerup = auto_free(PowerUp.instantiate())
-	plasma_powerup.position = player_ref.position
-	game.get_node("PowerUps").add_child(plasma_powerup)
-	plasma_powerup._ready()
-	plasma_powerup.powerup_type = "plasma_powerup"
-	plasma_powerup.update_appearance()
+	# Test switching to chain weapon
+	var chain_powerup = auto_free(PowerUp.instantiate())
+	chain_powerup.position = player_ref.position
+	game.get_node("PowerUps").add_child(chain_powerup)
+	chain_powerup._ready()
+	chain_powerup.powerup_type = "chain_powerup"
+	chain_powerup.update_appearance()
 
 	# Collect powerup directly
-	player_ref.collect_powerup(plasma_powerup)
+	player_ref.collect_powerup(chain_powerup)
 
 	await get_tree().process_frame
 
-	# Weapon should have switched to plasma and reset to level 1
-	assert_that(player_ref.weapon_type).is_equal("plasma")
+	# Weapon should have switched to chain and reset to level 1
+	assert_that(player_ref.weapon_type).is_equal("chain")
 	assert_that(player_ref.weapon_level).is_equal(1)
 
 func test_bomb_powerup_increases_bombs():
