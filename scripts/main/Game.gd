@@ -134,8 +134,8 @@ func _on_player_shoot(bullet_position, bullet_direction, weapon_type = "vulcan")
 		bullet.position = bullet_position
 		bullet.direction = bullet_direction
 
-		# Pass weapon level to chain bullets for scaling
-		if weapon_type == "chain" and current_player and is_instance_valid(current_player):
+		# Pass weapon level to bullets for scaling
+		if current_player and is_instance_valid(current_player):
 			bullet.weapon_level = current_player.weapon_level
 
 		$Bullets.add_child(bullet)
