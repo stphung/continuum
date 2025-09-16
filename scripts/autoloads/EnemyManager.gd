@@ -68,11 +68,16 @@ func spawn_random_enemies():
 		spawn_enemy(i * 60)
 
 func spawn_enemy(x_offset = 0, enemy_type_name: String = ""):
-	if not enemy_scene or not enemies_container:
-		print("Cannot spawn enemy: missing enemy_scene or enemies_container")
+	if not enemies_container:
+		print("Cannot spawn enemy: missing enemies_container")
+		return
+
+	if not enemy_scene:
+		print("Cannot spawn enemy: missing enemy_scene")
 		return
 
 	var enemy = enemy_scene.instantiate()
+
 	var x_pos = randf_range(50, 750) + x_offset
 	x_pos = clamp(x_pos, 50, 750)
 	enemy.position = Vector2(x_pos, -50)

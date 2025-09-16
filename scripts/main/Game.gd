@@ -127,7 +127,7 @@ func _on_player_shoot(bullet_position, bullet_direction, weapon_type = "vulcan")
 		"chain":
 			scene_to_use = chain_bullet_scene
 		_:
-			scene_to_use = bullet_scene  # Default to vulcan
+			scene_to_use = bullet_scene
 
 	if scene_to_use:
 		var bullet = scene_to_use.instantiate()
@@ -137,6 +137,10 @@ func _on_player_shoot(bullet_position, bullet_direction, weapon_type = "vulcan")
 		# Pass weapon level to bullets for scaling
 		if current_player and is_instance_valid(current_player):
 			bullet.weapon_level = current_player.weapon_level
+
+		# Initialize bullet with new weapon level
+		if bullet.has_method("_initialize_bullet"):
+			bullet._initialize_bullet()
 
 		$Bullets.add_child(bullet)
 
