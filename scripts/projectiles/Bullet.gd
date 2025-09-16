@@ -13,8 +13,14 @@ func _process(delta):
 
 func _on_area_entered(area):
 	if area.is_in_group("enemies"):
-		area.take_damage(damage)
-		call_deferred("queue_free")
+		# Only damage enemies that are visible on screen
+		if area.has_method("is_visible_for_damage") and area.is_visible_for_damage():
+			area.take_damage(damage)
+			call_deferred("queue_free")
+		elif not area.has_method("is_visible_for_damage"):
+			# Fallback for any enemies without the new method
+			area.take_damage(damage)
+			call_deferred("queue_free")
 
 func _on_screen_exited():
 	call_deferred("queue_free")

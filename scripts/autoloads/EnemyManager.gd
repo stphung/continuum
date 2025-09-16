@@ -52,7 +52,7 @@ func load_enemy_types():
 
 func reset_game_state():
 	wave_number = 1
-	enemies_per_wave = 2  # Start easier
+	enemies_per_wave = 4  # Start with more enemies
 	spawn_delay_reduction = 0.0
 	game_over = false
 
@@ -61,8 +61,8 @@ func spawn_random_enemies():
 		return
 
 	var spawn_count = 1
-	if randf() < 0.25:  # Further reduced to 25% chance
-		spawn_count = randi_range(2, min(3, wave_number))  # 2-3 enemies max early on
+	if randf() < 0.5:  # 50% chance for multi-spawn
+		spawn_count = randi_range(2, min(5, 2 + wave_number / 2))  # More enemies as waves progress
 
 	for i in spawn_count:
 		spawn_enemy(i * 60)
@@ -133,9 +133,15 @@ func _on_wave_timer_timeout():
 
 func advance_wave():
 	wave_number += 1
-	spawn_delay_reduction = min(0.5, wave_number * 0.03)  # Faster spawn acceleration
+	spawn_delay_reduction = min(0.8, wave_number * 0.05)  # Much faster spawn acceleration
 	spawn_wave()
 	show_wave_announcement()
+
+	# Dynamic wave timing - waves come faster as game progresses
+	if enemies_container and enemies_container.has_node("../WaveTimer"):
+		var wave_timer = enemies_container.get_node("../WaveTimer")
+		var new_wait_time = max(3.0, 10.0 - (wave_number * 0.2))  # Start at 10s, min 3s
+		wave_timer.wait_time = new_wait_time
 
 func spawn_wave():
 	if not enemies_container:
@@ -152,41 +158,37 @@ func spawn_wave():
 			_spawn_random_burst()
 
 func _spawn_line_formation():
-	var enemy_count = enemies_per_wave + min(wave_number, 5)  # Capped increase
-	# Mix enemy types in line formation
+	var enemy_count = enemies_per_wave + wave_number  # Uncapped increase
+	# Mix enemy types in line formation - using delayed call instead of timer nodes
 	for i in range(enemy_count):
-		var timer = Timer.new()
-		timer.wait_time = max(0.1, i * 0.2)  # Ensure minimum wait time
-		timer.one_shot = true
+		var delay = max(0.1, i * 0.15)  # Slightly faster spawning
 		var x_offset = 400 - 200 + i * 40
-		timer.timeout.connect(func(): spawn_enemy(x_offset))
-		timer.timeout.connect(func(): timer.queue_free())
-		add_child(timer)
-		timer.start()
+		# Use get_tree().create_timer for more efficient timing
+		get_tree().create_timer(delay).timeout.connect(func(): spawn_enemy(x_offset))
 
 func _spawn_v_formation():
-	var enemy_count = enemies_per_wave + min(wave_number, 5)  # Capped increase
-	# V formation with mixed enemy types
+	var enemy_count = enemies_per_wave + wave_number  # Uncapped increase
+	# V formation with mixed enemy types - using delayed call instead of timer nodes
 	for i in range(enemy_count):
-		var timer = Timer.new()
-		timer.wait_time = max(0.05, i * 0.1)  # Ensure minimum wait time
-		timer.one_shot = true
+		var delay = max(0.05, i * 0.08)  # Faster V formation
 		var x = 400 + (i - enemy_count / 2) * 60
 		var x_offset = x - 400
-		timer.timeout.connect(func(): spawn_enemy(x_offset))
-		timer.timeout.connect(func(): timer.queue_free())
-		add_child(timer)
-		timer.start()
+		# Use get_tree().create_timer for more efficient timing
+		get_tree().create_timer(delay).timeout.connect(func(): spawn_enemy(x_offset))
 
 func _spawn_random_burst():
-	var enemy_count = enemies_per_wave + min(wave_number * 2, 10)  # Capped burst
+	var enemy_count = enemies_per_wave + min(wave_number * 2, 15)  # Up to 15 enemies in burst
 	# Random burst with weighted selection toward appropriate types
 	for i in range(enemy_count):
 		spawn_enemy(0)
 
-	# Special: Add fortress ships earlier and more often
-	if wave_number >= 15 and randf() < 0.4:  # From wave 15 instead of 26
+	# Special: Add fortress ships more often
+	if wave_number >= 15 and randf() < 0.5:  # 50% chance from wave 15
 		spawn_enemy(0, "fortress_ship")
+
+	# Add support carriers too
+	if wave_number >= 12 and randf() < 0.4:  # 40% chance from wave 12
+		spawn_enemy(0, "support_carrier")
 
 func show_wave_announcement():
 	if has_node("/root/SoundManager"):

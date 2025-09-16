@@ -113,8 +113,8 @@ color = Color(1, 0.6, 0.2, 1)
 shape = SubResource("ConvexPolygonShape2D_1")
 
 [node name="ShootTimer" type="Timer" parent="."]
-wait_time = 0.15
-autostart = true
+wait_time = 0.2
+autostart = false
 
 [node name="InvulnerabilityTimer" type="Timer" parent="."]
 wait_time = 5.0

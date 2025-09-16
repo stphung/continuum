@@ -19,6 +19,7 @@ var stop_timer: float = 0.0  # For stop_and_shoot pattern
 var is_stopped: bool = false
 var spawn_timer: float = 0.0  # For spawning enemies
 var current_wave: int = 1
+var is_dying: bool = false  # Prevent multiple death triggers
 
 # Visual animation variables
 var current_velocity = Vector2.ZERO
@@ -75,7 +76,7 @@ func setup_from_type_data():
 
 	# Update shooting with more aggressive rates
 	if weapon_type != "none":
-		$ShootTimer.wait_time = max(1.0, enemy_type_data.fire_rate * 0.9)  # Only 10% faster firing
+		$ShootTimer.wait_time = max(0.5, enemy_type_data.fire_rate * 0.5)  # Twice as fast firing
 
 func update_collision_radius(radius: float):
 	# Use set_deferred to avoid physics state conflicts
@@ -131,6 +132,10 @@ func _process(delta):
 	update_visual_animations(delta)
 
 func take_damage(damage):
+	# Prevent processing damage if already dying
+	if is_dying:
+		return
+
 	# Apply damage reduction for heavy enemies
 	var actual_damage = damage
 	if damage_reduction > 0.0:
@@ -171,10 +176,15 @@ func update_damage_visuals():
 			$Sprite.color = Color(0.8, 0.2, 0.2, 1)  # Red danger
 
 func destroy():
+	# Prevent multiple destroy calls
+	if is_dying:
+		return
+	is_dying = true
+
 	# Play enemy destruction sound
 	if has_node("/root/SoundManager"):
 		SoundManager.play_random_pitch("enemy_destroy", -8.0, 0.15)
-	
+
 	enemy_destroyed.emit(points, position)
 	call_deferred("queue_free")
 
@@ -193,13 +203,26 @@ func _on_shoot_timer_timeout():
 
 func is_on_screen() -> bool:
 	# Check if enemy is within visible screen bounds
-	var screen_rect = Rect2(Vector2(0, 0), Vector2(720, 1280))
-	var enemy_pos = position
+	var viewport_size = get_viewport_rect().size
+	var enemy_pos = global_position
 
-	# Add some margin so enemies slightly off-screen don't fire
-	var margin = 50
-	return enemy_pos.x > -margin and enemy_pos.x < 720 + margin and \
-	       enemy_pos.y > -margin and enemy_pos.y < 1280 + margin
+	# Only allow margin on top (for enemies entering) and bottom
+	# No margin on left/right to prevent offscreen firing
+	var top_margin = 50  # Allow enemies just entering from top
+	var bottom_margin = 50  # Some leeway at bottom
+	var side_margin = 0  # No margin on sides - must be fully on screen
+
+	return enemy_pos.x > side_margin and enemy_pos.x < viewport_size.x - side_margin and \
+	       enemy_pos.y > -top_margin and enemy_pos.y < viewport_size.y + bottom_margin
+
+func is_visible_for_damage() -> bool:
+	# Stricter check for whether enemy should take damage from player bullets
+	# No margins - enemy must be fully within visible screen
+	var viewport_size = get_viewport_rect().size
+	var enemy_pos = global_position
+
+	return enemy_pos.x > 0 and enemy_pos.x < viewport_size.x and \
+	       enemy_pos.y > 0 and enemy_pos.y < viewport_size.y
 
 func shoot():
 	# Double-check we're on screen before firing

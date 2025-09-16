@@ -29,13 +29,17 @@ func _ready():
 		screen_size = get_viewport_rect().size
 	position = Vector2(screen_size.x / 2, screen_size.y - 100)
 	add_to_group("player")
+
+	# Stop timer first to ensure clean initialization
+	$ShootTimer.stop()
 	adjust_fire_rate()  # Initialize fire rate
-	
+	$ShootTimer.start()  # Start with correct fire rate
+
 	# Ensure ship is visible and functional on spawn
 	visible = true
 	set_process(true)
 	can_shoot = true
-	
+
 	# Start with invulnerability when spawned/respawned
 	start_invulnerability()
 
@@ -92,18 +96,14 @@ func fire_weapon():
 	match weapon_type:
 		"vulcan":
 			fire_vulcan()
-		"laser":
-			fire_laser()
 		"chain":
 			fire_chain()
 
 	# Play different shooting sounds for different weapons
 	if has_node("/root/SoundManager"):
 		match weapon_type:
-			"laser":
-				SoundManager.play_random_pitch("laser", -8.0, 0.1)  # Deeper, more focused sound
 			"chain":
-				SoundManager.play_random_pitch("laser", -6.0, 0.2)  # Medium pitch for chain
+				SoundManager.play_random_pitch("shoot", -6.0, 0.2)  # Medium pitch for chain
 			"vulcan":
 				SoundManager.play_random_pitch("shoot", -12.0, 0.15)  # Higher pitch for vulcan
 
@@ -118,36 +118,102 @@ func fire_vulcan():
 			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
 			shoot.emit($LeftMuzzle.global_position, Vector2(-0.1, -1).normalized(), "vulcan")
 			shoot.emit($RightMuzzle.global_position, Vector2(0.1, -1).normalized(), "vulcan")
-		_:
+		4:
 			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
 			shoot.emit($LeftMuzzle.global_position, Vector2(-0.2, -1).normalized(), "vulcan")
 			shoot.emit($RightMuzzle.global_position, Vector2(0.2, -1).normalized(), "vulcan")
 			shoot.emit($LeftMuzzle.global_position, Vector2(-0.1, -1).normalized(), "vulcan")
 			shoot.emit($RightMuzzle.global_position, Vector2(0.1, -1).normalized(), "vulcan")
+		5:
+			# 5 bullets with wider spread
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.3, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.3, -1).normalized(), "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.15, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.15, -1).normalized(), "vulcan")
+		6:
+			# 6 bullets
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
+			shoot.emit($MuzzlePosition.global_position, Vector2(-0.05, -1).normalized(), "vulcan")
+			shoot.emit($MuzzlePosition.global_position, Vector2(0.05, -1).normalized(), "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.3, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.3, -1).normalized(), "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.2, -1).normalized(), "vulcan")
+		7:
+			# 7 bullets with even wider spread
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.4, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.4, -1).normalized(), "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.25, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.25, -1).normalized(), "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.1, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.1, -1).normalized(), "vulcan")
+		8:
+			# 8 bullets in a wide fan
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
+			shoot.emit($MuzzlePosition.global_position, Vector2(-0.05, -1).normalized(), "vulcan")
+			shoot.emit($MuzzlePosition.global_position, Vector2(0.05, -1).normalized(), "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.45, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.45, -1).normalized(), "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.3, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.3, -1).normalized(), "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.15, -1).normalized(), "vulcan")
+		9:
+			# 9 bullets in maximum spread
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.5, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.5, -1).normalized(), "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.35, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.35, -1).normalized(), "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.2, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.2, -1).normalized(), "vulcan")
+			shoot.emit($MuzzlePosition.global_position, Vector2(-0.1, -1).normalized(), "vulcan")
+			shoot.emit($MuzzlePosition.global_position, Vector2(0.1, -1).normalized(), "vulcan")
+		10:
+			# 10 bullets in ultimate spread pattern
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
+			shoot.emit($MuzzlePosition.global_position, Vector2(-0.05, -1).normalized(), "vulcan")
+			shoot.emit($MuzzlePosition.global_position, Vector2(0.05, -1).normalized(), "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.6, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.6, -1).normalized(), "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.4, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.4, -1).normalized(), "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.25, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.25, -1).normalized(), "vulcan")
+			shoot.emit($MuzzlePosition.global_position, Vector2(-0.12, -1).normalized(), "vulcan")
+		11, 12, 13:
+			# 11-13 bullets within 70-degree arc
+			for i in range(11 + (weapon_level - 11)):
+				var bullet_count = 10 + (weapon_level - 10)
+				var angle = -0.35 + (i * 0.7 / (bullet_count - 1))
+				var pos = $MuzzlePosition.global_position if abs(angle) < 0.15 else ($LeftMuzzle.global_position if angle < 0 else $RightMuzzle.global_position)
+				shoot.emit(pos, Vector2(angle, -1).normalized(), "vulcan")
+		14, 15, 16:
+			# 14-16 bullets within 75-degree arc
+			for i in range(14 + (weapon_level - 14)):
+				var bullet_count = 13 + (weapon_level - 13)
+				var angle = -0.375 + (i * 0.75 / (bullet_count - 1))
+				var pos = $MuzzlePosition.global_position if abs(angle) < 0.1 else ($LeftMuzzle.global_position if angle < 0 else $RightMuzzle.global_position)
+				shoot.emit(pos, Vector2(angle, -1).normalized(), "vulcan")
+		17, 18, 19:
+			# 17-19 bullets within 80-degree arc
+			for i in range(17 + (weapon_level - 17)):
+				var bullet_count = 16 + (weapon_level - 16)
+				var angle = -0.4 + (i * 0.8 / (bullet_count - 1))
+				var pos = $MuzzlePosition.global_position if abs(angle) < 0.1 else ($LeftMuzzle.global_position if angle < 0 else $RightMuzzle.global_position)
+				shoot.emit(pos, Vector2(angle, -1).normalized(), "vulcan")
+		_: # Level 20 - Maximum firepower
+			# 20 bullets within 90-degree arc - dense forward coverage
+			for i in range(20):
+				var angle = -0.45 + (i * 0.9 / 19)
+				var pos = $MuzzlePosition.global_position if abs(angle) < 0.1 else ($LeftMuzzle.global_position if angle < 0 else $RightMuzzle.global_position)
+				shoot.emit(pos, Vector2(angle, -1).normalized(), "vulcan")
 
-func fire_laser():
-	# Laser always fires a single, powerful beam regardless of level
-	# Higher levels increase damage and pierce through more enemies
-	shoot.emit($MuzzlePosition.global_position, Vector2.UP, "laser")
 
 func fire_chain():
 	# Chain lightning fires single projectiles that chain to nearby enemies
-	match weapon_level:
-		1:
-			# Level 1: Single shot, 1 chain
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "chain")
-		2:
-			# Level 2: Single shot, 2 chains
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "chain")
-		3:
-			# Level 3: Single shot, 3 chains
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "chain")
-		4:
-			# Level 4: Single shot, 4 chains
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "chain")
-		5:
-			# Level 5: Single shot, 5 chains
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "chain")
+	# The chain count is handled in PlasmaBullet.gd based on weapon_level
+	shoot.emit($MuzzlePosition.global_position, Vector2.UP, "chain")
 
 func _on_area_entered(area):
 	if area.is_in_group("enemies") or area.is_in_group("enemy_bullets"):
@@ -184,16 +250,14 @@ func drop_power_ups():
 	var powerup_scene = preload("res://scenes/pickups/PowerUp.tscn")
 	var parent = get_parent()
 
-	# Drop weapon power-ups equal to weapon level - 1 (level 1 is default)
-	var weapon_upgrades_to_drop = weapon_level - 1
+	# Drop power-ups equal to weapon level (e.g., level 7 = drop 7 power-ups)
+	var weapon_upgrades_to_drop = weapon_level
 	for i in range(weapon_upgrades_to_drop):
 		var powerup = powerup_scene.instantiate()
 		# Drop the same weapon type the player had
 		match weapon_type:
 			"vulcan":
 				powerup.powerup_type = "vulcan_powerup"
-			"laser":
-				powerup.powerup_type = "laser_powerup"
 			"chain":
 				powerup.powerup_type = "chain_powerup"
 		powerup.update_appearance()
@@ -233,37 +297,20 @@ func collect_powerup(powerup):
 	var game = get_parent()
 	match powerup.powerup_type:
 		"vulcan_powerup":
-			if weapon_type == "vulcan":
-				# Same weapon type: upgrade level
-				weapon_level = min(weapon_level + 1, 5)
-				show_upgrade_effect("VULCAN LV " + str(weapon_level))
-			else:
-				# Different weapon type: switch and reset to level 1
+			# Always increase level when picking up any weapon
+			weapon_level = min(weapon_level + 1, 20)
+			if weapon_type != "vulcan":
+				# Switch to vulcan if different type
 				weapon_type = "vulcan"
-				weapon_level = 1
-				show_upgrade_effect("VULCAN")
-			adjust_fire_rate()
-		"laser_powerup":
-			if weapon_type == "laser":
-				# Same weapon type: upgrade level
-				weapon_level = min(weapon_level + 1, 5)
-				show_upgrade_effect("LASER LV " + str(weapon_level))
-			else:
-				# Different weapon type: switch and reset to level 1
-				weapon_type = "laser"
-				weapon_level = 1
-				show_upgrade_effect("LASER")
+			show_upgrade_effect("VULCAN LV " + str(weapon_level))
 			adjust_fire_rate()
 		"chain_powerup":
-			if weapon_type == "chain":
-				# Same weapon type: upgrade level
-				weapon_level = min(weapon_level + 1, 5)
-				show_upgrade_effect("CHAIN LV " + str(weapon_level))
-			else:
-				# Different weapon type: switch and reset to level 1
+			# Always increase level when picking up any weapon
+			weapon_level = min(weapon_level + 1, 20)
+			if weapon_type != "chain":
+				# Switch to chain if different type
 				weapon_type = "chain"
-				weapon_level = 1
-				show_upgrade_effect("CHAIN")
+			show_upgrade_effect("CHAIN LV " + str(weapon_level))
 			adjust_fire_rate()
 		"bomb":
 			if game.has_method("add_bomb"):
@@ -289,13 +336,23 @@ func collect_powerup(powerup):
 
 func adjust_fire_rate():
 	# Adjust shooting timer based on weapon type and level
+	var was_running = not $ShootTimer.is_stopped()
+	if was_running:
+		$ShootTimer.stop()
+
 	match weapon_type:
 		"vulcan":
-			$ShootTimer.wait_time = max(0.15, 0.25 - (weapon_level - 1) * 0.02)  # Faster spread fire rate
-		"laser":
-			$ShootTimer.wait_time = max(0.18, 0.28 - (weapon_level - 1) * 0.02)  # Increased laser rate
+			# Scale fire rate from 0.25s at level 1 to 0.05s at level 20
+			$ShootTimer.wait_time = max(0.05, 0.25 - (weapon_level - 1) * 0.01)
 		"chain":
-			$ShootTimer.wait_time = max(0.11, 0.15 - (weapon_level - 1) * 0.01)  # 2x faster chain lightning
+			# ULTRA aggressive fire rate scaling for chain lightning
+			# Level 1: 0.2s, Level 10: 0.03s, Level 20: 0.01s (insane speed!)
+			$ShootTimer.wait_time = max(0.01, 0.2 - (weapon_level - 1) * 0.01)
+
+	if was_running:
+		$ShootTimer.start()
+
+	print("Fire rate adjusted - Weapon: ", weapon_type, " Level: ", weapon_level, " Timer: ", $ShootTimer.wait_time)
 
 func show_upgrade_effect(text):
 	var label = Label.new()

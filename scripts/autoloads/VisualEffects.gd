@@ -128,7 +128,7 @@ func _create_bomb_explosion(pos: Vector2, effects_parent: Node):
 			var ring_tween = effects_parent.create_tween()
 			ring_tween.tween_property(shockwave, "scale", Vector2(8, 8), 0.8)
 			ring_tween.parallel().tween_property(shockwave, "modulate:a", 0, 0.8)
-			ring_tween.tween_callback(shockwave.queue_free)
+			ring_tween.tween_callback(func(): safe_cleanup_node(shockwave))
 
 	_create_screen_flash_sequence(effects_parent)
 	_schedule_cleanup([mega_explosion], effects_parent, 2.0)
@@ -174,7 +174,7 @@ func _create_shockwave(pos: Vector2, parent: Node, radius: float, max_scale: Vec
 	var shockwave_tween = parent.create_tween()
 	shockwave_tween.parallel().tween_property(shockwave, "scale", max_scale, duration)
 	shockwave_tween.parallel().tween_property(shockwave, "modulate:a", 0, duration)
-	shockwave_tween.tween_callback(shockwave.queue_free)
+	shockwave_tween.tween_callback(func(): safe_cleanup_node(shockwave))
 
 func _create_shockwave_ring(pos: Vector2, ring_index: int) -> Polygon2D:
 	var shockwave = Polygon2D.new()
@@ -198,7 +198,7 @@ func _create_screen_flash_sequence(parent: Node):
 
 	var flash_tween = parent.create_tween()
 	flash_tween.tween_property(flash, "modulate:a", 0, 0.6)
-	flash_tween.tween_callback(flash.queue_free)
+	flash_tween.tween_callback(func(): safe_cleanup_node(flash))
 
 	for pulse_i in range(3):
 		var pulse_flash = ColorRect.new()
@@ -223,7 +223,7 @@ func _create_screen_flash_sequence(parent: Node):
 			# First pulse starts immediately
 			var pulse_tween = parent.create_tween()
 			pulse_tween.tween_property(pulse_flash, "modulate:a", 0, 0.1)
-			pulse_tween.tween_callback(pulse_flash.queue_free)
+			pulse_tween.tween_callback(func(): safe_cleanup_node(pulse_flash))
 
 func _schedule_cleanup(particles: Array, parent: Node, delay: float):
 	var cleanup_timer = Timer.new()
