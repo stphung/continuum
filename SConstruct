@@ -134,6 +134,9 @@ def setup_command_line_targets(env):
 
     # Quality assurance targets
     env.Alias('test', env.Command('test-target', [], run_tests_action))
+    env.Alias('test-unit', env.Command('test-unit-target', [], run_unit_tests_action))
+    env.Alias('test-integration', env.Command('test-integration-target', [], run_integration_tests_action))
+    env.Alias('test-report', env.Command('test-report-target', [], run_tests_with_report_action))
     env.Alias('lint', env.Command('lint-target', [], run_lint_action))
     env.Alias('validate', env.Command('validate-target', [], run_validation_action))
 
@@ -177,6 +180,21 @@ def run_tests_action(target, source, env):
     """Execute the full test suite"""
     return env.GodotRunTests()
 
+def run_unit_tests_action(target, source, env):
+    """Execute only unit tests"""
+    print("🧪 Running unit tests only...")
+    return env.GodotRunTests(test_filter="test/unit")
+
+def run_integration_tests_action(target, source, env):
+    """Execute only integration tests"""
+    print("🧪 Running integration tests only...")
+    return env.GodotRunTests(test_filter="test/integration")
+
+def run_tests_with_report_action(target, source, env):
+    """Execute tests and generate HTML reports"""
+    print("🧪 Running tests with report generation...")
+    return env.GodotRunTests(generate_report=True)
+
 def run_lint_action(target, source, env):
     """Run code quality checks"""
     print("🔍 Running code quality checks...")
@@ -218,6 +236,9 @@ Asset Processing:
 
 Quality Assurance:
   scons test                         # Execute complete test suite
+  scons test-unit                    # Run only unit tests
+  scons test-integration             # Run only integration tests
+  scons test-report                  # Run tests and generate HTML reports
   scons lint                         # Code quality checks
   scons validate                     # Comprehensive validation
 

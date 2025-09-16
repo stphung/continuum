@@ -27,6 +27,7 @@ def setup_godot_integration(env):
     env.AddMethod(godot_import_assets, "GodotImportAssets")
     env.AddMethod(godot_validate_project, "GodotValidateProject")
     env.AddMethod(godot_run_tests, "GodotRunTests")
+    env.AddMethod(ensure_test_dependencies, "EnsureTestDependencies")
 
 def verify_godot_installation(env):
     """Verify that Godot is properly installed and accessible"""
@@ -332,12 +333,75 @@ def godot_validate_project(env):
     print("✅ Project structure validation passed")
     return 0
 
-def godot_run_tests(env):
-    """Run Godot test suite using gdUnit4 directly"""
+def ensure_test_dependencies(env):
+    """Ensure test dependencies (gdUnit4) are properly installed"""
+    project_path = str(env['PROJECT_DIR'])
+
+    # Check if gdUnit4 is already installed
+    gdunit_path = os.path.join(project_path, 'addons', 'gdUnit4', 'bin', 'GdUnitCmdTool.gd')
+    if os.path.exists(gdunit_path):
+        print("✅ gdUnit4 test framework already installed")
+        return 0
+
+    print("📦 Installing test dependencies...")
+
+    # Try to install using gd-plug
+    plug_script = os.path.join(project_path, 'plug.gd')
+    if not os.path.exists(plug_script):
+        print("❌ Error: plug.gd script not found - cannot install dependencies")
+        print("   Please ensure gd-plug is properly set up")
+        return 1
+
+    try:
+        # Use Godot directly to run plug.gd install (more reliable than shebang)
+        godot_path = env['GODOT_EXECUTABLE']
+        result = subprocess.run([
+            godot_path,
+            '--path', project_path,
+            '--headless',
+            '-s', plug_script,
+            'install'
+        ], capture_output=True, text=True, timeout=300)
+
+        if result.returncode == 0:
+            print("✅ Test dependencies installed successfully")
+
+            # Verify gdUnit4 is now available
+            if os.path.exists(gdunit_path):
+                print("✅ gdUnit4 test framework verified")
+                return 0
+            else:
+                print("⚠️  Warning: Dependencies installed but gdUnit4 not found")
+                print(f"   Expected path: {gdunit_path}")
+                # List what was actually installed
+                addons_dir = os.path.join(project_path, 'addons')
+                if os.path.exists(addons_dir):
+                    print(f"   Available addons: {os.listdir(addons_dir)}")
+                return 1
+        else:
+            print("❌ Failed to install test dependencies")
+            print(f"   stdout: {result.stdout}")
+            print(f"   stderr: {result.stderr}")
+            return 1
+
+    except subprocess.TimeoutExpired:
+        print("❌ Dependency installation timed out")
+        return 1
+    except Exception as e:
+        print(f"❌ Dependency installation error: {e}")
+        return 1
+
+def godot_run_tests(env, test_filter="", generate_report=False):
+    """Run Godot test suite using gdUnit4 with enhanced options"""
     godot_path = env['GODOT_EXECUTABLE']
     project_path = str(env['PROJECT_DIR'])
 
     print("🧪 Running Godot test suite...")
+
+    # Ensure test dependencies are installed
+    if ensure_test_dependencies(env) != 0:
+        print("❌ Cannot run tests: missing dependencies")
+        return 1
 
     # First, import project assets (needed for running tests)
     print("📦 Importing project assets...")
@@ -354,26 +418,75 @@ def godot_run_tests(env):
     except Exception as e:
         print(f"⚠️ Asset import error: {e}")
 
+    # Build test command with optional filtering
+    test_cmd = [
+        godot_path,
+        '--path', project_path,
+        '--headless',
+        '-s', 'addons/gdUnit4/bin/GdUnitCmdTool.gd',
+        '--add', test_filter if test_filter else 'test',
+        '--continue',
+        '--ignoreHeadlessMode'
+    ]
+
+    # Add report generation if requested
+    if generate_report:
+        reports_dir = os.path.join(project_path, 'reports')
+        if not os.path.exists(reports_dir):
+            os.makedirs(reports_dir)
+        test_cmd.extend(['--report', '--reportFormat', 'html'])
+
+    # Display test configuration
+    if test_filter:
+        print(f"🎯 Running filtered tests: {test_filter}")
+    else:
+        print("🎯 Running all tests")
+
+    if generate_report:
+        print("📊 Generating test reports")
+
     # Run the tests using gdUnit4
     try:
-        result = subprocess.run([
-            godot_path,
-            '--path', project_path,
-            '--headless',
-            '-s', 'addons/gdUnit4/bin/GdUnitCmdTool.gd',
-            '--add', 'test',
-            '--continue',
-            '--ignoreHeadlessMode'
-        ], capture_output=True, text=True, timeout=600)
+        result = subprocess.run(test_cmd, capture_output=True, text=True, timeout=600)
 
-        if result.returncode == 0:
+        # Parse and display results
+        success = result.returncode == 0
+
+        if success:
             print("✅ All tests passed")
-            return 0
+
+            # Count test results from output
+            stdout = result.stdout
+            if "Passed:" in stdout:
+                lines = stdout.split('\n')
+                for line in lines:
+                    if "Passed:" in line or "Failed:" in line or "Total:" in line:
+                        print(f"   {line.strip()}")
         else:
-            print("❌ Tests failed")
-            print(f"   stdout: {result.stdout}")
-            print(f"   stderr: {result.stderr}")
-            return 1
+            print("❌ Some tests failed")
+
+            # Display detailed failure information
+            stdout = result.stdout
+            stderr = result.stderr
+
+            if stdout:
+                print("📋 Test output:")
+                # Show last 20 lines of output for context
+                lines = stdout.split('\n')
+                for line in lines[-20:]:
+                    if line.strip():
+                        print(f"   {line}")
+
+            if stderr:
+                print("⚠️  Error output:")
+                print(f"   {stderr}")
+
+        if generate_report:
+            reports_dir = os.path.join(project_path, 'reports')
+            if os.path.exists(reports_dir):
+                print(f"📊 Test reports generated in: {reports_dir}")
+
+        return 0 if success else 1
 
     except subprocess.TimeoutExpired:
         print("❌ Test execution timed out")

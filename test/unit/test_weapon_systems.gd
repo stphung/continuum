@@ -1,7 +1,7 @@
 extends GdUnitTestSuite
 
 const Player = preload("res://scenes/player/Player.tscn")
-const LaserBullet = preload("res://scenes/projectiles/LaserBullet.tscn")
+const PlasmaBullet = preload("res://scenes/projectiles/PlasmaBullet.tscn")
 const Bullet = preload("res://scenes/projectiles/Bullet.tscn")
 
 var player: Area2D
@@ -64,44 +64,41 @@ func test_vulcan_weapon_max_level_wide_spread():
 	# Check signal was emitted 5 times for max level spread
 	assert_that(signal_count[0]).is_equal(5)
 
-func test_laser_weapon_single_beam():
-	player.weapon_type = "laser"
+func test_chain_weapon_single_beam():
+	player.weapon_type = "chain"
 
 	var signal_count = [0]
 	player.shoot.connect(func(pos, dir, weapon): signal_count[0] += 1)
 
-	player.fire_laser()
+	player.fire_chain()
 
-	# Check signal was emitted once for laser
+	# Check signal was emitted once for chain lightning
 	assert_that(signal_count[0]).is_equal(1)
 
-func test_laser_bullet_damage_scaling():
-	var laser = auto_free(LaserBullet.instantiate())
-	laser.weapon_level = 3
-	laser._ready()
+func test_chain_bullet_damage_scaling():
+	var chain_bullet = auto_free(PlasmaBullet.instantiate())
+	chain_bullet.weapon_level = 3
+	chain_bullet._ready()
 
-	assert_that(laser.damage).is_equal(10)  # 4 + (3 * 2) = 10
-	assert_that(laser.pierce_count).is_equal(5)  # 2 + 3 = 5
+	# Chain bullets have fixed damage of 1
+	assert_that(chain_bullet.damage).is_equal(1)
+	# Chain bullets have homing based on weapon level
+	assert_that(chain_bullet.homing_strength).is_equal(3.0)  # weapon_level * 1.0
 
-func test_laser_bullet_piercing_mechanics():
-	var laser = auto_free(LaserBullet.instantiate())
-	add_child(laser)
-	laser.weapon_level = 2
-	laser._ready()
+func test_chain_bullet_hit_tracking():
+	var chain_bullet = auto_free(PlasmaBullet.instantiate())
+	add_child(chain_bullet)
+	chain_bullet.weapon_level = 2
+	chain_bullet._ready()
 
 	# Create mock enemies
 	var enemy1 = auto_free(MockEnemy.new())
 	var enemy2 = auto_free(MockEnemy.new())
 
-	# First hit should not destroy laser
-	laser._on_area_entered(enemy1)
-	assert_that(laser.enemies_hit).is_equal(1)
-	assert_that(laser.is_queued_for_deletion()).is_false()
-
-	# Second hit should not destroy laser (pierce count = 3)
-	laser._on_area_entered(enemy2)
-	assert_that(laser.enemies_hit).is_equal(2)
-	assert_that(laser.is_queued_for_deletion()).is_false()
+	# First hit should destroy chain bullet (no piercing in chain lightning)
+	chain_bullet._on_area_entered(enemy1)
+	assert_that(chain_bullet.hit_enemies.size()).is_equal(1)
+	assert_that(chain_bullet.is_queued_for_deletion()).is_true()
 
 func test_weapon_fire_rate_adjustment():
 	# Test vulcan fire rate
@@ -110,13 +107,13 @@ func test_weapon_fire_rate_adjustment():
 	player.adjust_fire_rate()
 	var vulcan_wait_time = player.get_node("ShootTimer").wait_time
 
-	# Test laser fire rate (should be slower)
-	player.weapon_type = "laser"
+	# Test chain fire rate (should be faster)
+	player.weapon_type = "chain"
 	player.weapon_level = 1
 	player.adjust_fire_rate()
-	var laser_wait_time = player.get_node("ShootTimer").wait_time
+	var chain_wait_time = player.get_node("ShootTimer").wait_time
 
-	assert_that(laser_wait_time).is_greater(vulcan_wait_time)
+	assert_that(chain_wait_time).is_less_equal(vulcan_wait_time)
 
 func test_weapon_level_affects_fire_rate():
 	player.weapon_type = "vulcan"
