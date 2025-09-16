@@ -7,7 +7,7 @@ var enemy_scene: PackedScene
 var enemy_types: Dictionary = {}
 
 var wave_number = 1
-var enemies_per_wave = 3
+var enemies_per_wave = 2  # Start easier
 var spawn_delay_reduction = 0.0
 var game_over = false
 var enemies_container: Node
@@ -52,7 +52,7 @@ func load_enemy_types():
 
 func reset_game_state():
 	wave_number = 1
-	enemies_per_wave = 3
+	enemies_per_wave = 2  # Start easier
 	spawn_delay_reduction = 0.0
 	game_over = false
 
@@ -61,8 +61,8 @@ func spawn_random_enemies():
 		return
 
 	var spawn_count = 1
-	if randf() < 0.3:
-		spawn_count = randi_range(2, min(3, wave_number))
+	if randf() < 0.25:  # Further reduced to 25% chance
+		spawn_count = randi_range(2, min(3, wave_number))  # 2-3 enemies max early on
 
 	for i in spawn_count:
 		spawn_enemy(i * 60)
@@ -133,7 +133,7 @@ func _on_wave_timer_timeout():
 
 func advance_wave():
 	wave_number += 1
-	spawn_delay_reduction = min(0.4, wave_number * 0.02)
+	spawn_delay_reduction = min(0.5, wave_number * 0.03)  # Faster spawn acceleration
 	spawn_wave()
 	show_wave_announcement()
 
@@ -152,7 +152,7 @@ func spawn_wave():
 			_spawn_random_burst()
 
 func _spawn_line_formation():
-	var enemy_count = enemies_per_wave + wave_number
+	var enemy_count = enemies_per_wave + min(wave_number, 5)  # Capped increase
 	# Mix enemy types in line formation
 	for i in range(enemy_count):
 		var timer = Timer.new()
@@ -165,7 +165,7 @@ func _spawn_line_formation():
 		timer.start()
 
 func _spawn_v_formation():
-	var enemy_count = enemies_per_wave + wave_number
+	var enemy_count = enemies_per_wave + min(wave_number, 5)  # Capped increase
 	# V formation with mixed enemy types
 	for i in range(enemy_count):
 		var timer = Timer.new()
@@ -179,13 +179,13 @@ func _spawn_v_formation():
 		timer.start()
 
 func _spawn_random_burst():
-	var enemy_count = enemies_per_wave + wave_number * 2
+	var enemy_count = enemies_per_wave + min(wave_number * 2, 10)  # Capped burst
 	# Random burst with weighted selection toward appropriate types
 	for i in range(enemy_count):
 		spawn_enemy(0)
 
-	# Special: Add one fortress ship on high waves
-	if wave_number >= 26 and randf() < 0.3:
+	# Special: Add fortress ships earlier and more often
+	if wave_number >= 15 and randf() < 0.4:  # From wave 15 instead of 26
 		spawn_enemy(0, "fortress_ship")
 
 func show_wave_announcement():

@@ -295,7 +295,7 @@ func adjust_fire_rate():
 		"laser":
 			$ShootTimer.wait_time = max(0.18, 0.28 - (weapon_level - 1) * 0.02)  # Increased laser rate
 		"chain":
-			$ShootTimer.wait_time = max(0.2, 0.3 - (weapon_level - 1) * 0.02)  # Faster chain targeting
+			$ShootTimer.wait_time = max(0.11, 0.15 - (weapon_level - 1) * 0.01)  # 2x faster chain lightning
 
 func show_upgrade_effect(text):
 	var label = Label.new()

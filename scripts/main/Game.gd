@@ -10,7 +10,7 @@ var lives = 3
 var bombs = 3
 var game_over = false
 var current_player = null
-var starfield_background: StarfieldBackground
+var starfield_background
 
 func _ready():
 	randomize()

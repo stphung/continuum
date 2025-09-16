@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_elite")
 enemy_name = "Elite Scout Fighter"
-base_health = 4
+base_health = 2
 base_speed = 180.0
 base_points = 200
 movement_pattern = "straight"
