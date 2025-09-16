@@ -16,11 +16,19 @@ var target_enemy: Area2D = null
 
 # Trail effect variables
 var trail_positions: Array = []
-var max_trail_length = 8
+var max_trail_length = 12
+
+# Animation variables
+var time_alive: float = 0.0
+var pulse_intensity: float = 1.0
+var core_base_scale: Vector2
+var glow_base_scale: Vector2
 
 func _ready():
 	add_to_group("player_bullets")
+	_initialize_bullet()
 
+func _initialize_bullet():
 	# Fixed damage of 1, same as vulcan
 	damage = 1
 
@@ -34,13 +42,24 @@ func _ready():
 	var scale_factor = 1.0 + (weapon_level - 1) * 0.05  # 1.0x to 1.95x at level 20
 	var length_factor = 1.0 + (weapon_level - 1) * 0.1  # 1.0x to 2.9x length at level 20
 
+	# Store base scales for animation
+	core_base_scale = Vector2(scale_factor * 0.8, length_factor * 0.9)
+	glow_base_scale = Vector2(scale_factor * 1.2, length_factor)
+
 	# Update all visual components to be thicker and longer
 	$Sprite.scale = Vector2(scale_factor, length_factor)
-	$Glow.scale = Vector2(scale_factor * 1.2, length_factor)
-	$Core.scale = Vector2(scale_factor * 0.8, length_factor * 0.9)
-	$Trail.scale = Vector2(scale_factor, length_factor)
-	$Trail2.scale = Vector2(scale_factor, length_factor)
+	$Glow.scale = glow_base_scale
+	$Core.scale = core_base_scale
 	$OuterGlow.scale = Vector2(scale_factor * 1.5, length_factor)
+
+	# Set up Line2D trail properties based on weapon level
+	$FluidTrail.width = 6.0 + (weapon_level * 1.5)
+	$FluidTrail2.width = 10.0 + (weapon_level * 2.0)
+
+	# Scale particle effects based on weapon level
+	if has_node("EnergyParticles"):
+		$EnergyParticles.amount = 10 + (weapon_level * 2)
+		$EnergyParticles.emission_sphere_radius = 4.0 + (weapon_level * 0.5)
 
 	# Also scale collision to match visual size
 	if $CollisionShape2D.shape is CapsuleShape2D:
@@ -48,10 +67,15 @@ func _ready():
 		$CollisionShape2D.shape.height = 20.0 * length_factor
 
 func _process(delta):
+	time_alive += delta
+
 	# Store trail positions for curved visual effect
 	trail_positions.append(global_position)
 	if trail_positions.size() > max_trail_length:
 		trail_positions.pop_front()
+
+	# Update pulsing animation
+	update_pulsing_animation(delta)
 
 	# Find and track nearest enemy for homing
 	update_homing_target()
@@ -77,42 +101,69 @@ func _process(delta):
 	# Move the bullet
 	position += direction * speed * delta
 
-	# Update trail visuals to show curve
-	update_trail_visual()
+	# Update fluid trail system
+	update_fluid_trail()
+
+	# Update particle direction based on movement
+	if has_node("EnergyParticles"):
+		$EnergyParticles.direction = -direction
 
 	lifetime += delta
 	if lifetime > max_lifetime:
 		call_deferred("queue_free")
 
-func update_trail_visual():
-	# Dynamically adjust trail based on recent positions to show curve
-	if trail_positions.size() >= 2:
-		var trail_node = $Trail
-		var trail2_node = $Trail2 if has_node("Trail2") else null
+func update_pulsing_animation(delta):
+	# Create smooth pulsing effect using sine waves
+	var pulse_speed = 8.0 + (weapon_level * 0.5)  # Faster pulse at higher levels
+	pulse_intensity = 0.9 + sin(time_alive * pulse_speed) * 0.2  # Pulse between 0.7 and 1.1
 
-		# Calculate trail direction from recent positions
-		var last_pos = trail_positions[-1]
-		var prev_pos = trail_positions[-2] if trail_positions.size() >= 2 else last_pos
+	# Apply pulsing to core and glow
+	if has_node("Core"):
+		$Core.scale = core_base_scale * pulse_intensity
+		# Add slight color pulsing
+		var pulse_brightness = 0.8 + sin(time_alive * pulse_speed * 2) * 0.2
+		$Core.modulate = Color(1, 1, 1, pulse_brightness)
 
-		# Elongate trail in opposite direction of movement to show path
-		var trail_dir = (prev_pos - last_pos).normalized()
-		if trail_dir.length() > 0:
-			# Primary trail
-			trail_node.polygon = PackedVector2Array([
-				Vector2(-5, 10),
-				Vector2(-5, 25) + trail_dir * 15,
-				Vector2(5, 25) + trail_dir * 15,
-				Vector2(5, 10)
-			])
+	if has_node("Glow"):
+		$Glow.scale = glow_base_scale * (0.9 + sin(time_alive * pulse_speed * 0.7) * 0.15)
 
-			# Secondary trail (if exists)
-			if trail2_node:
-				trail2_node.polygon = PackedVector2Array([
-					Vector2(-3, 25) + trail_dir * 15,
-					Vector2(-3, 40) + trail_dir * 25,
-					Vector2(3, 40) + trail_dir * 25,
-					Vector2(3, 25) + trail_dir * 15
-				])
+	# Add rotation effect to main sprite for energy feel
+	if has_node("Sprite"):
+		$Sprite.rotation = sin(time_alive * 4.0) * 0.05  # Slight oscillation
+
+func update_fluid_trail():
+	# Create smooth curved trail through all trail positions
+	if trail_positions.size() >= 2 and has_node("FluidTrail"):
+		var trail = $FluidTrail
+		var trail2 = $FluidTrail2 if has_node("FluidTrail2") else null
+
+		# Clear existing points
+		trail.clear_points()
+		if trail2:
+			trail2.clear_points()
+
+		# Add points with smooth interpolation
+		var points_to_add = min(trail_positions.size(), max_trail_length)
+		for i in range(points_to_add):
+			var pos = trail_positions[trail_positions.size() - 1 - i]
+			var relative_pos = pos - global_position
+
+			# Add smooth curve by slightly offsetting alternating points
+			var curve_offset = Vector2(sin(i * 0.3) * 2.0, 0)
+			trail.add_point(relative_pos + curve_offset)
+
+			# Secondary trail with more offset for layered effect
+			if trail2 and i % 2 == 0:  # Add every other point for smoother secondary trail
+				trail2.add_point(relative_pos + curve_offset * 1.5)
+
+		# Animate trail width based on speed and weapon level
+		var base_width = 6.0 + (weapon_level * 1.5)
+		var speed_factor = clamp(direction.length() * 2.0, 0.8, 1.5)
+		var animated_width = base_width * speed_factor * pulse_intensity
+		trail.width = animated_width
+
+		if trail2:
+			trail2.width = (10.0 + (weapon_level * 2.0)) * speed_factor * (pulse_intensity * 0.8)
 
 func update_homing_target():
 	# Once a target is locked, never change it (prevents retargeting)
