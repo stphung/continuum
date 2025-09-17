@@ -12,9 +12,68 @@ env:
   EXPORT_NAME: continuum
 
 jobs:
+  test-suite:
+    name: Run Test Suite
+    runs-on: ubuntu-22.04
+    container:
+      image: barichello/godot-ci:4.4.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Setup
+        run: |
+          mkdir -v -p ~/.local/share/godot/export_templates/
+          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+
+      - name: Install Dependencies via gd-plug
+        run: |
+          echo "Installing project dependencies including gdUnit4..."
+          godot --path . --headless -s plug.gd install || true
+          echo "Dependencies installed successfully"
+          ls -la addons/
+
+      - name: Import project assets
+        run: |
+          godot --path . --headless --import --quit-after 1 || true
+
+      - name: Run Test Suite
+        id: run-tests
+        run: |
+          echo "=== Running Continuum Test Suite ==="
+          echo "Starting test execution with gdUnit4..."
+
+          # Run tests and capture the exit code
+          set +e
+          godot --headless --path . -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add test --continue --ignoreHeadlessMode
+          TEST_EXIT_CODE=$?
+          set -e
+
+          echo "Test execution completed with exit code: $TEST_EXIT_CODE"
+
+          # Check if reports directory exists and has content
+          if [ -d "reports" ]; then
+            echo "Test reports generated:"
+            find reports -type f -name "*.html" | head -10
+          fi
+
+          # Exit with the test exit code
+          exit $TEST_EXIT_CODE
+
+      - name: Upload Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: reports/
+          if-no-files-found: ignore
+
   export-linux:
     name: Linux Export
     runs-on: ubuntu-22.04
+    needs: [test-suite]
     container:
       image: barichello/godot-ci:4.4.1
     steps:
@@ -46,6 +105,7 @@ jobs:
   export-windows:
     name: Windows Export
     runs-on: ubuntu-22.04
+    needs: [test-suite]
     container:
       image: barichello/godot-ci:4.4.1
     steps:
@@ -77,6 +137,7 @@ jobs:
   export-web:
     name: Web Export
     runs-on: ubuntu-22.04
+    needs: [test-suite]
     container:
       image: barichello/godot-ci:4.4.1
     permissions:
@@ -127,6 +188,7 @@ jobs:
   export-android:
     name: Android Export
     runs-on: ubuntu-22.04
+    needs: [test-suite]
     container:
       image: barichello/godot-ci:4.4.1
     env:
@@ -299,7 +361,7 @@ jobs:
     name: Auto Version Bump
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    needs: [export-linux, export-windows, export-web, export-android]
+    needs: [test-suite, export-linux, export-windows, export-web, export-android]
     permissions:
       contents: write
     outputs:
@@ -338,7 +400,7 @@ jobs:
     name: Create Release
     runs-on: ubuntu-22.04
     if: (startsWith(github.ref, 'refs/tags/v')) || (needs.auto-version.outputs.new_tag != '')
-    needs: [export-linux, export-windows, export-web, export-android, auto-version]
+    needs: [test-suite, export-linux, export-windows, export-web, export-android, auto-version]
     permissions:
       contents: write
     steps:
