@@ -1,111 +1,5 @@
 extends Area2D
 
-## Weapon Pattern System Classes (embedded to avoid import issues)
-
-## Base class for weapon firing patterns
-class WeaponPattern extends RefCounted:
-	class BulletConfig:
-		var position_offset: Vector2 = Vector2.ZERO
-		var direction: Vector2 = Vector2.UP
-		var muzzle_type: String = "center"  # "center", "left", "right"
-
-		func _init(pos_offset: Vector2 = Vector2.ZERO, dir: Vector2 = Vector2.UP, muzzle: String = "center"):
-			position_offset = pos_offset
-			direction = dir
-			muzzle_type = muzzle
-
-	func get_bullet_configs() -> Array:
-		assert(false, "WeaponPattern.get_bullet_configs() must be implemented by subclass")
-		return []
-
-	func fire(player: Node2D) -> void:
-		var configs = get_bullet_configs()
-		for config in configs:
-			var muzzle_position = get_muzzle_position(player, config.muzzle_type)
-			player.shoot.emit(muzzle_position, config.direction, "vulcan")
-
-	func get_muzzle_position(player: Node2D, muzzle_type: String) -> Vector2:
-		match muzzle_type:
-			"left":
-				return player.get_node("LeftMuzzle").global_position
-			"right":
-				return player.get_node("RightMuzzle").global_position
-			"center", _:
-				return player.get_node("MuzzlePosition").global_position
-
-## Specific weapon patterns
-class SingleShotPattern extends WeaponPattern:
-	func get_bullet_configs() -> Array:
-		return [BulletConfig.new(Vector2.ZERO, Vector2.UP, "center")]
-
-class DualShotPattern extends WeaponPattern:
-	func get_bullet_configs() -> Array:
-		return [
-			BulletConfig.new(Vector2.ZERO, Vector2.UP, "left"),
-			BulletConfig.new(Vector2.ZERO, Vector2.UP, "right")
-		]
-
-class SpreadShotPattern extends WeaponPattern:
-	func get_bullet_configs() -> Array:
-		return [
-			BulletConfig.new(Vector2.ZERO, Vector2.UP, "center"),
-			BulletConfig.new(Vector2.ZERO, Vector2(-0.1, -1).normalized(), "left"),
-			BulletConfig.new(Vector2.ZERO, Vector2(0.1, -1).normalized(), "right")
-		]
-
-class ArcPattern extends WeaponPattern:
-	var bullet_count: int
-	var arc_width: float
-
-	func _init(bullets: int, width: float):
-		bullet_count = bullets
-		arc_width = width
-
-	func get_bullet_configs() -> Array:
-		var configs: Array = []
-		if bullet_count == 1:
-			configs.append(BulletConfig.new(Vector2.ZERO, Vector2.UP, "center"))
-			return configs
-
-		for i in range(bullet_count):
-			var angle = -arc_width/2 + (i * arc_width / (bullet_count - 1))
-			var direction = Vector2(angle, -1).normalized()
-			var muzzle_type = get_muzzle_for_angle(angle)
-			configs.append(BulletConfig.new(Vector2.ZERO, direction, muzzle_type))
-		return configs
-
-	func get_muzzle_for_angle(angle: float) -> String:
-		if abs(angle) < 0.15:
-			return "center"
-		elif angle < 0:
-			return "left"
-		else:
-			return "right"
-
-## Factory function to create weapon patterns
-static func create_vulcan_pattern_for_level(level: int) -> WeaponPattern:
-	match level:
-		1:
-			return SingleShotPattern.new()
-		2:
-			return DualShotPattern.new()
-		3:
-			return SpreadShotPattern.new()
-		4, 5:
-			return ArcPattern.new(level, 0.6)
-		6, 7:
-			return ArcPattern.new(level, 0.8)
-		8, 9, 10:
-			return ArcPattern.new(level, 1.0)
-		11, 12, 13:
-			return ArcPattern.new(level, 0.7)
-		14, 15, 16:
-			return ArcPattern.new(level, 0.75)
-		17, 18, 19:
-			return ArcPattern.new(level, 0.8)
-		20, _:
-			return ArcPattern.new(20, 0.9)  # Maximum firepower
-
 signal player_hit
 signal shoot(position, direction, weapon_type)
 signal use_bomb
@@ -223,7 +117,7 @@ func fire_weapon():
 func initialize_weapon_patterns():
 	# Pre-populate patterns for all weapon levels to avoid runtime allocation
 	for level in range(1, 21):  # Levels 1-20
-		vulcan_patterns[level] = create_vulcan_pattern_for_level(level)
+		vulcan_patterns[level] = VulcanPatterns.create_pattern_for_level(level)
 
 ## New streamlined fire_vulcan method using pattern system
 func fire_vulcan():
