@@ -21,6 +21,12 @@ var spawn_timer: float = 0.0  # For spawning enemies
 var current_wave: int = 1
 var is_dying: bool = false  # Prevent multiple death triggers
 
+# Off-screen cleanup variables
+var off_screen_timer: float = 0.0
+var is_off_screen: bool = false
+var max_off_screen_time: float = 3.0  # 3 seconds max off-screen
+var max_distance_from_viewport: float = 500.0  # Max pixels from viewport edge
+
 # Visual animation variables
 var current_velocity = Vector2.ZERO
 var banking_angle = 0.0
@@ -32,6 +38,12 @@ var visual_layers = []  # For multi-layer rendering
 func _ready():
 	add_to_group("enemies")
 	initial_x = position.x
+
+	# Debug tracking
+	if has_node("/root/EnemyManager"):
+		var enemy_manager = get_node("/root/EnemyManager")
+		if "total_enemies_spawned" in enemy_manager:
+			print("[Enemy] Created - Total enemies: ", get_tree().get_nodes_in_group("enemies").size())
 
 	# Initialize from enemy type data if provided
 	if enemy_type_data:
@@ -86,6 +98,9 @@ func _process(delta):
 	time_alive += delta
 	spawn_timer += delta
 	time_since_spawn += delta
+
+	# Check for off-screen cleanup
+	check_off_screen_cleanup(delta)
 
 	# Store previous position for velocity calculation
 	var prev_position = position
@@ -186,6 +201,10 @@ func destroy():
 		SoundManager.play_random_pitch("enemy_destroy", -8.0, 0.15)
 
 	enemy_destroyed.emit(points, position)
+
+	# Debug tracking
+	print("[Enemy] Destroyed - Remaining enemies: ", get_tree().get_nodes_in_group("enemies").size() - 1)
+
 	call_deferred("queue_free")
 
 func _on_area_entered(area):
@@ -194,7 +213,10 @@ func _on_area_entered(area):
 		pass
 
 func _on_screen_exited():
-	call_deferred("queue_free")
+	# Mark as off-screen and start timer
+	is_off_screen = true
+	off_screen_timer = 0.0
+	print("[Enemy] Exited screen at position: ", position)
 
 func _on_shoot_timer_timeout():
 	# Only shoot if enemy is on screen
@@ -1000,3 +1022,64 @@ func setup_fortress_ship_visuals():
 			Vector2(4, 35), Vector2(8, 35), Vector2(8, 42), Vector2(4, 42),
 			Vector2(8, 35), Vector2(12, 35), Vector2(12, 42), Vector2(8, 42)
 		])
+
+func check_off_screen_cleanup(delta):
+	"""Implement secondary cleanup mechanism for off-screen enemies"""
+	var viewport_size = get_viewport_rect().size
+	var enemy_pos = global_position
+
+	# Check if enemy is off-screen
+	var is_currently_off_screen = (enemy_pos.x < -50 or enemy_pos.x > viewport_size.x + 50 or
+	                               enemy_pos.y < -50 or enemy_pos.y > viewport_size.y + 50)
+
+	# Update off-screen status and timer
+	if is_currently_off_screen:
+		if not is_off_screen:
+			is_off_screen = true
+			off_screen_timer = 0.0
+			print("[Enemy] Went off-screen at position: ", position)
+
+		off_screen_timer += delta
+
+		# Check for cleanup conditions
+		var should_cleanup = false
+		var cleanup_reason = ""
+
+		# Condition 1: Too long off-screen
+		if off_screen_timer > max_off_screen_time:
+			should_cleanup = true
+			cleanup_reason = "exceeded max off-screen time"
+
+		# Condition 2: Too far from viewport
+		var distance_from_viewport = 0.0
+		if enemy_pos.x < 0:
+			distance_from_viewport = abs(enemy_pos.x)
+		elif enemy_pos.x > viewport_size.x:
+			distance_from_viewport = enemy_pos.x - viewport_size.x
+
+		if enemy_pos.y < 0:
+			distance_from_viewport = max(distance_from_viewport, abs(enemy_pos.y))
+		elif enemy_pos.y > viewport_size.y:
+			distance_from_viewport = max(distance_from_viewport, enemy_pos.y - viewport_size.y)
+
+		if distance_from_viewport > max_distance_from_viewport:
+			should_cleanup = true
+			cleanup_reason = "too far from viewport (" + str(int(distance_from_viewport)) + " pixels)"
+
+		# Perform cleanup if needed
+		if should_cleanup and not is_dying:
+			print("[Enemy] Force cleanup - ", cleanup_reason, " at position: ", position)
+			is_dying = true
+			call_deferred("queue_free")
+	else:
+		# Enemy returned on-screen, reset timer
+		if is_off_screen:
+			is_off_screen = false
+			off_screen_timer = 0.0
+			print("[Enemy] Returned on-screen at position: ", position)
+
+func _on_screen_entered():
+	"""Called when enemy re-enters the screen"""
+	is_off_screen = false
+	off_screen_timer = 0.0
+	print("[Enemy] Entered screen at position: ", position)
