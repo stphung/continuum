@@ -2,7 +2,7 @@ class_name VulcanPatterns
 extends RefCounted
 
 ## Collection of all vulcan weapon patterns
-## Each pattern corresponds to a weapon level (1-20)
+## Each pattern corresponds to a weapon level (1-10)
 
 ## Single shot pattern (Level 1)
 class SingleShotPattern extends WeaponPattern:

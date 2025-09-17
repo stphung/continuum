@@ -74,13 +74,20 @@ func setup_from_type_data():
 	weapon_type = enemy_type_data.weapon_type
 	damage_reduction = enemy_type_data.damage_reduction
 
-	# Update visuals
+	# Update visuals with wave-based scaling
 	if has_node("Sprite"):
-		$Sprite.color = enemy_type_data.sprite_color
+		# Apply base color with wave-based tinting
+		var base_color = enemy_type_data.sprite_color
+		var wave_tinted_color = get_wave_tinted_color(base_color, current_wave)
+		$Sprite.color = wave_tinted_color
+
 		if enemy_type_data.sprite_polygon.size() > 0:
 			# Don't override the enhanced visuals we set up
 			pass
-		$Sprite.scale = Vector2.ONE * enemy_type_data.sprite_scale
+
+		# Apply slight size scaling based on wave (max +25% at wave 100)
+		var size_multiplier = 1.0 + min(current_wave / 100.0, 1.0) * 0.25
+		$Sprite.scale = Vector2.ONE * enemy_type_data.sprite_scale * size_multiplier
 
 	# Update collision (deferred to avoid physics query conflicts)
 	if has_node("CollisionShape2D") and $CollisionShape2D.shape is CircleShape2D:
@@ -1083,3 +1090,35 @@ func _on_screen_entered():
 	is_off_screen = false
 	off_screen_timer = 0.0
 	print("[Enemy] Entered screen at position: ", position)
+
+func get_wave_tinted_color(base_color: Color, wave: int) -> Color:
+	"""Apply progressive color tinting based on wave number"""
+	var tinted_color = base_color
+
+	if wave >= 81:
+		# Wave 81-100: White-hot legendary glow
+		var glow_intensity = (wave - 80) / 20.0  # 0.0 to 1.0
+		tinted_color = tinted_color.lerp(Color(2.0, 2.0, 2.0, 1.0), glow_intensity * 0.6)
+		# Add pulsing effect for legendary enemies
+		var pulse = (sin(Time.get_ticks_msec() * 0.01) + 1.0) * 0.5
+		tinted_color = tinted_color.lerp(Color(2.5, 2.5, 2.5, 1.0), pulse * 0.3)
+	elif wave >= 61:
+		# Wave 61-80: Pulsing orange/red elite
+		var elite_intensity = (wave - 60) / 20.0  # 0.0 to 1.0
+		var orange_tint = Color(1.5, 0.8, 0.3, 1.0)
+		tinted_color = tinted_color.lerp(orange_tint, elite_intensity * 0.5)
+		# Add subtle pulsing
+		var pulse = (sin(Time.get_ticks_msec() * 0.008) + 1.0) * 0.5
+		tinted_color = tinted_color.lerp(Color(2.0, 1.0, 0.5, 1.0), pulse * 0.2)
+	elif wave >= 41:
+		# Wave 41-60: Orange/red veteran glow
+		var veteran_intensity = (wave - 40) / 20.0  # 0.0 to 1.0
+		var red_tint = Color(1.4, 0.7, 0.3, 1.0)
+		tinted_color = tinted_color.lerp(red_tint, veteran_intensity * 0.4)
+	elif wave >= 21:
+		# Wave 21-40: Red battle-hardened tint
+		var hardened_intensity = (wave - 20) / 20.0  # 0.0 to 1.0
+		var battle_tint = Color(1.2, 0.8, 0.8, 1.0)
+		tinted_color = tinted_color.lerp(battle_tint, hardened_intensity * 0.3)
+
+	return tinted_color

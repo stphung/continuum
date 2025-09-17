@@ -162,6 +162,14 @@ func advance_wave():
 		var new_wait_time = max(3.0, 10.0 - (wave_number * 0.2))  # Start at 10s, min 3s
 		wave_timer.wait_time = new_wait_time
 
+	# Update enemy spawn timer for increased spawn rate
+	if enemies_container and enemies_container.has_node("../EnemySpawnTimer"):
+		var spawn_timer = enemies_container.get_node("../EnemySpawnTimer")
+		# Decrease spawn interval - faster spawning as waves progress
+		var spawn_rate_multiplier = 1.0 - min(wave_number * 0.01, 0.5)  # Up to 50% faster
+		var new_spawn_time = max(0.5, 2.0 * spawn_rate_multiplier)  # Min 0.5s between spawns
+		spawn_timer.wait_time = new_spawn_time
+
 func spawn_wave():
 	if not enemies_container:
 		return
@@ -177,7 +185,10 @@ func spawn_wave():
 			_spawn_random_burst()
 
 func _spawn_line_formation():
-	var enemy_count = enemies_per_wave + wave_number  # Uncapped increase
+	# Scale enemy count with logarithmic progression to prevent overwhelming
+	var base_count = enemies_per_wave + min(int(log(wave_number + 1) * 3), 10)  # Cap at 10 extra
+	var enemy_count = min(base_count, 20)  # Hard cap at 20 enemies per formation
+
 	# Mix enemy types in line formation - using delayed call instead of timer nodes
 	for i in range(enemy_count):
 		var delay = max(0.1, i * 0.15)  # Slightly faster spawning
@@ -186,7 +197,10 @@ func _spawn_line_formation():
 		get_tree().create_timer(delay).timeout.connect(func(): spawn_enemy(x_offset))
 
 func _spawn_v_formation():
-	var enemy_count = enemies_per_wave + wave_number  # Uncapped increase
+	# Scale enemy count with logarithmic progression to prevent overwhelming
+	var base_count = enemies_per_wave + min(int(log(wave_number + 1) * 3), 10)  # Cap at 10 extra
+	var enemy_count = min(base_count, 20)  # Hard cap at 20 enemies per formation
+
 	# V formation with mixed enemy types - using delayed call instead of timer nodes
 	for i in range(enemy_count):
 		var delay = max(0.05, i * 0.08)  # Faster V formation
@@ -196,17 +210,20 @@ func _spawn_v_formation():
 		get_tree().create_timer(delay).timeout.connect(func(): spawn_enemy(x_offset))
 
 func _spawn_random_burst():
-	var enemy_count = enemies_per_wave + min(wave_number * 2, 15)  # Up to 15 enemies in burst
+	# Scale burst size with controlled progression
+	var base_count = enemies_per_wave + min(int(log(wave_number + 1) * 4), 15)  # Cap at 15 extra
+	var enemy_count = min(base_count, 25)  # Hard cap at 25 enemies per burst
+
 	# Random burst with weighted selection toward appropriate types
 	for i in range(enemy_count):
 		spawn_enemy(0)
 
-	# Special: Add fortress ships more often
-	if wave_number >= 15 and randf() < 0.5:  # 50% chance from wave 15
+	# Special: Add fortress ships more often at higher waves
+	if wave_number >= 15 and randf() < min(0.3 + (wave_number - 15) * 0.02, 0.8):  # Scale from 30% to 80%
 		spawn_enemy(0, "fortress_ship")
 
-	# Add support carriers too
-	if wave_number >= 12 and randf() < 0.4:  # 40% chance from wave 12
+	# Add support carriers with scaling probability
+	if wave_number >= 12 and randf() < min(0.2 + (wave_number - 12) * 0.02, 0.6):  # Scale from 20% to 60%
 		spawn_enemy(0, "support_carrier")
 
 func show_wave_announcement():
@@ -243,7 +260,7 @@ func _on_cleanup_timer_timeout():
 func perform_enemy_cleanup_sweep():
 	"""Periodic sweep to clean up orphaned enemies"""
 	var enemies = get_tree().get_nodes_in_group("enemies")
-	var viewport_size = get_viewport().get_rect().size
+	var viewport_size = get_viewport().get_visible_rect().size
 	var cleaned_count = 0
 	var active_count = 0
 

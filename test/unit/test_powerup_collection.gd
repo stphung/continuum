@@ -61,14 +61,14 @@ func test_weapon_upgrade_collection():
 
 func test_weapon_upgrade_max_level():
 	player.weapon_type = "vulcan"
-	player.weapon_level = 20
+	player.weapon_level = 10
 	var powerup = auto_free(PowerUp.instantiate())
 	powerup.powerup_type = "vulcan_powerup"
 
 	player.collect_powerup(powerup)
 
-	# Should not exceed max level of 20
-	assert_that(player.weapon_level).is_equal(20)
+	# Should not exceed max level of 10
+	assert_that(player.weapon_level).is_equal(10)
 	assert_that(player.weapon_type).is_equal("vulcan")
 
 func test_weapon_switch_collection():

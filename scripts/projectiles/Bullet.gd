@@ -9,17 +9,15 @@ var weapon_level = 1
 func _ready():
 	add_to_group("player_bullets")
 
-	# Scale damage based on weapon level (every 5 levels)
-	if weapon_level >= 20:
-		damage = 5  # Level 20: 5x damage
-	elif weapon_level >= 15:
-		damage = 4  # Level 15-19: 4x damage
-	elif weapon_level >= 10:
-		damage = 3  # Level 10-14: 3x damage
-	elif weapon_level >= 5:
-		damage = 2  # Level 5-9: 2x damage
+	# Scale damage based on weapon level (compressed for 1-10 range)
+	if weapon_level >= 10:
+		damage = 4  # Level 10: 4x damage
+	elif weapon_level >= 7:
+		damage = 3  # Level 7-9: 3x damage
+	elif weapon_level >= 4:
+		damage = 2  # Level 4-6: 2x damage
 	else:
-		damage = 1  # Level 1-4: 1x damage
+		damage = 1  # Level 1-3: 1x damage
 
 	# Update bullet color based on damage level
 	update_bullet_color()

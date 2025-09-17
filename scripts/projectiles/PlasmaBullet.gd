@@ -34,13 +34,13 @@ func _initialize_bullet():
 
 	# Set homing parameters based on weapon level
 	# Level 1: Very subtle homing
-	# Level 20: Aggressive homing that rarely misses
-	homing_strength = weapon_level * 1.0  # 1 to 20 radians/sec
-	homing_range = 150.0 + (weapon_level * 20.0)  # 170 to 550 pixels
+	# Level 10: Aggressive homing that rarely misses
+	homing_strength = weapon_level * 1.0  # 1 to 10 radians/sec
+	homing_range = 150.0 + (weapon_level * 20.0)  # 170 to 350 pixels
 
 	# Scale bullet visuals based on level (thicker and longer)
-	var scale_factor = 1.0 + (weapon_level - 1) * 0.05  # 1.0x to 1.95x at level 20
-	var length_factor = 1.0 + (weapon_level - 1) * 0.1  # 1.0x to 2.9x length at level 20
+	var scale_factor = 1.0 + (weapon_level - 1) * 0.05  # 1.0x to 1.45x at level 10
+	var length_factor = 1.0 + (weapon_level - 1) * 0.1  # 1.0x to 1.9x length at level 10
 
 	# Store base scales for animation
 	core_base_scale = Vector2(scale_factor * 0.8, length_factor * 0.9)
@@ -235,7 +235,7 @@ func chain_lightning(from_position: Vector2, chains_remaining: int):
 		return
 
 	# Find nearest enemy within chain range
-	var chain_range = 200.0 + (weapon_level * 50.0)  # Longer range at higher levels
+	var chain_range = 200.0 + (weapon_level * 50.0)  # 250-700 pixels (level 1-10)
 	var nearest_enemy = find_nearest_enemy(from_position, chain_range)
 
 	if nearest_enemy:

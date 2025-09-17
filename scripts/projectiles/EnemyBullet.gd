@@ -4,6 +4,8 @@ extends Area2D
 var direction = Vector2.DOWN
 var is_aimed = false
 var is_tracking = false
+var is_spread = false
+var is_sniper = false
 var tracking_time = 0.0
 var max_tracking_time = 1.5  # Track for 1.5 seconds
 var target = null
@@ -21,14 +23,18 @@ func _ready():
 		])
 		add_child(sprite)
 
-	# Color based on bullet type
+	# Enhanced color system based on bullet type and behavior
 	if has_node("Sprite"):
 		if is_tracking:
-			$Sprite.color = Color(0.8, 0, 0.8, 1)  # Purple for tracking
+			$Sprite.color = Color(0.9, 0.1, 0.9, 1)  # Bright purple for tracking
+		elif is_sniper:
+			$Sprite.color = Color(0.3, 0.7, 1.0, 1)  # Bright blue for sniper/fast
+		elif is_spread:
+			$Sprite.color = Color(1.0, 0.5, 0.2, 1)  # Orange for spread pattern
 		elif is_aimed:
-			$Sprite.color = Color(1, 0, 0, 1)  # Red for aimed
+			$Sprite.color = Color(1.0, 0.2, 0.2, 1)  # Bright red for aimed
 		else:
-			$Sprite.color = Color(1, 1, 0, 1)  # Yellow for normal
+			$Sprite.color = Color(1.0, 1.0, 0.3, 1)  # Bright yellow for normal
 
 func _process(delta):
 	# Handle tracking bullets
@@ -59,3 +65,12 @@ func set_tracking(player_node):
 	if target:
 		direction = (target.position - position).normalized()
 		rotation = direction.angle() + PI/2
+
+func set_spread():
+	# Mark as spread pattern bullet
+	is_spread = true
+
+func set_sniper():
+	# Mark as high-speed sniper bullet
+	is_sniper = true
+	speed = 600  # Faster than normal bullets

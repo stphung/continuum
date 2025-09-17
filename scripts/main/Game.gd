@@ -86,6 +86,11 @@ func _on_wave_timer_timeout():
 	EnemyManager.advance_wave()
 
 func _on_wave_announcement(wave_num: int):
+	# Check for wave 100 victory condition
+	if wave_num >= 100:
+		victory_sequence()
+		return
+
 	var label = Label.new()
 	label.text = "WAVE " + str(wave_num)
 	label.add_theme_font_size_override("font_size", 48)
@@ -110,7 +115,7 @@ func _on_enemy_destroyed(points, pos):
 	update_ui()
 	EffectManager.create_explosion("enemy_destroy", pos, $Effects)
 
-	if randf() < 0.2:
+	if randf() < 0.1:
 		spawn_powerup(pos)
 
 func spawn_powerup(pos):
@@ -226,13 +231,89 @@ func add_life():
 	lives += 1
 	update_ui()
 
+func victory_sequence():
+	"""Handle wave 100 victory condition"""
+	game_over = true
+	EnemyManager.set_game_over(true)
+
+	# Calculate final score with wave 100 bonus
+	var wave_100_bonus = score * 2  # Double score bonus for completing the game
+	score += wave_100_bonus
+
+	# Show victory screen
+	var victory_panel = Control.new()
+	victory_panel.name = "VictoryPanel"
+	victory_panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	victory_panel.color = Color(0, 0, 0, 0.8)  # Semi-transparent background
+
+	# Victory title
+	var victory_label = Label.new()
+	victory_label.text = "VICTORY!"
+	victory_label.add_theme_font_size_override("font_size", 72)
+	victory_label.modulate = Color(1, 1, 0, 1)  # Gold color
+	victory_label.position = Vector2(250, 200)
+	victory_label.size = Vector2(300, 100)
+	victory_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	# Wave completion message
+	var completion_label = Label.new()
+	completion_label.text = "Wave 100 Complete!"
+	completion_label.add_theme_font_size_override("font_size", 36)
+	completion_label.modulate = Color(1, 0.8, 0, 1)
+	completion_label.position = Vector2(200, 300)
+	completion_label.size = Vector2(400, 50)
+	completion_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	# Final score with bonus
+	var score_label = Label.new()
+	score_label.text = "Final Score: " + str(score)
+	score_label.add_theme_font_size_override("font_size", 32)
+	score_label.modulate = Color(1, 1, 1, 1)
+	score_label.position = Vector2(200, 380)
+	score_label.size = Vector2(400, 50)
+	score_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	# Bonus score info
+	var bonus_label = Label.new()
+	bonus_label.text = "Victory Bonus: +" + str(wave_100_bonus)
+	bonus_label.add_theme_font_size_override("font_size", 24)
+	bonus_label.modulate = Color(0, 1, 0, 1)  # Green for bonus
+	bonus_label.position = Vector2(200, 430)
+	bonus_label.size = Vector2(400, 40)
+	bonus_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	# Restart button
+	var restart_button = Button.new()
+	restart_button.text = "Play Again"
+	restart_button.position = Vector2(320, 500)
+	restart_button.size = Vector2(120, 40)
+	restart_button.pressed.connect(_on_restart_button_pressed)
+
+	# Add all elements to victory panel
+	victory_panel.add_child(victory_label)
+	victory_panel.add_child(completion_label)
+	victory_panel.add_child(score_label)
+	victory_panel.add_child(bonus_label)
+	victory_panel.add_child(restart_button)
+
+	$UI.add_child(victory_panel)
+
+	# Play victory sound
+	if has_node("/root/SoundManager"):
+		SoundManager.play_sound("wave_start", 0.0)  # Use wave start sound for victory
+
+	# Clean up player
+	if current_player and is_instance_valid(current_player):
+		current_player.call_deferred("queue_free")
+		current_player = null
+
 func update_ui():
 	$UI/HUD/ScoreLabel.text = "Score: " + str(score)
 	$UI/HUD/LivesLabel.text = "Lives: " + str(lives)
 	$UI/HUD/BombsLabel.text = "Bombs: " + str(bombs)
 	
 	# Show weapon level if player exists
-	if current_player and is_instance_valid(current_player):
+	if current_player and is_instance_valid(current_player) and current_player.has_method("get") and "weapon_type" in current_player:
 		if not $UI/HUD.has_node("WeaponLabel"):
 			var weapon_label = Label.new()
 			weapon_label.name = "WeaponLabel"

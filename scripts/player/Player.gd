@@ -12,9 +12,6 @@ var invulnerable = false
 var weapon_level = 1
 var weapon_type = "vulcan"
 
-# Weapon pattern system
-var vulcan_patterns: Dictionary = {}  # Cache for weapon patterns
-
 # Movement animation variables
 var current_velocity = Vector2.ZERO
 var banking_angle = 0.0
@@ -45,9 +42,6 @@ func _ready():
 
 	# Start with invulnerability when spawned/respawned
 	start_invulnerability()
-
-	# Initialize weapon pattern system
-	initialize_weapon_patterns()
 
 func _process(delta):
 	handle_movement(delta)
@@ -113,16 +107,40 @@ func fire_weapon():
 			"vulcan":
 				SoundManager.play_random_pitch("shoot", -12.0, 0.15)  # Higher pitch for vulcan
 
-## Initialize weapon pattern system for vulcan weapons
-func initialize_weapon_patterns():
-	# Pre-populate patterns for all weapon levels to avoid runtime allocation
-	for level in range(1, 21):  # Levels 1-20
-		vulcan_patterns[level] = VulcanPatterns.create_pattern_for_level(level)
-
-## New streamlined fire_vulcan method using pattern system
+## Fire vulcan bullets with weapon level progression
 func fire_vulcan():
-	var pattern = vulcan_patterns.get(weapon_level, vulcan_patterns[20])
-	pattern.fire(self)
+	# Progressive weapon levels with increasing bullet count and spread
+	match weapon_level:
+		1:
+			# Single bullet
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
+		2:
+			# Dual bullets (left/right muzzles)
+			shoot.emit($LeftMuzzle.global_position, Vector2.UP, "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2.UP, "vulcan")
+		3:
+			# Three bullets with slight spread
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.1, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.1, -1).normalized(), "vulcan")
+		4:
+			# Five bullets with wider spread
+			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.2, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.2, -1).normalized(), "vulcan")
+			shoot.emit($LeftMuzzle.global_position, Vector2(-0.1, -1).normalized(), "vulcan")
+			shoot.emit($RightMuzzle.global_position, Vector2(0.1, -1).normalized(), "vulcan")
+		_:
+			# Higher levels: Arc pattern based on weapon level
+			var bullet_count = min(weapon_level, 10)
+			var arc_width = 0.8
+			for i in range(bullet_count):
+				var angle = -arc_width/2 + (i * arc_width / (bullet_count - 1))
+				var direction = Vector2(angle, -1).normalized()
+				var muzzle_pos = $MuzzlePosition.global_position
+				if abs(angle) > 0.15:
+					muzzle_pos = $LeftMuzzle.global_position if angle < 0 else $RightMuzzle.global_position
+				shoot.emit(muzzle_pos, direction, "vulcan")
 
 
 func fire_chain():
@@ -213,7 +231,7 @@ func collect_powerup(powerup):
 	match powerup.powerup_type:
 		"vulcan_powerup":
 			# Always increase level when picking up any weapon
-			weapon_level = min(weapon_level + 1, 20)
+			weapon_level = min(weapon_level + 1, 10)
 			if weapon_type != "vulcan":
 				# Switch to vulcan if different type
 				weapon_type = "vulcan"
@@ -221,7 +239,7 @@ func collect_powerup(powerup):
 			adjust_fire_rate()
 		"chain_powerup":
 			# Always increase level when picking up any weapon
-			weapon_level = min(weapon_level + 1, 20)
+			weapon_level = min(weapon_level + 1, 10)
 			if weapon_type != "chain":
 				# Switch to chain if different type
 				weapon_type = "chain"
@@ -257,12 +275,12 @@ func adjust_fire_rate():
 
 	match weapon_type:
 		"vulcan":
-			# Scale fire rate from 0.25s at level 1 to 0.05s at level 20
-			$ShootTimer.wait_time = max(0.05, 0.25 - (weapon_level - 1) * 0.01)
+			# Scale fire rate from 0.25s at level 1 to 0.10s at level 10
+			$ShootTimer.wait_time = max(0.10, 0.25 - (weapon_level - 1) * 0.017)
 		"chain":
-			# ULTRA aggressive fire rate scaling for chain lightning
-			# Level 1: 0.2s, Level 10: 0.03s, Level 20: 0.01s (insane speed!)
-			$ShootTimer.wait_time = max(0.01, 0.2 - (weapon_level - 1) * 0.01)
+			# Balanced fire rate scaling for chain lightning
+			# Level 1: 0.20s, Level 10: 0.05s (reasonable progression)
+			$ShootTimer.wait_time = max(0.05, 0.20 - (weapon_level - 1) * 0.017)
 
 	if was_running:
 		$ShootTimer.start()

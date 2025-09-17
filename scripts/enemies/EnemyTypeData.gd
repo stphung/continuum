@@ -31,18 +31,29 @@ class_name EnemyTypeData
 @export var attack_sound: String = ""
 
 func get_scaled_health(wave_number: int) -> int:
-	# Aggressive health scaling: 15% increase per wave
-	var wave_multiplier = 1.0 + (wave_number * 0.15)
-	return int(base_health * wave_multiplier)
+	# Logarithmic health scaling with hard cap at 3x base health
+	# This ensures enemies remain killable even at wave 100
+	var log_multiplier = 1.0 + log(wave_number + 1) * 0.3
+	var capped_multiplier = min(log_multiplier, 3.0)  # Hard cap at 3x
+
+	# Apply different scaling rates for different enemy tiers
+	if enemy_name.begins_with("Elite"):
+		capped_multiplier = min(log_multiplier * 1.2, 4.0)  # Elites cap at 4x
+	elif base_health >= 10:  # Boss-tier enemies (Fortress, Carrier)
+		capped_multiplier = min(log_multiplier * 1.1, 3.5)  # Bosses cap at 3.5x
+
+	return int(base_health * capped_multiplier)
 
 func get_scaled_speed(wave_number: int) -> float:
-	# Scale speed more aggressively: +5 per wave, capped at +150
-	var wave_bonus = min(wave_number * 5, 150)  # Max +150 speed
-	return base_speed + wave_bonus
+	# Logarithmic speed scaling, capped at +100 speed
+	# Speed increases more gradually for better playability
+	var speed_bonus = min(log(wave_number + 1) * 20, 100)  # Max +100 speed
+	return base_speed + speed_bonus
 
 func get_scaled_points(wave_number: int) -> int:
-	# Better point rewards for tougher enemies
-	var wave_multiplier = 1.0 + (wave_number / 2.0)
+	# Exponential point rewards for risk/reward balance
+	# Higher waves give much better scores
+	var wave_multiplier = 1.0 + pow(wave_number / 10.0, 1.5)
 	return int(base_points * wave_multiplier)
 
 func can_spawn_on_wave(wave_number: int) -> bool:
