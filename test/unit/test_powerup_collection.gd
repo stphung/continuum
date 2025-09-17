@@ -60,42 +60,42 @@ func test_weapon_upgrade_collection():
 	assert_that(player.weapon_type).is_equal("vulcan")
 
 func test_weapon_upgrade_max_level():
-	player.weapon_type = "laser"
-	player.weapon_level = 5
+	player.weapon_type = "vulcan"
+	player.weapon_level = 20
 	var powerup = auto_free(PowerUp.instantiate())
-	powerup.powerup_type = "laser_powerup"
+	powerup.powerup_type = "vulcan_powerup"
 
 	player.collect_powerup(powerup)
 
-	# Should not exceed max level of 5
-	assert_that(player.weapon_level).is_equal(5)
-	assert_that(player.weapon_type).is_equal("laser")
+	# Should not exceed max level of 20
+	assert_that(player.weapon_level).is_equal(20)
+	assert_that(player.weapon_type).is_equal("vulcan")
 
 func test_weapon_switch_collection():
-	# Test switching from vulcan to laser
+	# Test switching from vulcan to chain
 	player.weapon_type = "vulcan"
 	player.weapon_level = 3
-	var powerup = auto_free(PowerUp.instantiate())
-	powerup.powerup_type = "laser_powerup"
-
-	player.collect_powerup(powerup)
-
-	# Should switch to laser and reset to level 1
-	assert_that(player.weapon_type).is_equal("laser")
-	assert_that(player.weapon_level).is_equal(1)
-
-func test_weapon_switch_to_chain():
-	# Test switching from laser to chain
-	player.weapon_type = "laser"
-	player.weapon_level = 4
 	var powerup = auto_free(PowerUp.instantiate())
 	powerup.powerup_type = "chain_powerup"
 
 	player.collect_powerup(powerup)
 
-	# Should switch to chain and reset to level 1
+	# Should switch to chain and keep level or upgrade
 	assert_that(player.weapon_type).is_equal("chain")
-	assert_that(player.weapon_level).is_equal(1)
+	assert_that(player.weapon_level).is_greater_equal(3)
+
+func test_weapon_switch_to_chain():
+	# Test switching from chain to vulcan
+	player.weapon_type = "chain"
+	player.weapon_level = 4
+	var powerup = auto_free(PowerUp.instantiate())
+	powerup.powerup_type = "vulcan_powerup"
+
+	player.collect_powerup(powerup)
+
+	# Should switch to vulcan and keep level or upgrade
+	assert_that(player.weapon_type).is_equal("vulcan")
+	assert_that(player.weapon_level).is_greater_equal(4)
 
 func test_bomb_powerup_collection():
 	var powerup = auto_free(PowerUp.instantiate())

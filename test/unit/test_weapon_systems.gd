@@ -98,6 +98,9 @@ func test_chain_bullet_hit_tracking():
 	# First hit should destroy chain bullet (no piercing in chain lightning)
 	chain_bullet._on_area_entered(enemy1)
 	assert_that(chain_bullet.hit_enemies.size()).is_equal(1)
+
+	# Wait for deferred queue_free to take effect
+	await get_tree().process_frame
 	assert_that(chain_bullet.is_queued_for_deletion()).is_true()
 
 func test_weapon_fire_rate_adjustment():

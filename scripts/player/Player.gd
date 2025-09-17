@@ -1,5 +1,111 @@
 extends Area2D
 
+## Weapon Pattern System Classes (embedded to avoid import issues)
+
+## Base class for weapon firing patterns
+class WeaponPattern extends RefCounted:
+	class BulletConfig:
+		var position_offset: Vector2 = Vector2.ZERO
+		var direction: Vector2 = Vector2.UP
+		var muzzle_type: String = "center"  # "center", "left", "right"
+
+		func _init(pos_offset: Vector2 = Vector2.ZERO, dir: Vector2 = Vector2.UP, muzzle: String = "center"):
+			position_offset = pos_offset
+			direction = dir
+			muzzle_type = muzzle
+
+	func get_bullet_configs() -> Array:
+		assert(false, "WeaponPattern.get_bullet_configs() must be implemented by subclass")
+		return []
+
+	func fire(player: Node2D) -> void:
+		var configs = get_bullet_configs()
+		for config in configs:
+			var muzzle_position = get_muzzle_position(player, config.muzzle_type)
+			player.shoot.emit(muzzle_position, config.direction, "vulcan")
+
+	func get_muzzle_position(player: Node2D, muzzle_type: String) -> Vector2:
+		match muzzle_type:
+			"left":
+				return player.get_node("LeftMuzzle").global_position
+			"right":
+				return player.get_node("RightMuzzle").global_position
+			"center", _:
+				return player.get_node("MuzzlePosition").global_position
+
+## Specific weapon patterns
+class SingleShotPattern extends WeaponPattern:
+	func get_bullet_configs() -> Array:
+		return [BulletConfig.new(Vector2.ZERO, Vector2.UP, "center")]
+
+class DualShotPattern extends WeaponPattern:
+	func get_bullet_configs() -> Array:
+		return [
+			BulletConfig.new(Vector2.ZERO, Vector2.UP, "left"),
+			BulletConfig.new(Vector2.ZERO, Vector2.UP, "right")
+		]
+
+class SpreadShotPattern extends WeaponPattern:
+	func get_bullet_configs() -> Array:
+		return [
+			BulletConfig.new(Vector2.ZERO, Vector2.UP, "center"),
+			BulletConfig.new(Vector2.ZERO, Vector2(-0.1, -1).normalized(), "left"),
+			BulletConfig.new(Vector2.ZERO, Vector2(0.1, -1).normalized(), "right")
+		]
+
+class ArcPattern extends WeaponPattern:
+	var bullet_count: int
+	var arc_width: float
+
+	func _init(bullets: int, width: float):
+		bullet_count = bullets
+		arc_width = width
+
+	func get_bullet_configs() -> Array:
+		var configs: Array = []
+		if bullet_count == 1:
+			configs.append(BulletConfig.new(Vector2.ZERO, Vector2.UP, "center"))
+			return configs
+
+		for i in range(bullet_count):
+			var angle = -arc_width/2 + (i * arc_width / (bullet_count - 1))
+			var direction = Vector2(angle, -1).normalized()
+			var muzzle_type = get_muzzle_for_angle(angle)
+			configs.append(BulletConfig.new(Vector2.ZERO, direction, muzzle_type))
+		return configs
+
+	func get_muzzle_for_angle(angle: float) -> String:
+		if abs(angle) < 0.15:
+			return "center"
+		elif angle < 0:
+			return "left"
+		else:
+			return "right"
+
+## Factory function to create weapon patterns
+static func create_vulcan_pattern_for_level(level: int) -> WeaponPattern:
+	match level:
+		1:
+			return SingleShotPattern.new()
+		2:
+			return DualShotPattern.new()
+		3:
+			return SpreadShotPattern.new()
+		4, 5:
+			return ArcPattern.new(level, 0.6)
+		6, 7:
+			return ArcPattern.new(level, 0.8)
+		8, 9, 10:
+			return ArcPattern.new(level, 1.0)
+		11, 12, 13:
+			return ArcPattern.new(level, 0.7)
+		14, 15, 16:
+			return ArcPattern.new(level, 0.75)
+		17, 18, 19:
+			return ArcPattern.new(level, 0.8)
+		20, _:
+			return ArcPattern.new(20, 0.9)  # Maximum firepower
+
 signal player_hit
 signal shoot(position, direction, weapon_type)
 signal use_bomb
@@ -11,6 +117,9 @@ var screen_size
 var invulnerable = false
 var weapon_level = 1
 var weapon_type = "vulcan"
+
+# Weapon pattern system
+var vulcan_patterns: Dictionary = {}  # Cache for weapon patterns
 
 # Movement animation variables
 var current_velocity = Vector2.ZERO
@@ -42,6 +151,9 @@ func _ready():
 
 	# Start with invulnerability when spawned/respawned
 	start_invulnerability()
+
+	# Initialize weapon pattern system
+	initialize_weapon_patterns()
 
 func _process(delta):
 	handle_movement(delta)
@@ -107,107 +219,16 @@ func fire_weapon():
 			"vulcan":
 				SoundManager.play_random_pitch("shoot", -12.0, 0.15)  # Higher pitch for vulcan
 
+## Initialize weapon pattern system for vulcan weapons
+func initialize_weapon_patterns():
+	# Pre-populate patterns for all weapon levels to avoid runtime allocation
+	for level in range(1, 21):  # Levels 1-20
+		vulcan_patterns[level] = create_vulcan_pattern_for_level(level)
+
+## New streamlined fire_vulcan method using pattern system
 func fire_vulcan():
-	match weapon_level:
-		1:
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
-		2:
-			shoot.emit($LeftMuzzle.global_position, Vector2.UP, "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2.UP, "vulcan")
-		3:
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.1, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.1, -1).normalized(), "vulcan")
-		4:
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.2, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.2, -1).normalized(), "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.1, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.1, -1).normalized(), "vulcan")
-		5:
-			# 5 bullets with wider spread
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.3, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.3, -1).normalized(), "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.15, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.15, -1).normalized(), "vulcan")
-		6:
-			# 6 bullets
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
-			shoot.emit($MuzzlePosition.global_position, Vector2(-0.05, -1).normalized(), "vulcan")
-			shoot.emit($MuzzlePosition.global_position, Vector2(0.05, -1).normalized(), "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.3, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.3, -1).normalized(), "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.2, -1).normalized(), "vulcan")
-		7:
-			# 7 bullets with even wider spread
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.4, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.4, -1).normalized(), "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.25, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.25, -1).normalized(), "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.1, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.1, -1).normalized(), "vulcan")
-		8:
-			# 8 bullets in a wide fan
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
-			shoot.emit($MuzzlePosition.global_position, Vector2(-0.05, -1).normalized(), "vulcan")
-			shoot.emit($MuzzlePosition.global_position, Vector2(0.05, -1).normalized(), "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.45, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.45, -1).normalized(), "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.3, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.3, -1).normalized(), "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.15, -1).normalized(), "vulcan")
-		9:
-			# 9 bullets in maximum spread
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.5, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.5, -1).normalized(), "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.35, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.35, -1).normalized(), "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.2, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.2, -1).normalized(), "vulcan")
-			shoot.emit($MuzzlePosition.global_position, Vector2(-0.1, -1).normalized(), "vulcan")
-			shoot.emit($MuzzlePosition.global_position, Vector2(0.1, -1).normalized(), "vulcan")
-		10:
-			# 10 bullets in ultimate spread pattern
-			shoot.emit($MuzzlePosition.global_position, Vector2.UP, "vulcan")
-			shoot.emit($MuzzlePosition.global_position, Vector2(-0.05, -1).normalized(), "vulcan")
-			shoot.emit($MuzzlePosition.global_position, Vector2(0.05, -1).normalized(), "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.6, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.6, -1).normalized(), "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.4, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.4, -1).normalized(), "vulcan")
-			shoot.emit($LeftMuzzle.global_position, Vector2(-0.25, -1).normalized(), "vulcan")
-			shoot.emit($RightMuzzle.global_position, Vector2(0.25, -1).normalized(), "vulcan")
-			shoot.emit($MuzzlePosition.global_position, Vector2(-0.12, -1).normalized(), "vulcan")
-		11, 12, 13:
-			# 11-13 bullets within 70-degree arc
-			for i in range(11 + (weapon_level - 11)):
-				var bullet_count = 10 + (weapon_level - 10)
-				var angle = -0.35 + (i * 0.7 / (bullet_count - 1))
-				var pos = $MuzzlePosition.global_position if abs(angle) < 0.15 else ($LeftMuzzle.global_position if angle < 0 else $RightMuzzle.global_position)
-				shoot.emit(pos, Vector2(angle, -1).normalized(), "vulcan")
-		14, 15, 16:
-			# 14-16 bullets within 75-degree arc
-			for i in range(14 + (weapon_level - 14)):
-				var bullet_count = 13 + (weapon_level - 13)
-				var angle = -0.375 + (i * 0.75 / (bullet_count - 1))
-				var pos = $MuzzlePosition.global_position if abs(angle) < 0.1 else ($LeftMuzzle.global_position if angle < 0 else $RightMuzzle.global_position)
-				shoot.emit(pos, Vector2(angle, -1).normalized(), "vulcan")
-		17, 18, 19:
-			# 17-19 bullets within 80-degree arc
-			for i in range(17 + (weapon_level - 17)):
-				var bullet_count = 16 + (weapon_level - 16)
-				var angle = -0.4 + (i * 0.8 / (bullet_count - 1))
-				var pos = $MuzzlePosition.global_position if abs(angle) < 0.1 else ($LeftMuzzle.global_position if angle < 0 else $RightMuzzle.global_position)
-				shoot.emit(pos, Vector2(angle, -1).normalized(), "vulcan")
-		_: # Level 20 - Maximum firepower
-			# 20 bullets within 90-degree arc - dense forward coverage
-			for i in range(20):
-				var angle = -0.45 + (i * 0.9 / 19)
-				var pos = $MuzzlePosition.global_position if abs(angle) < 0.1 else ($LeftMuzzle.global_position if angle < 0 else $RightMuzzle.global_position)
-				shoot.emit(pos, Vector2(angle, -1).normalized(), "vulcan")
+	var pattern = vulcan_patterns.get(weapon_level, vulcan_patterns[20])
+	pattern.fire(self)
 
 
 func fire_chain():

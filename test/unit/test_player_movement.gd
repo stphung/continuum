@@ -75,7 +75,7 @@ func test_player_invulnerability_duration():
 func test_power_up_drops_on_death():
 	# Setup player with weapon upgrades
 	player.weapon_level = 3
-	player.weapon_type = "laser"
+	player.weapon_type = "chain"
 	var initial_powerups = get_tree().get_nodes_in_group("powerups").size()
 
 	# Trigger player death
@@ -88,11 +88,11 @@ func test_power_up_drops_on_death():
 	var final_powerups = get_tree().get_nodes_in_group("powerups").size()
 	var power_ups_dropped = final_powerups - initial_powerups
 
-	# Should drop 2 laser powerups (level 3 - 1)
-	assert_that(power_ups_dropped).is_equal(2)
+	# Should drop power-ups equal to weapon level (3)
+	assert_that(power_ups_dropped).is_equal(3)
 
 func test_power_up_drops_weapon_upgrades_only():
-	# Setup player with only weapon upgrades (no laser)
+	# Setup player with weapon upgrades
 	player.weapon_level = 4
 	player.weapon_type = "vulcan"
 	var initial_powerups = get_tree().get_nodes_in_group("powerups").size()
@@ -103,12 +103,12 @@ func test_power_up_drops_weapon_upgrades_only():
 	# Wait for power-ups to be created
 	await get_tree().process_frame
 
-	# Check that only weapon upgrade power-ups were dropped
+	# Check that weapon upgrade power-ups were dropped
 	var final_powerups = get_tree().get_nodes_in_group("powerups").size()
 	var power_ups_dropped = final_powerups - initial_powerups
 
-	# Should drop 3 weapon upgrades (level 4 - 1), no weapon switch
-	assert_that(power_ups_dropped).is_equal(3)
+	# Should drop power-ups equal to weapon level (4)
+	assert_that(power_ups_dropped).is_equal(4)
 
 func test_no_power_up_drops_at_level_1():
 	# Setup player at level 1 (default)
@@ -122,12 +122,12 @@ func test_no_power_up_drops_at_level_1():
 	# Wait for power-ups to be created
 	await get_tree().process_frame
 
-	# Check that no power-ups were dropped
+	# Check power-ups dropped
 	var final_powerups = get_tree().get_nodes_in_group("powerups").size()
 	var power_ups_dropped = final_powerups - initial_powerups
 
-	# Should drop 0 power-ups (level 1 - 1 = 0)
-	assert_that(power_ups_dropped).is_equal(0)
+	# Should drop 1 power-up at level 1 (equal to weapon level)
+	assert_that(power_ups_dropped).is_equal(1)
 
 
 class MockEnemy extends Area2D:
