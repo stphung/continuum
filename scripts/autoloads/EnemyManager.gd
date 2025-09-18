@@ -1,6 +1,6 @@
 extends Node
 
-signal enemy_destroyed(points, pos)
+signal enemy_destroyed(pos)
 signal wave_announcement(wave_num)
 
 var enemy_scene: PackedScene
@@ -106,7 +106,6 @@ func spawn_enemy(x_offset = 0, enemy_type_name: String = ""):
 		# Fallback: set basic properties directly for compatibility
 		enemy.health = 1 + (wave_number / 5)
 		enemy.speed = 150 + (wave_number * 5)
-		enemy.points = 100 + (wave_number * 10)
 		enemy.movement_pattern = "straight"
 		print("Spawned basic enemy (no type data available)")
 
@@ -232,8 +231,8 @@ func show_wave_announcement():
 
 	emit_signal("wave_announcement", wave_number)
 
-func _on_enemy_destroyed(points, pos):
-	emit_signal("enemy_destroyed", points, pos)
+func _on_enemy_destroyed(pos):
+	emit_signal("enemy_destroyed", pos)
 	total_enemies_destroyed += 1
 	print("[EnemyManager] Enemy destroyed #", total_enemies_destroyed, " - Remaining: ", get_tree().get_nodes_in_group("enemies").size() - 1)
 

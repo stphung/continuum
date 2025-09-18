@@ -4,7 +4,6 @@ extends Node2D
 @export var chain_bullet_scene: PackedScene = preload("res://scenes/projectiles/PlasmaBullet.tscn") if ResourceLoader.exists("res://scenes/projectiles/PlasmaBullet.tscn") else null
 @export var powerup_scene: PackedScene = preload("res://scenes/pickups/PowerUp.tscn") if ResourceLoader.exists("res://scenes/pickups/PowerUp.tscn") else null
 
-var score = 0
 var lives = 3
 var bombs = 3
 var game_over = false
@@ -110,8 +109,7 @@ func _on_wave_announcement(wave_num: int):
 			var speed_multiplier = 1.0 + (wave_num - 1) * 0.15
 			starfield_background.set_star_speed(100 * speed_multiplier)
 
-func _on_enemy_destroyed(points, pos):
-	score += points
+func _on_enemy_destroyed(pos):
 	update_ui()
 	EffectManager.create_explosion("enemy_destroy", pos, $Effects)
 
@@ -196,7 +194,7 @@ func game_over_sequence():
 	game_over = true
 	EnemyManager.set_game_over(true)
 	$UI/GameOverPanel.visible = true
-	$UI/GameOverPanel/FinalScoreLabel.text = "Final Score: " + str(score)
+	$UI/GameOverPanel/FinalWaveLabel.text = "Waves Completed: " + str(EnemyManager.get_current_wave() - 1)
 
 
 	if current_player and is_instance_valid(current_player):
@@ -236,9 +234,7 @@ func victory_sequence():
 	game_over = true
 	EnemyManager.set_game_over(true)
 
-	# Calculate final score with wave 100 bonus
-	var wave_100_bonus = score * 2  # Double score bonus for completing the game
-	score += wave_100_bonus
+	# Victory achieved at wave 100
 
 	# Show victory screen
 	var victory_panel = Control.new()
@@ -264,23 +260,14 @@ func victory_sequence():
 	completion_label.size = Vector2(400, 50)
 	completion_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
-	# Final score with bonus
-	var score_label = Label.new()
-	score_label.text = "Final Score: " + str(score)
-	score_label.add_theme_font_size_override("font_size", 32)
-	score_label.modulate = Color(1, 1, 1, 1)
-	score_label.position = Vector2(200, 380)
-	score_label.size = Vector2(400, 50)
-	score_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-
-	# Bonus score info
-	var bonus_label = Label.new()
-	bonus_label.text = "Victory Bonus: +" + str(wave_100_bonus)
-	bonus_label.add_theme_font_size_override("font_size", 24)
-	bonus_label.modulate = Color(0, 1, 0, 1)  # Green for bonus
-	bonus_label.position = Vector2(200, 430)
-	bonus_label.size = Vector2(400, 40)
-	bonus_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# Waves completed info
+	var waves_label = Label.new()
+	waves_label.text = "100 Waves Completed!"
+	waves_label.add_theme_font_size_override("font_size", 32)
+	waves_label.modulate = Color(1, 1, 1, 1)
+	waves_label.position = Vector2(200, 380)
+	waves_label.size = Vector2(400, 50)
+	waves_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 	# Restart button
 	var restart_button = Button.new()
@@ -292,8 +279,7 @@ func victory_sequence():
 	# Add all elements to victory panel
 	victory_panel.add_child(victory_label)
 	victory_panel.add_child(completion_label)
-	victory_panel.add_child(score_label)
-	victory_panel.add_child(bonus_label)
+	victory_panel.add_child(waves_label)
 	victory_panel.add_child(restart_button)
 
 	$UI.add_child(victory_panel)
@@ -308,7 +294,7 @@ func victory_sequence():
 		current_player = null
 
 func update_ui():
-	$UI/HUD/ScoreLabel.text = "Score: " + str(score)
+	$UI/HUD/WaveLabel.text = "Wave: " + str(EnemyManager.get_current_wave())
 	$UI/HUD/LivesLabel.text = "Lives: " + str(lives)
 	$UI/HUD/BombsLabel.text = "Bombs: " + str(bombs)
 	

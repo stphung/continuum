@@ -171,7 +171,6 @@ func test_powerup_rotation_animation():
 class MockGame extends Node2D:
 	var bombs = 0
 	var lives = 3
-	var score = 0
 
 	func add_bomb():
 		bombs += 1

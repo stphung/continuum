@@ -1,11 +1,10 @@
 extends Area2D
 
-signal enemy_destroyed(points, position)
+signal enemy_destroyed(position)
 
 @export var enemy_type_data: Resource
 @export var health = 3
 @export var speed = 150
-@export var points = 100
 @export var movement_pattern = "straight"
 
 var direction = Vector2.DOWN
@@ -69,7 +68,6 @@ func setup_from_type_data():
 	health = enemy_type_data.get_scaled_health(current_wave)
 	max_health = health
 	speed = enemy_type_data.get_scaled_speed(current_wave)
-	points = enemy_type_data.get_scaled_points(current_wave)
 	movement_pattern = enemy_type_data.movement_pattern
 	weapon_type = enemy_type_data.weapon_type
 	damage_reduction = enemy_type_data.damage_reduction
@@ -207,7 +205,7 @@ func destroy():
 	if has_node("/root/SoundManager"):
 		SoundManager.play_random_pitch("enemy_destroy", -8.0, 0.15)
 
-	enemy_destroyed.emit(points, position)
+	enemy_destroyed.emit(position)
 
 	# Debug tracking
 	print("[Enemy] Destroyed - Remaining enemies: ", get_tree().get_nodes_in_group("enemies").size() - 1)

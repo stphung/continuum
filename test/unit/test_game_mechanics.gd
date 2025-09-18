@@ -14,24 +14,11 @@ func before_test():
 	add_child(mock_enemy_manager)
 
 func test_initial_game_state():
-	assert_that(game.score).is_equal(0)
 	assert_that(game.lives).is_equal(3)
 	assert_that(game.bombs).is_equal(3)
 	assert_that(game.game_over).is_false()
 
-func test_score_calculation():
-	var initial_score = game.score
 
-	game._on_enemy_destroyed(100, Vector2(400, 300))
-
-	assert_that(game.score).is_equal(initial_score + 100)
-
-func test_multiple_score_additions():
-	game._on_enemy_destroyed(50, Vector2(200, 200))
-	game._on_enemy_destroyed(75, Vector2(300, 300))
-	game._on_enemy_destroyed(100, Vector2(400, 400))
-
-	assert_that(game.score).is_equal(225)
 
 func test_bomb_usage():
 	var initial_bombs = game.bombs
@@ -236,7 +223,7 @@ func test_powerup_spawning():
 		pass
 
 class MockEnemyManager extends Node:
-	signal enemy_destroyed(points, position)
+	signal enemy_destroyed(position)
 	signal wave_announcement(wave_num)
 
 	func setup_for_game(_enemies_node):

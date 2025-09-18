@@ -54,22 +54,19 @@ func test_enemy_destruction_on_zero_health():
 	assert_that(is_instance_valid(enemy)).is_false()
 
 func test_enemy_destruction_emits_signal():
-	var signal_data = [false, 0, Vector2.ZERO]  # [emitted, points, position]
+	var signal_data = [false, Vector2.ZERO]  # [emitted, position]
 
-	enemy.connect("enemy_destroyed", func(points, pos):
+	enemy.connect("enemy_destroyed", func(pos):
 		signal_data[0] = true
-		signal_data[1] = points
-		signal_data[2] = pos
+		signal_data[1] = pos
 	)
 
-	var expected_points = enemy.points
 	var expected_position = enemy.position
 
 	enemy.destroy()
 
 	assert_that(signal_data[0]).is_true()
-	assert_that(signal_data[1]).is_equal(expected_points)
-	assert_that(signal_data[2]).is_equal(expected_position)
+	assert_that(signal_data[1]).is_equal(expected_position)
 
 func test_straight_movement_pattern():
 	enemy.movement_pattern = "straight"

@@ -1,10 +1,8 @@
 extends Node
 ## Mock Game Scene for testing Kiosk Mode integration
 
-signal score_changed(new_score: int)
 
 var is_paused: bool = false
-var current_score: int = 0
 var player_spawned: bool = false
 
 func pause_game():
@@ -28,18 +26,10 @@ func spawn_player():
 		player_spawned = true
 		print("MockGameScene: Player spawned")
 
-func add_score(points: int):
-	"""Mock score addition"""
-	current_score += points
-	score_changed.emit(current_score)
 
-func get_score() -> int:
-	"""Get current score"""
-	return current_score
 
 func reset_game():
 	"""Reset game state for new demo"""
-	current_score = 0
 	is_paused = false
 	if has_node("Player"):
 		get_node("Player").queue_free()

@@ -5,7 +5,6 @@ class_name EnemyTypeData
 @export var enemy_name: String = ""
 @export var base_health: int = 1
 @export var base_speed: float = 150.0
-@export var base_points: int = 100
 @export var movement_pattern: String = "straight"
 @export var weapon_type: String = "none"
 @export var fire_rate: float = 2.0
@@ -50,11 +49,6 @@ func get_scaled_speed(wave_number: int) -> float:
 	var speed_bonus = min(log(wave_number + 1) * 20, 100)  # Max +100 speed
 	return base_speed + speed_bonus
 
-func get_scaled_points(wave_number: int) -> int:
-	# Exponential point rewards for risk/reward balance
-	# Higher waves give much better scores
-	var wave_multiplier = 1.0 + pow(wave_number / 10.0, 1.5)
-	return int(base_points * wave_multiplier)
 
 func can_spawn_on_wave(wave_number: int) -> bool:
 	return wave_number >= min_wave
