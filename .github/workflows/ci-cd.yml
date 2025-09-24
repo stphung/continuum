@@ -12,8 +12,9 @@ env:
   EXPORT_NAME: continuum
 
 jobs:
-  test-suite:
-    name: Run Test Suite
+  # Pre-authentication job to ensure Docker Hub access
+  auth-setup:
+    name: Setup Docker Authentication
     runs-on: ubuntu-22.04
     steps:
       - name: Login to Docker Hub
@@ -22,63 +23,52 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-        continue-on-error: true
 
+      - name: Pre-pull Godot CI Image
+        run: |
+          echo "Pre-pulling barichello/godot-ci:4.4.1 with authentication..."
+          docker pull barichello/godot-ci:4.4.1 || docker pull barichello/godot-ci:4.3.2
+
+  test-suite:
+    name: Run Test Suite
+    runs-on: ubuntu-22.04
+    needs: [auth-setup]
+    container:
+      image: barichello/godot-ci:4.4.1
+      credentials:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           lfs: true
 
-      - name: Setup Godot CI Container
+      - name: Setup
         run: |
-          # Try to pull the image with retry logic
-          echo "Attempting to pull barichello/godot-ci:4.4.1 with authentication..."
-
-          # First try with authentication if available, then fallback
-          if ! docker pull barichello/godot-ci:4.4.1; then
-            echo "First pull failed, waiting 10 seconds and retrying..."
-            sleep 10
-            if ! docker pull barichello/godot-ci:4.4.1; then
-              echo "Second pull failed, trying alternative tag..."
-              docker pull barichello/godot-ci:4.3.2 || exit 1
-              # Use the fallback image for subsequent commands
-              echo "GODOT_IMAGE=barichello/godot-ci:4.3.2" >> $GITHUB_ENV
-            else
-              echo "GODOT_IMAGE=barichello/godot-ci:4.4.1" >> $GITHUB_ENV
-            fi
-          else
-            echo "GODOT_IMAGE=barichello/godot-ci:4.4.1" >> $GITHUB_ENV
-          fi
-
-          # Setup export templates directory on host
-          mkdir -p /tmp/godot_templates
+          mkdir -v -p ~/.local/share/godot/export_templates/
+          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
 
       - name: Install Dependencies via gd-plug
         run: |
           echo "Installing project dependencies including gdUnit4..."
-          echo "Using Docker image: $GODOT_IMAGE"
-          docker run --rm -v "$PWD:/workspace" -w /workspace $GODOT_IMAGE \
-            godot --headless -s plug.gd install || true
+          godot --path . --headless -s plug.gd install || true
           echo "Dependencies installed successfully"
           ls -la addons/
 
       - name: Import project assets
         run: |
-          echo "Using Docker image: $GODOT_IMAGE"
-          docker run --rm -v "$PWD:/workspace" -w /workspace $GODOT_IMAGE \
-            godot --headless --import --quit-after 1 || true
+          godot --path . --headless --import --quit-after 1 || true
 
       - name: Run Test Suite
         id: run-tests
         run: |
           echo "=== Running Continuum Test Suite ==="
           echo "Starting test execution with gdUnit4..."
-          echo "Using Docker image: $GODOT_IMAGE"
 
           # Run tests and capture the exit code
           set +e
-          docker run --rm -v "$PWD:/workspace" -w /workspace $GODOT_IMAGE \
-            godot --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add test --continue --ignoreHeadlessMode 2>&1 | tee test_output.log
+          godot --headless --path . -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add test --continue --ignoreHeadlessMode 2>&1 | tee test_output.log
           TEST_EXIT_CODE=$?
           set -e
 
@@ -120,16 +110,13 @@ jobs:
   export-linux:
     name: Linux Export
     runs-on: ubuntu-22.04
-    needs: [test-suite]
+    needs: [test-suite, auth-setup]
     container:
       image: barichello/godot-ci:4.4.1
+      credentials:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-        continue-on-error: true
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -159,16 +146,13 @@ jobs:
   export-windows:
     name: Windows Export
     runs-on: ubuntu-22.04
-    needs: [test-suite]
+    needs: [test-suite, auth-setup]
     container:
       image: barichello/godot-ci:4.4.1
+      credentials:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-        continue-on-error: true
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -198,20 +182,17 @@ jobs:
   export-web:
     name: Web Export
     runs-on: ubuntu-22.04
-    needs: [test-suite]
+    needs: [test-suite, auth-setup]
     container:
       image: barichello/godot-ci:4.4.1
+      credentials:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     permissions:
       contents: read
       pages: write
       id-token: write
     steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-        continue-on-error: true
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -256,19 +237,16 @@ jobs:
   export-android:
     name: Android Export
     runs-on: ubuntu-22.04
-    needs: [test-suite]
+    needs: [test-suite, auth-setup]
     container:
       image: barichello/godot-ci:4.4.1
+      credentials:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     env:
       GODOT_VERSION: 4.4.1
       EXPORT_NAME: continuum
     steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-        continue-on-error: true
 
       - name: Checkout
         uses: actions/checkout@v4
