@@ -32,7 +32,7 @@ jobs:
       - name: Setup Godot CI Container
         run: |
           # Try to pull the image with retry logic
-          echo "Attempting to pull barichello/godot-ci:4.4.1..."
+          echo "Attempting to pull barichello/godot-ci:4.4.1 with authentication..."
 
           # First try with authentication if available, then fallback
           if ! docker pull barichello/godot-ci:4.4.1; then
