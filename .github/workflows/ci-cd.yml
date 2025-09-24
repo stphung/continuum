@@ -15,8 +15,6 @@ jobs:
   test-suite:
     name: Run Test Suite
     runs-on: ubuntu-22.04
-    container:
-      image: barichello/godot-ci:4.4.1
     steps:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -30,21 +28,26 @@ jobs:
         with:
           lfs: true
 
-      - name: Setup
+      - name: Setup Godot CI Container
         run: |
-          mkdir -v -p ~/.local/share/godot/export_templates/
-          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          # Pull the image after authentication
+          docker pull barichello/godot-ci:4.4.1
+
+          # Setup export templates directory on host
+          mkdir -p /tmp/godot_templates
 
       - name: Install Dependencies via gd-plug
         run: |
           echo "Installing project dependencies including gdUnit4..."
-          godot --path . --headless -s plug.gd install || true
+          docker run --rm -v "$PWD:/workspace" -w /workspace barichello/godot-ci:4.4.1 \
+            godot --headless -s plug.gd install || true
           echo "Dependencies installed successfully"
           ls -la addons/
 
       - name: Import project assets
         run: |
-          godot --path . --headless --import --quit-after 1 || true
+          docker run --rm -v "$PWD:/workspace" -w /workspace barichello/godot-ci:4.4.1 \
+            godot --headless --import --quit-after 1 || true
 
       - name: Run Test Suite
         id: run-tests
@@ -54,7 +57,8 @@ jobs:
 
           # Run tests and capture the exit code
           set +e
-          godot --headless --path . -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add test --continue --ignoreHeadlessMode 2>&1 | tee test_output.log
+          docker run --rm -v "$PWD:/workspace" -w /workspace barichello/godot-ci:4.4.1 \
+            godot --headless -s addons/gdUnit4/bin/GdUnitCmdTool.gd --add test --continue --ignoreHeadlessMode 2>&1 | tee test_output.log
           TEST_EXIT_CODE=$?
           set -e
 
