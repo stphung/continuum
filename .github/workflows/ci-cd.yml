@@ -26,7 +26,7 @@ jobs:
 
       - name: Pre-pull Godot CI Image
         run: |
-          echo "Pre-pulling barichello/godot-ci:4.4.1 with authentication..."
+          echo "Pre-pulling barichello/godot-ci:4.4.1 with Docker Hub authentication..."
           docker pull barichello/godot-ci:4.4.1 || docker pull barichello/godot-ci:4.3.2
 
   test-suite:
