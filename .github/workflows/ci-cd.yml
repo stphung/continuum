@@ -27,6 +27,7 @@ jobs:
       - name: Pre-pull Godot CI Image
         run: |
           echo "Pre-pulling barichello/godot-ci:4.4.1 with Docker Hub authentication..."
+          # Try primary version, fallback to older stable version if needed
           docker pull barichello/godot-ci:4.4.1 || docker pull barichello/godot-ci:4.3.2
 
   test-suite:
