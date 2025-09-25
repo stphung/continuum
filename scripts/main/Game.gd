@@ -6,6 +6,7 @@ extends Node2D
 
 var lives = 3
 var bombs = 3
+var score = 0
 var game_over = false
 var current_player = null
 var starfield_background
@@ -110,6 +111,7 @@ func _on_wave_announcement(wave_num: int):
 			starfield_background.set_star_speed(100 * speed_multiplier)
 
 func _on_enemy_destroyed(pos):
+	score += 100  # Add base score for enemy destruction
 	update_ui()
 	EffectManager.create_explosion("enemy_destroy", pos, $Effects)
 
@@ -294,6 +296,7 @@ func victory_sequence():
 		current_player = null
 
 func update_ui():
+	$UI/HUD/ScoreLabel.text = "Score: " + str(score)
 	$UI/HUD/WaveLabel.text = "Wave: " + str(EnemyManager.get_current_wave())
 	$UI/HUD/LivesLabel.text = "Lives: " + str(lives)
 	$UI/HUD/BombsLabel.text = "Bombs: " + str(bombs)

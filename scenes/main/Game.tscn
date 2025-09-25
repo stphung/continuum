@@ -64,6 +64,15 @@ offset_bottom = 120.0
 theme_override_font_sizes/font_size = 24
 text = "Bombs: 3"
 
+[node name="WaveLabel" type="Label" parent="UI/HUD"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 130.0
+offset_right = 200.0
+offset_bottom = 160.0
+theme_override_font_sizes/font_size = 24
+text = "Wave: 1"
+
 [node name="GameOverPanel" type="Panel" parent="UI"]
 visible = false
 layout_mode = 1
